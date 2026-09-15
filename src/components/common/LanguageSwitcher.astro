@@ -1,0 +1,44 @@
+---
+import { getRelativeLocaleUrl } from 'astro:i18n';
+
+export interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+
+const currentLocale = (Astro.currentLocale === 'uz' ? 'uz' : 'ru') as 'ru' | 'uz';
+
+// Тот же путь без языкового префикса — чтобы построить ссылку на его пару на другом языке.
+const withoutLocale = Astro.url.pathname.replace(/^\/uz(\/|$)/, '/');
+
+const ruHref = getRelativeLocaleUrl('ru', withoutLocale);
+const uzHref = getRelativeLocaleUrl('uz', withoutLocale);
+---
+
+<div
+  class:list={['inline-flex items-center gap-0.5 text-sm font-semibold', className]}
+  aria-label="Выбор языка / Til tanlash"
+>
+  <a
+    href={ruHref}
+    class:list={[
+      'px-2 py-1 rounded-[var(--gv-radius-sm)] transition-colors',
+      currentLocale === 'ru' ? 'text-primary' : 'text-muted hover:text-primary',
+    ]}
+    aria-current={currentLocale === 'ru' ? 'page' : undefined}
+  >
+    RU
+  </a>
+  <span class="text-muted" aria-hidden="true">/</span>
+  <a
+    href={uzHref}
+    class:list={[
+      'px-2 py-1 rounded-[var(--gv-radius-sm)] transition-colors',
+      currentLocale === 'uz' ? 'text-primary' : 'text-muted hover:text-primary',
+    ]}
+    aria-current={currentLocale === 'uz' ? 'page' : undefined}
+  >
+    UZ
+  </a>
+</div>

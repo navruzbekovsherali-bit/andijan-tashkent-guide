@@ -1,0 +1,47 @@
+---
+import { twMerge } from 'tailwind-merge';
+
+/**
+ * SectionDivider — a hairline rule. With `label`, the rule breaks around a
+ * centered overline caption; without it, a plain full-width hairline.
+ */
+interface Props {
+  label?: string;
+  class?: string;
+}
+
+const { label, class: className = '' } = Astro.props;
+---
+
+<div class={twMerge('gv-divider', label ? 'gv-divider--labeled' : '', className)} role="separator" aria-label={label}>
+  {label && <span class="gv-divider__label">{label}</span>}
+</div>
+
+<style>
+  .gv-divider {
+    border-top: 1px solid var(--aw-color-border);
+    margin-block: var(--space-6);
+  }
+  .gv-divider--labeled {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    border-top: 0;
+  }
+  .gv-divider--labeled::before,
+  .gv-divider--labeled::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--aw-color-border);
+  }
+  .gv-divider__label {
+    flex: none;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--aw-color-text-muted);
+  }
+</style>

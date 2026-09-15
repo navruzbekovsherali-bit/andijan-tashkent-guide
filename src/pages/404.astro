@@ -1,0 +1,226 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+import Overline from '~/components/ui/Overline.astro';
+import { getPermalink } from '~/utils/permalinks';
+
+const title = 'Страница не найдена';
+
+const links = [
+  { label: 'Районы', desc: '12 районов Ташкента с ценами и транспортом', href: getPermalink('/rayony') },
+  { label: 'Переезд', desc: 'Документы, дети, поликлиника, регистрация', href: getPermalink('/pereezd') },
+  { label: 'Главная', desc: 'С чего начать переезд из Андижана', href: getPermalink('/') },
+];
+---
+
+<Layout metadata={{ title }}>
+  <section class="nf">
+    <div class="nf__inner">
+      <Overline>Ошибка 404</Overline>
+      <h1 class="nf__headline">Эта страница переехала</h1>
+      <p class="nf__text">
+        Ссылка устарела или адрес набран с опечаткой. Ничего страшного — вернитесь к одному из разделов гайда ниже.
+      </p>
+
+      <div class="nf__route" aria-hidden="true">
+        <svg viewBox="0 0 240 40" fill="none" xmlns="http://www.w3.org/2000/svg" role="presentation">
+          <path
+            class="nf-route__line"
+            d="M6 30 C 54 8, 104 8, 150 22"
+            pathLength="1"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"></path>
+          <path
+            class="nf-route__stub"
+            d="M150 22 L 190 30"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-dasharray="2 6"></path>
+          <circle cx="6" cy="30" r="3.5" class="nf-route__dot"></circle>
+          <path
+            class="nf-route__x"
+            d="M186 26 l 8 8 M194 26 l -8 8"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"></path>
+        </svg>
+      </div>
+
+      <nav class="nf__links">
+        {
+          links.map((l) => (
+            <a class="nf__link" href={l.href}>
+              <span class="nf__link-label">{l.label}</span>
+              <span class="nf__link-desc">{l.desc}</span>
+              <span class="nf__link-arrow" aria-hidden="true">
+                →
+              </span>
+            </a>
+          ))
+        }
+      </nav>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .nf {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    min-height: 70vh;
+    padding-block: clamp(3.5rem, 9vw, 7rem);
+    overflow: clip;
+  }
+  /* Token gradient ground — no canvas. */
+  .nf::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(
+        120% 80% at 10% 0%,
+        color-mix(in srgb, var(--aw-color-primary) 16%, transparent),
+        transparent 58%
+      ),
+      radial-gradient(
+        90% 70% at 100% 8%,
+        color-mix(in srgb, var(--aw-color-ceramic) 12%, transparent),
+        transparent 55%
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--aw-color-primary) 6%, var(--aw-color-bg-page)),
+        var(--aw-color-bg-page) 70%
+      );
+  }
+
+  .nf__inner {
+    width: 100%;
+    max-width: var(--container-default);
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 2rem);
+  }
+
+  .nf__headline {
+    margin-top: var(--space-3);
+    font-family: var(--aw-font-heading);
+    font-size: var(--step-display);
+    font-weight: 640;
+    line-height: 1.03;
+    letter-spacing: -0.02em;
+    color: var(--aw-color-text-heading);
+    text-wrap: balance;
+  }
+  .nf__text {
+    margin-top: var(--space-4);
+    max-width: 34rem;
+    font-size: clamp(1.05rem, 0.98rem + 0.5vw, 1.2rem);
+    line-height: 1.6;
+    color: var(--aw-color-text-muted);
+  }
+
+  /* ------------------------------------------------- dead-end route line -- */
+  .nf__route {
+    width: min(240px, 70%);
+    margin-top: var(--space-6);
+    color: color-mix(in srgb, var(--aw-color-text-muted) 70%, transparent);
+  }
+  .nf__route svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .nf-route__line {
+    stroke-dashoffset: 0;
+  }
+  .nf-route__dot {
+    fill: var(--aw-color-ceramic-text);
+  }
+  .nf-route__x {
+    color: var(--aw-color-danger);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .nf-route__line {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      animation: nf-draw 1s var(--gv-ease-out-soft) 0.3s forwards;
+    }
+  }
+  @keyframes nf-draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* -------------------------------------------------- editorial link rows -- */
+  .nf__links {
+    margin-top: clamp(2.5rem, 6vw, 4rem);
+    border-top: 1px solid var(--aw-color-border);
+    max-width: 40rem;
+  }
+  .nf__link {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'label arrow'
+      'desc arrow';
+    align-items: center;
+    gap: 0.15rem var(--space-4);
+    padding-block: var(--space-5);
+    min-height: 44px;
+    border-bottom: 1px solid var(--aw-color-border);
+    text-decoration: none;
+    transition: background var(--dur-sm) var(--gv-ease-out-quart);
+  }
+  .nf__link:hover {
+    background: color-mix(in srgb, var(--aw-color-primary) 6%, transparent);
+  }
+  .nf__link:focus-visible {
+    outline: 2px solid var(--aw-color-primary);
+    outline-offset: 3px;
+    border-radius: var(--gv-radius-xs);
+  }
+  .nf__link-label {
+    grid-area: label;
+    font-family: var(--aw-font-heading);
+    font-size: var(--step-h3);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--aw-color-text-heading);
+  }
+  .nf__link:hover .nf__link-label {
+    color: var(--aw-color-primary);
+  }
+  .nf__link-desc {
+    grid-area: desc;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--aw-color-text-muted);
+  }
+  .nf__link-arrow {
+    grid-area: arrow;
+    font-size: 1.125rem;
+    color: var(--aw-color-text-muted);
+    transition:
+      transform var(--dur-sm) var(--gv-ease-spring),
+      color var(--dur-sm) var(--gv-ease-out-quart);
+  }
+  .nf__link:hover .nf__link-arrow {
+    transform: translateX(4px);
+    color: var(--aw-color-primary);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nf__link,
+    .nf__link-arrow {
+      transition: none;
+    }
+    .nf__link:hover .nf__link-arrow {
+      transform: none;
+    }
+  }
+</style>

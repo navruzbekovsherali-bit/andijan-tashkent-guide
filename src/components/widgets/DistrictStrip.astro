@@ -1,0 +1,240 @@
+---
+/**
+ * DistrictStrip — a horizontal scroll-snap strip teasing /rayony. Reuses
+ * `.u-card u-card--hover`. Scrollbar is hidden cosmetically; wheel + keyboard
+ * scroll stay available (the scroller is focusable, cards are links). Only the
+ * strip's own container scrolls — never the page. Wrapper carries `data-reveal`.
+ */
+import { Icon } from 'astro-icon/components';
+import Overline from '~/components/ui/Overline.astro';
+import { getPermalink } from '~/utils/permalinks';
+
+interface DistrictCard {
+  id: string;
+  title: string;
+  rentFrom: string;
+  metro: string;
+}
+
+interface Props {
+  overline?: string;
+  title?: string;
+  districts: DistrictCard[];
+  limit?: number;
+  totalCount: number;
+  viewAllHref?: string;
+  viewAllLabel?: string;
+  rentFromLabel?: string;
+  rentLabelPosition?: 'before' | 'after';
+  scrollerAriaLabel?: string;
+  cardHrefBase?: string;
+}
+
+const {
+  overline = 'Районы',
+  title,
+  districts,
+  limit = 8,
+  totalCount,
+  viewAllHref = getPermalink('/rayony'),
+  viewAllLabel = `Смотреть все ${totalCount} районов`,
+  rentFromLabel = 'от',
+  rentLabelPosition = 'before',
+  scrollerAriaLabel = 'Районы Ташкента — горизонтальная прокрутка',
+  cardHrefBase = '/rayon',
+} = Astro.props;
+
+const shown = districts.slice(0, limit);
+---
+
+<section class="ds" data-reveal>
+  <div class="ds__shell">
+    <header class="ds__head">
+      <div>
+        <Overline>{overline}</Overline>
+        {title && <h2 class="ds__heading">{title}</h2>}
+      </div>
+      <a class="ds__all" href={viewAllHref}>{viewAllLabel} <span aria-hidden="true">→</span></a>
+    </header>
+
+    <div class="ds__scroller" tabindex="0" role="region" aria-label={scrollerAriaLabel}>
+      {
+        shown.map((d) => (
+          <a class="ds__card u-card u-card--hover" href={getPermalink(`${cardHrefBase}/${d.id}`)}>
+            <span class="ds__card-top">
+              <span class="ds__card-title">{d.title}</span>
+              <span class="ds__rent tnum">
+                {rentLabelPosition === 'after' ? (
+                  <>
+                    {d.rentFrom} {rentFromLabel}
+                  </>
+                ) : (
+                  <>
+                    {rentFromLabel} {d.rentFrom}
+                  </>
+                )}
+              </span>
+            </span>
+            <span class="ds__metro">
+              <Icon name="tabler:train" class="mt-px h-4 w-4 shrink-0 text-primary" />
+              <span>{d.metro}</span>
+            </span>
+          </a>
+        ))
+      }
+      <a class="ds__more" href={viewAllHref}>
+        <span>{viewAllLabel}</span>
+        <span class="ds__more-arrow" aria-hidden="true">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ds__shell {
+    max-width: var(--container-default);
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 2rem);
+    padding-block: clamp(4rem, 8vw, 8rem);
+  }
+
+  .ds__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+  }
+  .ds__heading {
+    margin-top: var(--space-3);
+    font-family: var(--aw-font-heading);
+    font-size: var(--step-h2);
+    font-weight: 620;
+    line-height: 1.15;
+    letter-spacing: -0.014em;
+    color: var(--aw-color-text-heading);
+  }
+  .ds__all {
+    flex: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--aw-color-primary);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .ds__all:hover {
+    text-decoration: underline;
+  }
+  @media (max-width: 599px) {
+    .ds__all {
+      display: none;
+    }
+  }
+
+  .ds__scroller {
+    display: flex;
+    gap: var(--space-5);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    /* room for card lift + focus ring so nothing is clipped */
+    padding: var(--space-2) 4px var(--space-4);
+  }
+  .ds__scroller::-webkit-scrollbar {
+    display: none;
+  }
+  .ds__scroller:focus-visible {
+    outline: 2px solid var(--aw-color-primary);
+    outline-offset: 2px;
+    border-radius: var(--gv-radius-sm);
+  }
+
+  .ds__card {
+    scroll-snap-align: start;
+    flex: 0 0 clamp(15rem, 74vw, 18.5rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    text-decoration: none;
+    color: var(--aw-color-text-default);
+  }
+  .ds__card:focus-visible {
+    outline: 2px solid var(--aw-color-primary);
+    outline-offset: 2px;
+  }
+  .ds__card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+  .ds__card-title {
+    font-family: var(--aw-font-heading);
+    font-size: var(--step-h3);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: var(--aw-color-text-heading);
+  }
+  .ds__card:hover .ds__card-title {
+    color: var(--aw-color-primary);
+  }
+  .ds__rent {
+    flex: none;
+    padding: 2px 8px;
+    border-radius: var(--gv-radius-xs);
+    background: color-mix(in srgb, var(--aw-color-data) 12%, transparent);
+    color: var(--aw-color-data);
+    font-size: 0.8125rem;
+    font-weight: 650;
+    white-space: nowrap;
+  }
+  .ds__metro {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    color: var(--aw-color-text-muted);
+  }
+  .ds__more {
+    scroll-snap-align: start;
+    flex: 0 0 auto;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-5) var(--space-6);
+    max-width: 12rem;
+    font-weight: 600;
+    color: var(--aw-color-primary);
+    text-decoration: none;
+  }
+  .ds__more-arrow {
+    font-size: 1.25rem;
+    transition: transform var(--dur-sm) var(--gv-ease-spring);
+  }
+  .ds__more:hover .ds__more-arrow {
+    transform: translateX(4px);
+  }
+  .ds__more:focus-visible {
+    outline: 2px solid var(--aw-color-primary);
+    outline-offset: 2px;
+    border-radius: var(--gv-radius-sm);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ds__scroller {
+      scroll-snap-type: none;
+    }
+    .ds__more-arrow {
+      transition: none;
+    }
+  }
+</style>

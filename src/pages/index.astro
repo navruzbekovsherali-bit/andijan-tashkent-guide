@@ -1,0 +1,373 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+
+import HomeHero from '~/components/widgets/HomeHero.astro';
+import StartHere from '~/components/widgets/StartHere.astro';
+import HomeStats from '~/components/widgets/HomeStats.astro';
+import DistrictStrip from '~/components/widgets/DistrictStrip.astro';
+import Steps from '~/components/widgets/Steps.astro';
+
+import Overline from '~/components/ui/Overline.astro';
+import SectionDivider from '~/components/ui/SectionDivider.astro';
+import Button from '~/components/ui/Button.astro';
+import CountUp from '~/components/common/CountUp.astro';
+import { Icon } from 'astro-icon/components';
+
+import { getCollection } from 'astro:content';
+import { getPermalink } from '~/utils/permalinks';
+
+const districts = (await getCollection('district')).sort((a, b) => a.data.order - b.data.order);
+
+// --- Derived stat values (from real district frontmatter — nothing fabricated) ---
+const rentValues = districts
+  .map((d) => parseInt(String(d.data.rentFrom).replace(/[^\d]/g, ''), 10))
+  .filter((n) => Number.isFinite(n) && n > 0);
+const rentMin = Math.min(...rentValues); // $150 — Бектемир
+const rentMax = Math.max(...rentValues); // $550 — Мирабад
+const districtCount = districts.length; // 12
+
+const homeStats = [
+  { countTo: districtCount, label: 'районов Ташкента разобрано в гайде' },
+  { countTo: rentMin, prefix: 'от $', label: '1-комн. с ремонтом, 2026' },
+  { value: `$${rentMin}–$${rentMax}`, label: `диапазон аренды по ${districtCount} районам` },
+  // Chilanzar metro door-to-door per chilanzar.md §1: ~10–12 мин под землёй + ~3–10 мин пешком.
+  { value: '~20 мин', label: 'Чиланзар → офис на ул. Абая, 6А, на метро' },
+];
+
+const startHereItems = [
+  {
+    title: 'Районы',
+    description: `${districtCount} районов с ценами на аренду 2026, транспортом до офиса, школами и клиниками.`,
+    href: getPermalink('/rayony'),
+  },
+  {
+    title: 'Переезд',
+    description: 'Документы детей, перевод школы и сада, поликлиника, временная регистрация за 15 дней.',
+    href: getPermalink('/pereezd'),
+  },
+  {
+    title: 'Аренда',
+    description: 'Чек-лист осмотра, проверка собственника и кадастра, договор в E-ijara, схемы обмана.',
+    href: getPermalink('/arenda'),
+  },
+];
+
+const whatsInside = [
+  {
+    title: '12 районов Ташкента',
+    description:
+      'По каждому: дорога до офиса на метро, автобусе и такси, таблица цен на аренду 2026, школы, детские сады, поликлиники и частные клиники, кафе и парки.',
+    icon: 'tabler:building-community',
+    cta: 'Смотреть районы',
+    href: getPermalink('/rayony'),
+  },
+  {
+    title: 'Переезд из Андижана',
+    description:
+      'Что забрать из школы, сада и поликлиники в Андижане. Перевод детей через my.gov.uz и maktab.uz. Прикрепление к поликлинике. Временная регистрация за 15 дней. Перевозка вещей через перевал Камчик.',
+    icon: 'tabler:route',
+    cta: 'Открыть гайд',
+    href: getPermalink('/pereezd'),
+  },
+  {
+    title: 'Как снять квартиру',
+    description:
+      'Чек-лист осмотра (кондиционер, напор воды, отопление), проверка кадастра и паспорта собственника, договор в E-ijara, депозит и комиссия, топ-5 схем мошенничества в Ташкенте.',
+    icon: 'tabler:key',
+    cta: 'Открыть гайд',
+    href: getPermalink('/arenda'),
+  },
+  {
+    title: 'Цены на аренду 2026',
+    description:
+      'Сравнение диапазонов по 1-, 2- и 3-комнатным квартирам с хорошим ремонтом — от $150/мес. в Бектемире до $1600+/мес. в центральных массивах.',
+    icon: 'tabler:coin',
+    cta: 'Сравнить районы',
+    href: getPermalink('/rayony'),
+  },
+];
+
+const moveSteps = [
+  {
+    title: 'Шаг 1: <span class="font-medium">Выбрать район</span>',
+    description:
+      'Сопоставьте бюджет на аренду, время до офиса и наличие школ/садов рядом. В каждом гайде есть таблица цен и конкретные адреса.',
+    icon: 'tabler:map-search',
+  },
+  {
+    title: 'Шаг 2: <span class="font-medium">Закрыть дела в Андижане</span>',
+    description:
+      'Забрать личное дело ученика, табель, медкарты и прививочные листы (форма 063/у) из школы, сада и поликлиники.',
+    icon: 'tabler:file-check',
+  },
+  {
+    title: 'Шаг 3: <span class="font-medium">Снять квартиру и зарегистрироваться</span>',
+    description:
+      'Осмотр, проверка документов, договор в E-ijara. Временная регистрация — в течение 15 дней после приезда.',
+    icon: 'tabler:home-check',
+  },
+  {
+    title: 'Шаг 4: <span class="font-medium">Устроить детей и прикрепиться к поликлинике</span>',
+    description: 'Заявления через my.gov.uz и maktab.uz, прикрепление всей семьи к семейному врачу по новому адресу.',
+    icon: 'tabler:users',
+  },
+  { title: 'Готово!', icon: 'tabler:check' },
+];
+
+const metadata = {
+  title: 'Переезд из Андижана в Ташкент — гайд для релокантов',
+  ignoreTitleTemplate: true,
+};
+---
+
+<Layout metadata={metadata}>
+  <HomeHero
+    tagline="Гайд для переезжающих из Андижана"
+    actions={[
+      {
+        variant: 'primary',
+        text: 'Выбрать район',
+        href: getPermalink('/rayony'),
+        icon: 'tabler:map-pin',
+        'data-magnet': true,
+      },
+      { text: 'Как переехать', href: getPermalink('/pereezd') },
+    ]}
+  >
+    <Fragment slot="title">
+      Переезжаете из Андижана <br class="hidden md:inline" /> в <span class="gv-gradient-text">Ташкент</span>?
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      Всё, что нужно знать семье на новом месте: <span class="font-semibold"><CountUp to={12} /> районов города</span> с ценами
+      на аренду 2026, транспортом до офиса на ул. Абая, 6А, школами, детсадами и клиниками — плюс пошаговые гайды по документам
+      и аренде жилья.
+    </Fragment>
+  </HomeHero>
+
+  {/* --- Коротко --- */}
+  <section class="home-shell home-band" data-reveal>
+    <Overline>Как устроен гайд</Overline>
+    <p class="home-band__line">
+      Выберите район <span aria-hidden="true">→</span> разберитесь с документами <span aria-hidden="true">→</span> снимите
+      квартиру без обмана.
+    </p>
+  </section>
+
+  {/* --- Начните здесь --- */}
+  <StartHere overline="Начните здесь" title="Три шага, с которых начинают все" items={startHereItems} />
+
+  {/* --- Жизнь в цифрах --- */}
+  <HomeStats overline="Жизнь в цифрах" stats={homeStats} />
+
+  {/* --- Районы: горизонтальная лента --- */}
+  <DistrictStrip
+    overline="Районы"
+    title="Куда переезжают из Андижана"
+    districts={districts.map((d) => ({
+      id: d.id,
+      title: d.data.title,
+      rentFrom: d.data.rentFrom,
+      metro: d.data.metro,
+    }))}
+    totalCount={districtCount}
+    viewAllHref={getPermalink('/rayony')}
+  />
+
+  {/* --- Что внутри --- */}
+  <section class="home-shell home-section">
+    <SectionDivider />
+    <header class="home-head" data-reveal>
+      <Overline>Справочник</Overline>
+      <h2 class="home-head__title">Что внутри</h2>
+    </header>
+
+    <div class="wi__grid" data-reveal-stagger>
+      {
+        whatsInside.map((item) => (
+          <article class="u-card wi__card" data-reveal>
+            <span class="wi__icon">
+              <Icon name={item.icon} class="h-6 w-6" />
+            </span>
+            <h3 class="wi__title">{item.title}</h3>
+            <p class="wi__desc">{item.description}</p>
+            <a class="wi__cta" href={item.href}>
+              {item.cta} <span aria-hidden="true">→</span>
+            </a>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  {/* --- Как пройдёт переезд --- */}
+  <div class="home-shell home-divider-wrap"><SectionDivider /></div>
+  <Steps
+    title="Как пройдёт переезд"
+    tagline="Порядок действий"
+    items={moveSteps}
+    classes={{
+      headline: {
+        container: 'text-left rtl:text-right md:mx-0 max-w-2xl mb-8 md:mb-12',
+        title: 'text-[length:var(--step-h2)] md:text-[length:var(--step-h2)]',
+      },
+    }}
+  />
+
+  {/* --- Финальный CTA --- */}
+  <section class="home-shell home-section cta">
+    <SectionDivider />
+    <div class="cta__inner" data-reveal>
+      <Overline>Первый шаг</Overline>
+      <h2 class="cta__title">Начните с района</h2>
+      <p class="cta__text">
+        <span class="tnum cta__num">{districtCount}</span> подробных разборов — от бюджетного Янгихаёта до центрального Мирабада.
+      </p>
+      <div class="cta__actions">
+        <Button
+          variant="primary"
+          text="Выбрать район"
+          href={getPermalink('/rayony')}
+          icon="tabler:map-pin"
+          data-magnet
+        />
+        <Button text="Гайд по переезду" href={getPermalink('/pereezd')} />
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .home-shell {
+    max-width: var(--container-default);
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 2rem);
+  }
+  .home-section {
+    padding-block: clamp(4rem, 8vw, 8rem);
+  }
+  .home-band {
+    padding-block: clamp(2.25rem, 5vw, 3.5rem);
+  }
+  .home-band__line {
+    margin-top: var(--space-3);
+    font-family: var(--aw-font-heading);
+    font-size: var(--step-h3);
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    color: var(--aw-color-text-heading);
+    max-width: 46rem;
+  }
+  .home-band__line span {
+    color: var(--aw-color-text-muted);
+    padding-inline: 0.15em;
+  }
+
+  /* SectionDivider ships its own margin-block (var(--space-6)); this wrapper
+     just adds breathing room before the standalone rule ahead of Steps. */
+  .home-divider-wrap {
+    padding-top: clamp(1.5rem, 4vw, 3rem);
+  }
+  .home-head {
+    margin-bottom: var(--space-7);
+  }
+  .home-head__title {
+    margin-top: var(--space-3);
+    font-family: var(--aw-font-heading);
+    font-size: var(--step-h2);
+    font-weight: 620;
+    line-height: 1.15;
+    letter-spacing: -0.014em;
+    color: var(--aw-color-text-heading);
+  }
+
+  /* "Что внутри" — u-cards on the editorial grid */
+  .wi__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+  @media (min-width: 768px) {
+    .wi__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-6);
+    }
+  }
+  .wi__card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-6);
+  }
+  .wi__icon {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--gv-radius-md);
+    background: color-mix(in srgb, var(--aw-color-primary) 12%, transparent);
+    color: var(--aw-color-primary);
+  }
+  .wi__title {
+    font-family: var(--aw-font-heading);
+    font-size: var(--step-h3);
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: var(--aw-color-text-heading);
+  }
+  .wi__desc {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--aw-color-text-muted);
+  }
+  .wi__cta {
+    margin-top: auto;
+    padding-top: var(--space-2);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--aw-color-primary);
+    text-decoration: none;
+  }
+  .wi__cta:hover {
+    text-decoration: underline;
+  }
+
+  /* Final CTA */
+  .cta__inner {
+    max-width: 40rem;
+  }
+  .cta__title {
+    margin-top: var(--space-3);
+    font-family: var(--aw-font-heading);
+    font-size: var(--step-h1);
+    font-weight: 640;
+    line-height: 1.08;
+    letter-spacing: -0.018em;
+    color: var(--aw-color-text-heading);
+  }
+  .cta__text {
+    margin-top: var(--space-4);
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--aw-color-text-muted);
+  }
+  .cta__num {
+    color: var(--aw-color-data);
+    font-weight: 650;
+  }
+  .cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+  @media (max-width: 519px) {
+    .cta__actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+</style>

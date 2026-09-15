@@ -1,0 +1,127 @@
+---
+/**
+ * HeroCanvas — capability gate + lazy loader for the "Editorial Atlas" WebGL
+ * hero current. Renders NO markup: HomeHero.astro already ships the reserved,
+ * box-locked `#hero-canvas` div (CSS token-gradient poster + scrim). This
+ * component only adds the client island that decides whether to mount the
+ * shader and, if so, dynamically imports `./hero-current` after first paint.
+ *
+ *  - Hard capability gate (see `capable()` below) — on any fail we stay on the
+ *    CSS poster and mount nothing at all: no canvas, no JS chunk, no log.
+ *  - The shader module is code-split and only fetched inside requestIdleCallback
+ *    (fallback setTimeout ~200ms), AFTER first paint — never render-blocking,
+ *    the LCP <h1> is untouched.
+ *  - View Transitions: tears the current down on `astro:before-swap`, re-inits
+ *    on `astro:page-load` when `#hero-canvas` is present. Guarded against double
+ *    mount via `#hero-canvas[data-gv-hero]` + a module token.
+ */
+---
+
+<script>
+  import type { HeroCurrentController } from './hero-current';
+
+  declare global {
+    interface Window {
+      __gvHeroBound?: boolean;
+    }
+  }
+
+  type NavigatorExt = Navigator & {
+    connection?: { saveData?: boolean };
+    deviceMemory?: number;
+  };
+
+  let controller: HeroCurrentController | null = null;
+  let token = 0;
+
+  /**
+   * Review override: `?hero=on` in the URL or `localStorage.gvHeroForce === '1'`
+   * skips the *soft* device heuristics (CPU/RAM/save-data/small-touch) so the
+   * effect can be previewed on modest hardware. The *hard* requirements
+   * (reduced-motion, a real WebGL context) are still enforced below.
+   */
+  function forced(): boolean {
+    try {
+      if (new URLSearchParams(location.search).get('hero') === 'on') {
+        localStorage.setItem('gvHeroForce', '1');
+        return true;
+      }
+      return localStorage.getItem('gvHeroForce') === '1';
+    } catch {
+      return false;
+    }
+  }
+
+  /** Every one of these keeps us on the CSS poster (mount nothing). */
+  function capable(): boolean {
+    const nav = navigator as NavigatorExt;
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+    if (typeof WebGL2RenderingContext === 'undefined') return false;
+
+    if (!forced()) {
+      if (nav.connection?.saveData) return false;
+      if (nav.hardwareConcurrency && nav.hardwareConcurrency <= 4) return false;
+      if (nav.deviceMemory && nav.deviceMemory <= 4) return false;
+      if (window.matchMedia('(pointer: coarse)').matches && window.innerWidth < 640) return false;
+    }
+
+    // Make sure a context is actually obtainable (not just the constructor).
+    try {
+      const probe = document.createElement('canvas');
+      const gl = probe.getContext('webgl2') || probe.getContext('webgl');
+      if (!gl) return false;
+    } catch {
+      return false;
+    }
+    return true;
+  }
+
+  function setup(): void {
+    const el = document.getElementById('hero-canvas');
+    if (!el || el.dataset.gvHero) return;
+
+    if (!capable()) {
+      el.dataset.gvHero = 'poster';
+      return;
+    }
+    el.dataset.gvHero = 'pending';
+
+    const mine = ++token;
+    const start = (): void => {
+      if (mine !== token) return;
+      import('./hero-current')
+        .then(({ mountHeroCurrent }) => {
+          const host = document.getElementById('hero-canvas');
+          if (mine !== token || !host) return;
+          controller = mountHeroCurrent(host);
+          host.dataset.gvHero = 'live';
+        })
+        .catch(() => {
+          /* stay on the poster */
+        });
+    };
+
+    // Boolean in a plain var so TS doesn't narrow `window` to `never` in `else`.
+    const hasIdle = typeof (window as unknown as Record<string, unknown>).requestIdleCallback === 'function';
+    if (hasIdle) {
+      window.requestIdleCallback(start, { timeout: 2000 });
+    } else {
+      window.setTimeout(start, 200);
+    }
+  }
+
+  function teardown(): void {
+    token++; // invalidate any in-flight import
+    controller?.destroy();
+    controller = null;
+  }
+
+  if (!window.__gvHeroBound) {
+    window.__gvHeroBound = true;
+    document.addEventListener('astro:page-load', setup);
+    document.addEventListener('astro:before-swap', teardown);
+  }
+
+  setup();
+</script>

@@ -1,0 +1,385 @@
+---
+// Узбекская (кириллица) версия главной страницы. Дублирует src/pages/index.astro
+// с переводом видимого текста. Ссылки на /rayony, /pereezd, /arenda пока ведут
+// на русские страницы через withLangPrefix — узбекские версии этих разделов
+// ещё не переведены. Как только появятся, достаточно добавить их путь в
+// TRANSLATED_UZ_PATHS в src/navigation.ts — здесь ничего менять не придётся.
+import Layout from '~/layouts/PageLayout.astro';
+
+import HomeHero from '~/components/widgets/HomeHero.astro';
+import StartHere from '~/components/widgets/StartHere.astro';
+import HomeStats from '~/components/widgets/HomeStats.astro';
+import DistrictStrip from '~/components/widgets/DistrictStrip.astro';
+import Steps from '~/components/widgets/Steps.astro';
+
+import Overline from '~/components/ui/Overline.astro';
+import SectionDivider from '~/components/ui/SectionDivider.astro';
+import Button from '~/components/ui/Button.astro';
+import CountUp from '~/components/common/CountUp.astro';
+import { Icon } from 'astro-icon/components';
+
+import { getCollection } from 'astro:content';
+import { DISTRICTS, withLangPrefix } from '~/navigation';
+
+const getPermalink = (path: string) => withLangPrefix('uz', path);
+
+const districts = (await getCollection('district')).sort((a, b) => a.data.order - b.data.order);
+const uzNameById = new Map(DISTRICTS.map((d) => [d.slug, d.uz]));
+
+// --- Производные цифры (из реальных данных по районам — ничего не выдумано) ---
+const rentValues = districts
+  .map((d) => parseInt(String(d.data.rentFrom).replace(/[^\d]/g, ''), 10))
+  .filter((n) => Number.isFinite(n) && n > 0);
+const rentMin = Math.min(...rentValues);
+const rentMax = Math.max(...rentValues);
+const districtCount = districts.length;
+
+const homeStats = [
+  { countTo: districtCount, label: 'Тошкент тумани қўлланмада батафсил ёритилган' },
+  { countTo: rentMin, prefix: '$', suffix: ' дан', label: 'таъмирли 1 хонали, 2026 йил' },
+  { value: `$${rentMin}–$${rentMax}`, label: `${districtCount} туман бўйича ижара нархлари оралиғи` },
+  { value: '~20 мин', label: 'Чилонзор → офис (Абай кўчаси, 6А) метрода' },
+];
+
+const startHereItems = [
+  {
+    title: 'Туманлар',
+    description: `${districtCount} та туман: 2026 йил ижара нархлари, офисгача йўл, мактаб ва клиникалар.`,
+    href: getPermalink('/rayony'),
+  },
+  {
+    title: 'Кўчиш',
+    description: 'Болалар ҳужжатлари, мактаб ва боғчани кўчириш, поликлиника, 15 кун ичида вақтинчалик рўйхатдан ўтиш.',
+    href: getPermalink('/pereezd'),
+  },
+  {
+    title: 'Ижара',
+    description: 'Кўздан кечириш чек-листи, эгаси ва кадастрни текшириш, E-ijara орқали шартнома, алдов схемалари.',
+    href: getPermalink('/arenda'),
+  },
+];
+
+const whatsInside = [
+  {
+    title: '12 та Тошкент тумани',
+    description:
+      'Ҳар бири бўйича: офисгача метро, автобус ва такси орқали йўл, 2026 йил ижара нархлари жадвали, мактаб, боғча, поликлиника ва хусусий клиникалар, кафе ва парклар.',
+    icon: 'tabler:building-community',
+    cta: 'Туманларни кўриш',
+    href: getPermalink('/rayony'),
+  },
+  {
+    title: 'Андижондан кўчиш',
+    description:
+      'Андижондаги мактаб, боғча ва поликлиникадан нималарни олиш кераклиги. Болаларни my.gov.uz ва maktab.uz орқали кўчириш. Поликлиникага бириктирилиш. 15 кун ичида вақтинчалик рўйхатдан ўтиш. Қамчиқ довони орқали юкларни ташиш.',
+    icon: 'tabler:route',
+    cta: 'Йўриқномани очиш',
+    href: getPermalink('/pereezd'),
+  },
+  {
+    title: 'Уйни қандай ижарага олиш керак',
+    description:
+      'Кўздан кечириш чек-листи (кондиционер, сув босими, иситиш), кадастр ва эгасининг паспортини текшириш, E-ijara орқали шартнома, депозит ва комиссия, Тошкентдаги топ-5 алдов схемаси.',
+    icon: 'tabler:key',
+    cta: 'Йўриқномани очиш',
+    href: getPermalink('/arenda'),
+  },
+  {
+    title: '2026 йил ижара нархлари',
+    description:
+      'Яхши таъмирланган 1, 2 ва 3 хонали уйлар нархи оралиғи солиштируви — Бектемирда $150/ойдан марказий массивларда $1600+/ойгача.',
+    icon: 'tabler:coin',
+    cta: 'Туманларни солиштириш',
+    href: getPermalink('/rayony'),
+  },
+];
+
+const moveSteps = [
+  {
+    title: 'Қадам 1: <span class="font-medium">Туманни танлаш</span>',
+    description:
+      'Ижара бюджети, офисгача бўлган вақт ва яқин атрофдаги мактаб/боғчалар мавжудлигини солиштиринг. Ҳар бир йўриқномада нархлар жадвали ва аниқ манзиллар бор.',
+    icon: 'tabler:map-search',
+  },
+  {
+    title: 'Қадам 2: <span class="font-medium">Андижондаги ишларни якунлаш</span>',
+    description:
+      'Мактаб, боғча ва поликлиникадан ўқувчининг шахсий ишини, баҳолар дафтарчасини, тиббий карталарни ва эмлаш варақаларини (063/у шакли) олиш.',
+    icon: 'tabler:file-check',
+  },
+  {
+    title: 'Қадам 3: <span class="font-medium">Уй ижарага олиш ва рўйхатдан ўтиш</span>',
+    description:
+      'Кўздан кечириш, ҳужжатларни текшириш, E-ijara орқали шартнома. Вақтинчалик рўйхатдан ўтиш — келганингиздан кейин 15 кун ичида.',
+    icon: 'tabler:home-check',
+  },
+  {
+    title: 'Қадам 4: <span class="font-medium">Болаларни жойлаштириш ва поликлиникага бириктирилиш</span>',
+    description:
+      'my.gov.uz ва maktab.uz орқали аризалар, бутун оиланинг янги манзил бўйича оилавий шифокорга бириктирилиши.',
+    icon: 'tabler:users',
+  },
+  { title: 'Тайёр!', icon: 'tabler:check' },
+];
+
+const metadata = {
+  title: 'Андижондан Тошкентга кўчиш — кўчиб келувчилар учун қўлланма',
+  ignoreTitleTemplate: true,
+};
+---
+
+<Layout metadata={metadata}>
+  <HomeHero
+    tagline="Андижондан кўчиб келувчилар учун қўлланма"
+    fromLabel="Андижон"
+    toLabel="Тошкент"
+    actions={[
+      {
+        variant: 'primary',
+        text: 'Туманни танлаш',
+        href: getPermalink('/rayony'),
+        icon: 'tabler:map-pin',
+        'data-magnet': true,
+      },
+      { text: 'Қандай кўчиш керак', href: getPermalink('/pereezd') },
+    ]}
+  >
+    <Fragment slot="title">
+      Андижондан <br class="hidden md:inline" />
+      <span class="gv-gradient-text">Тошкент</span>га кўчяпсизми?
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      Янги жойда оилага керак бўлган барча маълумотлар: <span class="font-semibold"
+        >шаҳарнинг <CountUp to={12} /> тумани</span
+      > бўйича 2026 йил ижара нархлари, Абай кўчаси, 6А даги офисгача йўл, мактаб, боғча ва клиникалар — шунингдек ҳужжатлар
+      ва уй ижараси бўйича босқичма-босқич йўриқномалар.
+    </Fragment>
+  </HomeHero>
+
+  {/* --- Қисқача --- */}
+  <section class="home-shell home-band" data-reveal>
+    <Overline>Қўлланма қандай тузилган</Overline>
+    <p class="home-band__line">
+      Туманни танланг <span aria-hidden="true">→</span> ҳужжатларни ҳал қилинг <span aria-hidden="true">→</span> алдовсиз
+      уй ижарага олинг.
+    </p>
+  </section>
+
+  {/* --- Шундан бошланг --- */}
+  <StartHere overline="Шундан бошланг" title="Ҳамма бошлайдиган уч қадам" items={startHereItems} />
+
+  {/* --- Рақамлардаги ҳаёт --- */}
+  <HomeStats overline="Рақамлардаги ҳаёт" stats={homeStats} />
+
+  {/* --- Туманлар: горизонтал лента --- */}
+  <DistrictStrip
+    overline="Туманлар"
+    title="Андижондан қаерга кўчиб келишяпти"
+    districts={districts.map((d) => ({
+      id: d.id,
+      title: uzNameById.get(d.id) ?? d.data.title,
+      rentFrom: d.data.rentFrom,
+      metro: d.data.metro,
+    }))}
+    totalCount={districtCount}
+    viewAllHref={getPermalink('/rayony')}
+    viewAllLabel={`Барча ${districtCount} туманни кўриш`}
+    rentFromLabel="дан"
+    rentLabelPosition="after"
+    scrollerAriaLabel="Тошкент туманлари — горизонтал рўйхат"
+  />
+
+  {/* --- Ичида нима бор --- */}
+  <section class="home-shell home-section">
+    <SectionDivider />
+    <header class="home-head" data-reveal>
+      <Overline>Маълумотнома</Overline>
+      <h2 class="home-head__title">Ичида нима бор</h2>
+    </header>
+
+    <div class="wi__grid" data-reveal-stagger>
+      {
+        whatsInside.map((item) => (
+          <article class="u-card wi__card" data-reveal>
+            <span class="wi__icon">
+              <Icon name={item.icon} class="h-6 w-6" />
+            </span>
+            <h3 class="wi__title">{item.title}</h3>
+            <p class="wi__desc">{item.description}</p>
+            <a class="wi__cta" href={item.href}>
+              {item.cta} <span aria-hidden="true">→</span>
+            </a>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  {/* --- Кўчиш қандай ўтади --- */}
+  <div class="home-shell home-divider-wrap"><SectionDivider /></div>
+  <Steps
+    title="Кўчиш қандай ўтади"
+    tagline="Ҳаракатлар тартиби"
+    items={moveSteps}
+    classes={{
+      headline: {
+        container: 'text-left rtl:text-right md:mx-0 max-w-2xl mb-8 md:mb-12',
+        title: 'text-[length:var(--step-h2)] md:text-[length:var(--step-h2)]',
+      },
+    }}
+  />
+
+  {/* --- Якуний CTA --- */}
+  <section class="home-shell home-section cta">
+    <SectionDivider />
+    <div class="cta__inner" data-reveal>
+      <Overline>Биринчи қадам</Overline>
+      <h2 class="cta__title">Тумандан бошланг</h2>
+      <p class="cta__text">
+        <span class="tnum cta__num">{districtCount}</span> та батафсил таҳлил — бюджет учун қулай Янгиҳаётдан марказий Мирободгача.
+      </p>
+      <div class="cta__actions">
+        <Button
+          variant="primary"
+          text="Туманни танлаш"
+          href={getPermalink('/rayony')}
+          icon="tabler:map-pin"
+          data-magnet
+        />
+        <Button text="Кўчиш йўриқномаси" href={getPermalink('/pereezd')} />
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .home-shell {
+    max-width: var(--container-default);
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 2rem);
+  }
+  .home-section {
+    padding-block: clamp(4rem, 8vw, 8rem);
+  }
+  .home-band {
+    padding-block: clamp(2.25rem, 5vw, 3.5rem);
+  }
+  .home-band__line {
+    margin-top: var(--space-3);
+    font-family: var(--aw-font-heading);
+    font-size: var(--step-h3);
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    color: var(--aw-color-text-heading);
+    max-width: 46rem;
+  }
+  .home-band__line span {
+    color: var(--aw-color-text-muted);
+    padding-inline: 0.15em;
+  }
+
+  .home-divider-wrap {
+    padding-top: clamp(1.5rem, 4vw, 3rem);
+  }
+  .home-head {
+    margin-bottom: var(--space-7);
+  }
+  .home-head__title {
+    margin-top: var(--space-3);
+    font-family: var(--aw-font-heading);
+    font-size: var(--step-h2);
+    font-weight: 620;
+    line-height: 1.15;
+    letter-spacing: -0.014em;
+    color: var(--aw-color-text-heading);
+  }
+
+  .wi__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+  @media (min-width: 768px) {
+    .wi__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-6);
+    }
+  }
+  .wi__card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-6);
+  }
+  .wi__icon {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--gv-radius-md);
+    background: color-mix(in srgb, var(--aw-color-primary) 12%, transparent);
+    color: var(--aw-color-primary);
+  }
+  .wi__title {
+    font-family: var(--aw-font-heading);
+    font-size: var(--step-h3);
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: var(--aw-color-text-heading);
+  }
+  .wi__desc {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--aw-color-text-muted);
+  }
+  .wi__cta {
+    margin-top: auto;
+    padding-top: var(--space-2);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--aw-color-primary);
+    text-decoration: none;
+  }
+  .wi__cta:hover {
+    text-decoration: underline;
+  }
+
+  .cta__inner {
+    max-width: 40rem;
+  }
+  .cta__title {
+    margin-top: var(--space-3);
+    font-family: var(--aw-font-heading);
+    font-size: var(--step-h1);
+    font-weight: 640;
+    line-height: 1.08;
+    letter-spacing: -0.018em;
+    color: var(--aw-color-text-heading);
+  }
+  .cta__text {
+    margin-top: var(--space-4);
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--aw-color-text-muted);
+  }
+  .cta__num {
+    color: var(--aw-color-data);
+    font-weight: 650;
+  }
+  .cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+  @media (max-width: 519px) {
+    .cta__actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+</style>

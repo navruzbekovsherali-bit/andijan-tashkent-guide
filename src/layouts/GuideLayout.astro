@@ -1,0 +1,745 @@
+---
+import { Icon } from 'astro-icon/components';
+import Layout from '~/layouts/PageLayout.astro';
+import CollapsibleContent from '~/components/CollapsibleContent.astro';
+import Overline from '~/components/ui/Overline.astro';
+import SplitReveal from '~/components/ui/SplitReveal.astro';
+import { getPermalink, getCanonical, getHomePermalink } from '~/utils/permalinks';
+
+import type { MetaData } from '~/types';
+
+export interface Props {
+  frontmatter: {
+    title?: string;
+    description?: string;
+    /**
+     * 'guide'   (default) — h2 sections collapse into <details> panels + TOC.
+     * 'stepper' — /pereezd treatment: sections stay expanded as numbered steps
+     *             with a sticky left progress spine + printable checklist.
+     * 'topics'  — /arenda treatment: sections stay expanded under a sticky
+     *             auto-labeled category tab bar (district-page visual language).
+     */
+    variant?: 'guide' | 'stepper' | 'topics';
+    /** Optional kicker above the h1 (defaults to a generic guide label). */
+    overline?: string;
+  };
+}
+
+const { frontmatter } = Astro.props;
+const variant = frontmatter?.variant === 'stepper' ? 'stepper' : frontmatter?.variant === 'topics' ? 'topics' : 'guide';
+const kicker = frontmatter?.overline ?? 'Гайд для релокантов';
+
+const metadata: MetaData = {
+  title: frontmatter?.title,
+  description: frontmatter?.description,
+};
+
+const footLinks = [
+  { href: '/rayony', label: 'Выбрать район Ташкента' },
+  { href: '/pereezd', label: 'Гайд по переезду из Андижана' },
+  { href: '/arenda', label: 'Как снять квартиру в Ташкенте' },
+  { href: '/kontakty', label: 'Контакты, экстренные службы и как добраться' },
+];
+
+// No visible breadcrumb UI on guide pages — this is the standard 2-level
+// (Главная → page) trail, built from the page's own real title/URL.
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Главная', item: String(getCanonical(getHomePermalink())) },
+    { '@type': 'ListItem', position: 2, name: frontmatter?.title, item: String(getCanonical(Astro.url.pathname)) },
+  ],
+};
+---
+
+<Layout metadata={metadata}>
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbLd)} />
+  <article class:list={['guide', `guide--${variant}`]} data-guide-stepper={variant === 'stepper' ? '' : undefined}>
+    <header class="guide__hero">
+      <Overline>{kicker}</Overline>
+      <SplitReveal as="h1" class="guide__title">{frontmatter.title}</SplitReveal>
+    </header>
+
+    {
+      variant === 'stepper' && (
+        <div class="stepper-actions">
+          <button type="button" class="btn-download" data-download-checklist>
+            <Icon name="tabler:download" class="btn-download__icon" aria-hidden="true" /> Скачать чек-лист
+          </button>
+        </div>
+      )
+    }
+
+    {
+      variant === 'stepper' && (
+        <nav class="spine" data-spine aria-label="Шаги переезда">
+          <span class="spine__track" aria-hidden="true">
+            <span class="spine__fill" data-spine-fill />
+          </span>
+        </nav>
+      )
+    }
+
+    <div
+      class:list={['guide__body', variant === 'stepper' && 'stepper-body']}
+      data-reveal={variant === 'guide' ? '' : undefined}
+    >
+      <CollapsibleContent defaultOpen={0} variant={variant}>
+        <slot />
+      </CollapsibleContent>
+    </div>
+
+    <nav class="foot-links" aria-label="Дальше">
+      <Overline>Дальше</Overline>
+      <ul class="foot-links__list">
+        {
+          footLinks.map((l) => (
+            <li>
+              <a href={getPermalink(l.href)}>
+                <span>{l.label}</span>
+                <span class="foot-links__arrow" aria-hidden="true">
+                  →
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </article>
+</Layout>
+
+<style>
+  /* ------------------------------------------------------------- shell -- */
+  .guide {
+    max-width: 44rem;
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 2rem);
+    padding-block: clamp(3.5rem, 7vw, 6rem) clamp(4rem, 8vw, 8rem);
+  }
+  .guide__hero {
+    margin-bottom: clamp(2rem, 5vw, 3rem);
+  }
+  .guide__title {
+    margin-top: var(--space-3);
+    font-family: var(--aw-font-heading);
+    font-size: var(--step-h1);
+    font-weight: 640;
+    line-height: 1.08;
+    letter-spacing: -0.018em;
+    color: var(--aw-color-text-heading);
+    text-wrap: balance;
+  }
+  /* Guide + topics variants keep the body at a comfortable reading measure
+     (topics has no side spine, so it reads the same as plain guide pages). */
+  .guide--guide .guide__body,
+  .guide--topics .guide__body {
+    max-width: var(--container-prose);
+  }
+
+  /* ------------------------------------------------ stepper: download CTA -- */
+  .stepper-actions {
+    margin-bottom: var(--space-5);
+  }
+  .btn-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--aw-color-border);
+    border-radius: var(--gv-radius-sm);
+    background: var(--aw-color-surface-2);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--aw-color-text-default);
+    cursor: pointer;
+    transition:
+      border-color var(--dur-sm) var(--gv-ease-out-quart),
+      color var(--dur-sm) var(--gv-ease-out-quart);
+  }
+  .btn-download:hover {
+    border-color: color-mix(in srgb, var(--aw-color-primary) 55%, var(--aw-color-border));
+    color: var(--aw-color-primary);
+  }
+  .btn-download:focus-visible {
+    outline: 2px solid var(--aw-color-primary);
+    outline-offset: 2px;
+  }
+  .btn-download__icon {
+    width: 1.1rem;
+    height: 1.1rem;
+    flex: none;
+  }
+
+  /* ---------------------------------------------------- stepper: spine -- */
+  /* Hidden below 900px — the oversized 01…05 step numerals carry wayfinding
+     on mobile, so the spine adds nothing there and never crowds content. */
+  .spine {
+    display: none;
+  }
+
+  @media (min-width: 900px) {
+    .guide--stepper {
+      max-width: none;
+      display: grid;
+      grid-template-columns: 10.5rem minmax(0, 42rem);
+      grid-template-areas:
+        '.     hero'
+        '.     actions'
+        'spine body'
+        '.     foot';
+      column-gap: clamp(1.5rem, 4vw, 3rem);
+      justify-content: center;
+    }
+    .guide--stepper > .guide__hero {
+      grid-area: hero;
+    }
+    .guide--stepper > .stepper-actions {
+      grid-area: actions;
+    }
+    .guide--stepper > .spine {
+      grid-area: spine;
+    }
+    .guide--stepper > .guide__body {
+      grid-area: body;
+      min-width: 0;
+    }
+    .guide--stepper > .foot-links {
+      grid-area: foot;
+    }
+
+    .spine {
+      display: block;
+      position: sticky;
+      top: 6rem;
+      align-self: start;
+      padding-left: 0.85rem;
+    }
+    .spine__track {
+      position: absolute;
+      left: 0;
+      top: 0.35rem;
+      bottom: 0.35rem;
+      width: 2px;
+      background: var(--aw-color-border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .spine__fill {
+      position: absolute;
+      inset: 0;
+      background: var(--aw-color-primary);
+      transform: scaleY(0);
+      transform-origin: top;
+      will-change: transform;
+    }
+    .spine__item {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 0.5rem 0;
+      text-align: left;
+      cursor: pointer;
+      color: var(--aw-color-text-muted);
+      transition: color var(--dur-sm) var(--gv-ease-out-quart);
+    }
+    .spine__item:hover {
+      color: var(--aw-color-text-heading);
+    }
+    .spine__item:focus-visible {
+      outline: 2px solid var(--aw-color-primary);
+      outline-offset: 2px;
+      border-radius: var(--gv-radius-xs);
+    }
+    .spine__n {
+      font-size: 0.8125rem;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    .spine__label {
+      font-size: 0.75rem;
+      line-height: 1.25;
+    }
+    .spine__item.is-done {
+      color: color-mix(in srgb, var(--aw-color-text-heading) 62%, transparent);
+    }
+    .spine__item.is-active {
+      color: var(--aw-color-primary);
+      font-weight: 600;
+    }
+    .spine__item.is-active .spine__n {
+      color: var(--aw-color-primary);
+    }
+  }
+
+  /* Intro paragraphs (before the first step) → full-measure lead. Class is
+     added by JS, so no-JS just keeps normal prose. */
+  .stepper-body :global(.stepper-lead) {
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--aw-color-text-muted);
+  }
+  .stepper-body :global(.stepper-lead:first-child) {
+    margin-top: 0;
+  }
+
+  /* ---------------------------------------------------- stepper: steps -- */
+  /* .gstep wrappers are built client-side from the flat markdown. Server /
+     no-JS render is the plain document (headings + prose) — fully readable. */
+  .stepper-body :global(.gstep) {
+    scroll-margin-top: 6rem;
+    padding-top: clamp(1.75rem, 4vw, 2.75rem);
+  }
+  .stepper-body :global(.gstep + .gstep) {
+    border-top: 1px solid var(--aw-color-border);
+  }
+  .stepper-body :global(.gstep__num) {
+    display: block;
+    font-size: clamp(1.75rem, 1.2rem + 2.4vw, 2.75rem);
+    font-weight: 700;
+    line-height: 1;
+    color: color-mix(in srgb, var(--aw-color-text-muted) 55%, transparent);
+    margin-bottom: var(--space-2);
+  }
+  .stepper-body :global(.gstep__title) {
+    margin: 0 0 var(--space-3);
+    font-family: var(--aw-font-heading);
+    font-size: var(--step-h2);
+    font-weight: 620;
+    line-height: 1.18;
+    letter-spacing: -0.014em;
+    color: var(--aw-color-text-heading);
+  }
+
+  /* JS-only reveal hidden state (no-JS / reduced-motion never sets it → no CLS). */
+  .stepper-body :global(.gstep--pre) {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  .stepper-body :global(.gstep--pre.is-in) {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity var(--dur-md) var(--gv-ease-out-soft),
+      transform var(--dur-md) var(--gv-ease-out-soft);
+  }
+
+  /* ---------------------------------------------------- editorial footer -- */
+  .foot-links {
+    margin-top: clamp(3rem, 6vw, 4.5rem);
+  }
+  .foot-links__list {
+    list-style: none;
+    margin: var(--space-4) 0 0;
+    padding: 0;
+    border-top: 1px solid var(--aw-color-border);
+  }
+  .foot-links__list li {
+    border-bottom: 1px solid var(--aw-color-border);
+  }
+  .foot-links__list a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    min-height: 44px;
+    padding-block: var(--space-4);
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--aw-color-text-default);
+    text-decoration: none;
+    transition: color var(--dur-sm) var(--gv-ease-out-quart);
+  }
+  .foot-links__list a:hover {
+    color: var(--aw-color-primary);
+  }
+  .foot-links__list a:focus-visible {
+    outline: 2px solid var(--aw-color-primary);
+    outline-offset: 3px;
+    border-radius: var(--gv-radius-xs);
+  }
+  .foot-links__arrow {
+    flex: none;
+    color: var(--aw-color-text-muted);
+    transition:
+      transform var(--dur-sm) var(--gv-ease-spring),
+      color var(--dur-sm) var(--gv-ease-out-quart);
+  }
+  .foot-links__list a:hover .foot-links__arrow {
+    transform: translateX(4px);
+    color: var(--aw-color-primary);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn-download,
+    .spine__item,
+    .foot-links__list a,
+    .foot-links__arrow {
+      transition: none;
+    }
+    .foot-links__list a:hover .foot-links__arrow {
+      transform: none;
+    }
+    .stepper-body :global(.gstep--pre) {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* ---------------------------------------------------------- print -- */
+  @media print {
+    :global(#header),
+    :global(.mobile-dock),
+    :global(footer),
+    .foot-links,
+    .stepper-actions,
+    .spine {
+      display: none !important;
+    }
+    .guide {
+      max-width: none;
+      display: block;
+      padding: 0;
+    }
+    .stepper-body :global(.gstep),
+    .stepper-body :global(.gstep--pre) {
+      opacity: 1 !important;
+      transform: none !important;
+      break-inside: avoid;
+    }
+    .stepper-body :global(.gstep__title) {
+      break-after: avoid;
+    }
+    .stepper-body :global(.md-callout),
+    .stepper-body :global(table) {
+      break-inside: avoid;
+    }
+  }
+</style>
+
+<script>
+  const HEADER_OFFSET = 84;
+
+  // Window-level listeners/observers registered by initStepper for the page
+  // currently on screen — torn down on astro:before-swap (see bottom).
+  let stepperCleanup: Array<() => void> = [];
+
+  function goTo(el: HTMLElement) {
+    const lenis = (window as unknown as { __lenis?: { scrollTo: (t: HTMLElement, o?: unknown) => void } }).__lenis;
+    if (lenis) lenis.scrollTo(el, { offset: -HEADER_OFFSET });
+    else el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function shorten(text: string): string {
+    let s = text
+      .replace(/^\s*\d+\.\s*/, '')
+      .split(/[:(–—]/)[0]
+      .trim();
+    if (s.length > 40) {
+      const cut = s.slice(0, 38);
+      const sp = cut.lastIndexOf(' ');
+      s = (sp > 16 ? cut.slice(0, sp) : cut) + '…';
+    }
+    return s;
+  }
+
+  function escapeHtml(s: string): string {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  type Step = { section: HTMLElement; label: string };
+
+  /**
+   * Builds the standalone offline checklist document from the already-built
+   * `.gstep` DOM (so it can never drift out of sync with the page copy):
+   * step headings become a TOC, each step's `.md-checklist` lists become
+   * plain-glyph checkboxes, and the "Сводная таблица" <table> (wherever it
+   * lives among the steps) is reproduced verbatim.
+   */
+  function buildChecklistHtml(steps: Step[]): string {
+    const today = new Date().toLocaleDateString('ru-RU');
+
+    const tocHtml = steps
+      .map((s) => {
+        const num = escapeHtml(s.section.getAttribute('data-step') || '');
+        return `<li><span class="n">${num}</span> ${escapeHtml(s.label)}</li>`;
+      })
+      .join('');
+
+    const stepsHtml = steps
+      .map((s) => {
+        const num = escapeHtml(s.section.getAttribute('data-step') || '');
+        const lists = Array.from(s.section.querySelectorAll<HTMLUListElement>('ul.md-checklist'));
+        if (!lists.length) return '';
+        const listsHtml = lists
+          .map((ul) => {
+            const items = Array.from(ul.children).filter((c): c is HTMLLIElement => c.tagName === 'LI');
+            const titleLi = items.find((li) => li.classList.contains('md-checklist__title'));
+            const rest = items.filter((li) => li !== titleLi);
+            const titleHtml = titleLi
+              ? `<p class="cl-title">${escapeHtml((titleLi.textContent || '').trim())}</p>`
+              : '';
+            const itemsHtml = rest.map((li) => `<li>☐ ${escapeHtml((li.textContent || '').trim())}</li>`).join('');
+            return `${titleHtml}<ul class="cl">${itemsHtml}</ul>`;
+          })
+          .join('');
+        return `<section class="step"><h2>${num}. ${escapeHtml(s.label)}</h2>${listsHtml}</section>`;
+      })
+      .filter(Boolean)
+      .join('');
+
+    const table = steps.map((s) => s.section.querySelector('table')).find((t): t is HTMLTableElement => !!t);
+    let tableHtml = '';
+    if (table) {
+      const headCells = Array.from(table.querySelectorAll('thead th')).map((c) =>
+        escapeHtml((c.textContent || '').trim())
+      );
+      const bodyRows = Array.from(table.querySelectorAll('tbody tr')).map((tr) =>
+        Array.from(tr.children).map((c) => escapeHtml((c.textContent || '').trim()))
+      );
+      tableHtml = `<table><thead><tr>${headCells.map((h) => `<th>${h}</th>`).join('')}</tr></thead><tbody>${bodyRows
+        .map((row) => `<tr>${row.map((c) => `<td>${c}</td>`).join('')}</tr>`)
+        .join('')}</tbody></table>`;
+    }
+
+    return `<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Чек-лист переезда: Андижан → Ташкент</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 2.5rem 2rem 4rem;
+    max-width: 46rem;
+    margin-inline: auto;
+    background: #fbfaf8;
+    color: #211f1c;
+    font: 16px/1.6 Georgia, 'Times New Roman', serif;
+  }
+  header { border-bottom: 2px solid #211f1c; padding-bottom: 1rem; margin-bottom: 2rem; }
+  header h1 { margin: 0 0 0.4rem; font-size: 1.6rem; }
+  header p { margin: 0; color: #55504a; font-size: 0.9rem; }
+  nav.toc { margin-bottom: 2.5rem; padding: 1rem 1.25rem; border: 1px solid #ddd7cd; border-radius: 8px; background: #fff; }
+  nav.toc h2 { margin: 0 0 0.6rem; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  nav.toc ul { list-style: none; margin: 0; padding: 0; }
+  nav.toc li { padding: 0.25rem 0; font-size: 0.95rem; }
+  nav.toc .n { display: inline-block; width: 1.6rem; font-weight: 700; color: #8a6d3b; }
+  section.step { margin: 0 0 2.25rem; padding-top: 1.5rem; border-top: 1px solid #e3ddd2; }
+  section.step:first-of-type { border-top: none; padding-top: 0; }
+  section.step h2 { font-size: 1.15rem; margin: 0 0 0.9rem; }
+  p.cl-title { font-weight: 700; margin: 1rem 0 0.4rem; }
+  ul.cl { list-style: none; margin: 0 0 1rem; padding: 0; }
+  ul.cl li { padding: 0.3rem 0; font-size: 0.95rem; }
+  section.summary { margin-top: 2.5rem; }
+  section.summary h2 { font-size: 1.15rem; margin: 0 0 1rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th, td { border: 1px solid #ddd7cd; padding: 0.5rem 0.65rem; text-align: left; vertical-align: top; }
+  th { background: #f1ede4; }
+  tbody tr:nth-child(even) { background: #f7f4ee; }
+  footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #e3ddd2; font-size: 0.8rem; color: #8a857c; }
+  @media print { body { background: #fff; } }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Чек-лист переезда: Андижан → Ташкент</h1>
+    <p>ул. Абая, 6А · ${escapeHtml(today)}</p>
+  </header>
+  <nav class="toc">
+    <h2>Шаги</h2>
+    <ul>${tocHtml}</ul>
+  </nav>
+  ${stepsHtml}
+  ${table ? `<section class="summary"><h2>Сводная таблица: куда идти и что брать</h2>${tableHtml}</section>` : ''}
+  <footer>Отдел адаптации · сформировано автоматически со страницы «Переезд из Андижана в Ташкент»</footer>
+</body>
+</html>`;
+  }
+
+  function downloadChecklist(steps: Step[]) {
+    const html = buildChecklistHtml(steps);
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'chek-list-pereezd.html';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function initStepper(root: HTMLElement) {
+    if (root.dataset.stepReady) return;
+    const body = root.querySelector<HTMLElement>('.collapsible-body');
+    const spine = root.querySelector<HTMLElement>('[data-spine]');
+    if (!body) return;
+
+    // `steps` is filled in further down as the flat markdown is split into
+    // numbered sections. Declared here (not inside the click handler) so the
+    // download button can be wired up unconditionally, even if the step
+    // split bails below — by the time a user can actually click, this
+    // synchronous pass has already finished populating it (or left it empty).
+    const steps: Step[] = [];
+    root
+      .querySelector<HTMLButtonElement>('[data-download-checklist]')
+      ?.addEventListener('click', () => downloadChecklist(steps));
+
+    // Group the flat markdown into { heading, items } by <h2>. Anything before
+    // the first <h2> is the intro — promoted to a lead.
+    const groups: { heading: HTMLElement; items: ChildNode[] }[] = [];
+    const preamble: ChildNode[] = [];
+    let current: { heading: HTMLElement; items: ChildNode[] } | null = null;
+    for (const node of Array.from(body.childNodes)) {
+      if (node.nodeType === 1 && (node as HTMLElement).tagName === 'H2') {
+        current = { heading: node as HTMLElement, items: [] };
+        groups.push(current);
+      } else if (current) {
+        current.items.push(node);
+      } else {
+        preamble.push(node);
+      }
+    }
+    if (!groups.length) return;
+    root.dataset.stepReady = '1';
+
+    preamble.forEach((n) => {
+      if (n.nodeType === 1) (n as HTMLElement).classList.add('stepper-lead');
+    });
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    groups.forEach((g, i) => {
+      const m = (g.heading.textContent || '').match(/^\s*(\d+)\.\s*/);
+      const n = m ? m[1] : String(i + 1);
+      const num = n.padStart(2, '0');
+      const label = (g.heading.textContent || '').replace(/^\s*\d+\.\s*/, '').trim();
+
+      const section = document.createElement('section');
+      section.className = 'gstep';
+      section.id = `shag-${n}`;
+      section.setAttribute('data-step', num);
+      section.setAttribute('aria-labelledby', `${section.id}-t`);
+
+      const numEl = document.createElement('span');
+      numEl.className = 'gstep__num tnum';
+      numEl.setAttribute('aria-hidden', 'true');
+      numEl.textContent = num;
+
+      g.heading.classList.add('gstep__title');
+      g.heading.id = `${section.id}-t`;
+      g.heading.textContent = label;
+
+      const inner = document.createElement('div');
+      inner.className = 'gstep__body';
+      g.items.forEach((nd) => inner.appendChild(nd));
+
+      g.heading.replaceWith(section);
+      section.append(numEl, g.heading, inner);
+      steps.push({ section, label });
+
+      if (spine) {
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.className = 'spine__item';
+        item.innerHTML = `<span class="spine__n tnum">${num}</span><span class="spine__label"></span>`;
+        item.querySelector('.spine__label')!.textContent = shorten(label);
+        item.addEventListener('click', () => goTo(section));
+        spine.appendChild(item);
+      }
+    });
+
+    // ---- scroll-spy: active + done state (works under reduced motion) ----
+    const items = spine ? Array.from(spine.querySelectorAll<HTMLElement>('.spine__item')) : [];
+    const setActive = (idx: number) => {
+      items.forEach((it, k) => {
+        it.classList.toggle('is-active', k === idx);
+        it.classList.toggle('is-done', k < idx);
+      });
+    };
+    if ('IntersectionObserver' in window && steps.length) {
+      const spy = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (!e.isIntersecting) continue;
+            const idx = steps.findIndex((s) => s.section === e.target);
+            if (idx >= 0) setActive(idx);
+          }
+        },
+        { rootMargin: '-45% 0px -45% 0px', threshold: 0 }
+      );
+      steps.forEach((s) => spy.observe(s.section));
+      setActive(0);
+      stepperCleanup.push(() => spy.disconnect());
+    }
+
+    // ---- growing fill line (skipped entirely under reduced motion) ----
+    const fill = spine?.querySelector<HTMLElement>('[data-spine-fill]');
+    if (fill && !reduce && steps.length > 1) {
+      const first = steps[0].section;
+      const last = steps[steps.length - 1].section;
+      const onScroll = () => {
+        const startAbs = first.getBoundingClientRect().top + window.scrollY;
+        const endAbs = last.getBoundingClientRect().top + window.scrollY + last.offsetHeight;
+        const probe = window.scrollY + window.innerHeight * 0.5;
+        const p = Math.max(0, Math.min(1, (probe - startAbs) / (endAbs - startAbs || 1)));
+        fill.style.transform = `scaleY(${p.toFixed(4)})`;
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+      onScroll();
+      stepperCleanup.push(() => {
+        window.removeEventListener('scroll', onScroll);
+        window.removeEventListener('resize', onScroll);
+      });
+    }
+
+    // ---- per-step reveal (JS-only hidden state; off under reduced motion) ----
+    if (!reduce && 'IntersectionObserver' in window) {
+      const rev = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (!e.isIntersecting) continue;
+            e.target.classList.add('is-in');
+            rev.unobserve(e.target);
+          }
+        },
+        { rootMargin: '0px 0px -8% 0px' }
+      );
+      steps.forEach((s) => {
+        // Anything already at/above the fold reveals now (no flash on reload
+        // mid-page or on a #shag- anchor landing); the rest reveal on scroll.
+        if (s.section.getBoundingClientRect().top < window.innerHeight) {
+          s.section.classList.add('gstep--pre', 'is-in');
+        } else {
+          s.section.classList.add('gstep--pre');
+          rev.observe(s.section);
+        }
+      });
+      stepperCleanup.push(() => rev.disconnect());
+    }
+
+    // Land on a step named by the URL fragment.
+    if (location.hash.length > 1) {
+      const t = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+      if (t) requestAnimationFrame(() => t.scrollIntoView({ block: 'start' }));
+    }
+  }
+
+  function run() {
+    document.querySelectorAll<HTMLElement>('[data-guide-stepper]').forEach(initStepper);
+  }
+
+  run();
+  document.addEventListener('astro:page-load', run);
+  document.addEventListener('astro:before-swap', () => {
+    stepperCleanup.forEach((fn) => fn());
+    stepperCleanup = [];
+  });
+</script>

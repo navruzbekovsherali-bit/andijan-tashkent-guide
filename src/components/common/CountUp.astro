@@ -1,0 +1,29 @@
+---
+/**
+ * Scroll-triggered number tween. Adapted from React Bits "CountUp"
+ * (reactbits.dev); the animation runs in Enhancements.astro's vanilla script.
+ * SSR output is the final value, so it's correct with JS disabled.
+ */
+interface Props {
+  to: number;
+  from?: number;
+  duration?: number;
+  prefix?: string;
+  suffix?: string;
+  decimals?: number;
+  class?: string;
+}
+const { to, from = 0, duration = 1300, prefix = '', suffix = '', decimals, class: cls = '' } = Astro.props;
+const dec = decimals ?? (String(to).split('.')[1] ?? '').length;
+const shown = `${prefix}${to.toFixed(dec)}${suffix}`;
+---
+
+<span
+  class:list={['tabular-nums', cls]}
+  data-countup
+  data-from={from}
+  data-to={to}
+  data-dur={duration}
+  data-prefix={prefix}
+  data-suffix={suffix}>{shown}</span
+>

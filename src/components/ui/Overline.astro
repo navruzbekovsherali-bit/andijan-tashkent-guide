@@ -1,0 +1,28 @@
+---
+import { twMerge } from 'tailwind-merge';
+
+/**
+ * Overline — the uppercase, tracked micro-label type role.
+ * 0.75rem · 600 · 0.08em · uppercase (see the type scale in tailwind.css).
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+---
+
+<span class={twMerge('gv-overline', className)}><slot /></span>
+
+<style>
+  .gv-overline {
+    display: inline-block;
+    font-family: var(--aw-font-sans);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--aw-color-text-muted);
+  }
+</style>

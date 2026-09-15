@@ -1,0 +1,72 @@
+site:
+  name: Андижан → Ташкент
+  site: 'https://andijan-tashkent.example'
+  base: '/'
+  trailingSlash: false
+
+  googleSiteVerificationId: ''
+
+# Default SEO metadata
+metadata:
+  title:
+    default: Переезд из Андижана в Ташкент — гайд для релокантов
+    template: '%s — Андижан → Ташкент'
+  description: 'Практический путеводитель по переезду из Андижана в Ташкент: 12 районов с ценами на аренду 2026, транспорт до офиса, школы и клиники, документы и аренда жилья.'
+  robots:
+    index: true
+    follow: true
+  openGraph:
+    site_name: Андижан → Ташкент
+    images:
+      - url: '~/assets/images/default.png'
+        width: 1200
+        height: 628
+    type: website
+  twitter:
+    handle: ''
+    site: ''
+    cardType: summary_large_image
+
+i18n:
+  language: ru
+  textDirection: ltr
+
+apps:
+  blog:
+    isEnabled: false
+    postsPerPage: 6
+
+    post:
+      isEnabled: false
+      permalink: '/%slug%'
+      robots:
+        index: false
+
+    list:
+      isEnabled: false
+      pathname: 'blog'
+      robots:
+        index: false
+
+    category:
+      isEnabled: false
+      pathname: 'category'
+      robots:
+        index: false
+
+    tag:
+      isEnabled: false
+      pathname: 'tag'
+      robots:
+        index: false
+
+    isRelatedPostsEnabled: false
+    relatedPostsCount: 4
+
+analytics:
+  vendors:
+    googleAnalytics:
+      id: null # or "G-XXXXXXXXXX"
+
+ui:
+  theme: 'system' # Values: "system" | "light" | "dark" | "light:only" | "dark:only"

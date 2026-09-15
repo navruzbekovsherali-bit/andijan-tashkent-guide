@@ -1,0 +1,486 @@
+---
+import { getCollection } from 'astro:content';
+import { Icon } from 'astro-icon/components';
+
+import Layout from '~/layouts/PageLayout.astro';
+import Overline from '~/components/ui/Overline.astro';
+import SplitReveal from '~/components/ui/SplitReveal.astro';
+import DistrictsMap from '~/components/rayony/DistrictsMap.astro';
+import { getPermalink } from '~/utils/permalinks';
+
+const districts = (await getCollection('district')).sort((a, b) => a.data.order - b.data.order);
+
+const priceOf = (rentFrom: string) => parseInt(String(rentFrom).replace(/[^\d]/g, ''), 10) || 0;
+
+const metadata = {
+  title: 'Районы Ташкента — где жить релоканту',
+  description:
+    'Обзор 12 районов Ташкента для переезжающих из Андижана: аренда от, ближайшее метро и дорога до офиса на ул. Абая, 6А. Выберите район и откройте подробный гайд.',
+};
+---
+
+<Layout metadata={metadata}>
+  <div class="rayony-page">
+    <section class="rayony-hero">
+      <Overline>Районы Ташкента</Overline>
+      <SplitReveal as="h1" class="rayony-hero__title">Где жить в Ташкенте</SplitReveal>
+      <p class="rayony-hero__lead">
+        12 районов, куда чаще всего переезжают сотрудники из Андижана. По каждому — цены на аренду 2026, транспорт до
+        офиса на ул. Абая, 6А, школы, детсады, клиники, кафе и парки.
+      </p>
+    </section>
+
+    {
+      /* Districts map (see DistrictsMap.astro): Layer 0 = the card grid below,
+         Layer 1 = an inline SVG map of Tashkent that ships in HTML and works
+         with zero JS — each district a flat categorical colour, linking to its
+         guide. The box stays locked so the SVG paints CLS-free. */
+    }
+    <div id="districts-map" class="districts-map">
+      <div class="districts-map__box">
+        <DistrictsMap districts={districts} />
+      </div>
+    </div>
+
+    <section class="rayony-body">
+      <div id="rayony-filter" class="mt-8 flex flex-col gap-3">
+        <label class="relative block">
+          <Icon
+            name="tabler:search"
+            aria-hidden="true"
+            class="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted pointer-events-none"
+          />
+          <input
+            type="search"
+            name="q"
+            autocomplete="off"
+            placeholder="Поиск по названию, метро, описанию…"
+            aria-label="Поиск по названию, метро, описанию"
+            class="w-full rounded-xl border border-[var(--aw-color-border)] bg-[var(--aw-color-bg-page)] py-3 pl-11 pr-4 text-base outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
+          />
+        </label>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <div
+            class="flex flex-wrap gap-1 rounded-xl border border-[var(--aw-color-border)] bg-[var(--aw-color-surface-2)] p-1"
+          >
+            <button type="button" data-price="all" class="rayony-seg is-active" aria-pressed="true">Все цены</button>
+            <button type="button" data-price="0-250" aria-pressed="false">до $250</button>
+            <button type="button" data-price="250-400" aria-pressed="false">$250–400</button>
+            <button type="button" data-price="400-99999" aria-pressed="false">$400+</button>
+          </div>
+
+          <div class="relative ml-auto">
+            <select
+              name="sort"
+              aria-label="Сортировка списка районов"
+              class="appearance-none rounded-xl border border-[var(--aw-color-border)] bg-[var(--aw-color-bg-page)] py-2.5 pl-3.5 pr-9 text-sm font-medium outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15"
+            >
+              <option value="order">По умолчанию</option>
+              <option value="price-asc">Сначала дешевле</option>
+              <option value="price-desc">Сначала дороже</option>
+              <option value="title">По алфавиту</option>
+            </select>
+            <Icon
+              name="tabler:chevron-down"
+              aria-hidden="true"
+              class="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none"
+            />
+          </div>
+        </div>
+
+        <p id="rayony-count" class="text-sm text-muted" aria-live="polite"></p>
+      </div>
+
+      <div id="rayony-grid" class="rayony-grid" data-reveal>
+        {
+          districts.map((d, i) => (
+            <a
+              href={getPermalink(`/rayon/${d.id}`)}
+              class="rayony-card u-card u-card--hover"
+              data-title={d.data.title}
+              data-metro={d.data.metro}
+              data-excerpt={d.data.excerpt}
+              data-price={priceOf(d.data.rentFrom)}
+              data-order={i}
+            >
+              <span class="rc__head">
+                <h2 class="rc__title">{d.data.title}</h2>
+                <span class="rc__rent tnum">от {d.data.rentFrom}</span>
+              </span>
+              <span class="rc__excerpt">{d.data.excerpt}</span>
+              <span class="rc__metro">
+                <Icon name="tabler:train" class="rc__metro-icon" />
+                <span class="min-w-0">{d.data.metro}</span>
+              </span>
+            </a>
+          ))
+        }
+      </div>
+
+      <p
+        id="rayony-empty"
+        class="mt-8 hidden rounded-2xl border border-dashed border-[var(--aw-color-border)] p-8 text-center text-muted"
+      >
+        Ничего не найдено. Попробуйте изменить запрос или сбросить фильтр по цене.
+      </p>
+
+      <nav class="foot-links" aria-label="Что ещё почитать">
+        <Overline>Не про район</Overline>
+        <ul class="foot-links__list">
+          <li>
+            <a href={getPermalink('/pereezd')}>
+              <span>Переезд из Андижана: документы, дети, поликлиника, регистрация</span>
+              <span class="foot-links__arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+          <li>
+            <a href={getPermalink('/arenda')}>
+              <span>Как снять квартиру в Ташкенте без обмана</span>
+              <span class="foot-links__arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+          <li>
+            <a href={getPermalink('/kontakty')}>
+              <span>Контакты, экстренные службы и как добраться до офиса</span>
+              <span class="foot-links__arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </section>
+  </div>
+</Layout>
+
+<style>
+  .rayony-seg {
+    padding: 0.55rem 0.9rem;
+    border-radius: 0.6rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--aw-color-text-muted);
+    white-space: nowrap;
+    transition:
+      background var(--dur-sm) var(--gv-ease-spring),
+      color var(--dur-sm) var(--gv-ease-out-quart),
+      box-shadow var(--dur-sm) var(--gv-ease-out-quart);
+  }
+  .rayony-seg:hover {
+    color: var(--aw-color-text-heading);
+  }
+  .rayony-seg.is-active {
+    background: var(--aw-color-primary);
+    color: var(--aw-color-on-primary);
+    box-shadow: 0 1px 6px -1px color-mix(in srgb, var(--aw-color-primary) 45%, transparent);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rayony-seg {
+      transition: none;
+    }
+  }
+  .rayony-card.is-hidden {
+    display: none;
+  }
+
+  /* ---------------------------------------------------------------- shell -- */
+  .rayony-page {
+    /* Contains the full-bleed map breakout so it can never cause page-level
+       horizontal scroll (clip ≠ scroll container). */
+    overflow-x: clip;
+  }
+  .rayony-hero,
+  .rayony-body {
+    max-width: var(--container-default);
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 2rem);
+  }
+  .rayony-hero {
+    padding-block: clamp(3.5rem, 7vw, 6rem) clamp(1.5rem, 4vw, 2.5rem);
+  }
+  .rayony-hero__title {
+    margin-top: var(--space-3);
+    font-family: var(--aw-font-heading);
+    font-size: var(--step-display);
+    font-weight: 640;
+    line-height: 1.03;
+    letter-spacing: -0.02em;
+    color: var(--aw-color-text-heading);
+    text-wrap: balance;
+  }
+  .rayony-hero__lead {
+    margin-top: var(--space-5);
+    max-width: 46rem;
+    font-size: clamp(1.05rem, 0.98rem + 0.5vw, 1.25rem);
+    line-height: 1.6;
+    color: var(--aw-color-text-muted);
+  }
+  .rayony-body {
+    padding-bottom: clamp(4rem, 8vw, 8rem);
+  }
+
+  /* ---------------------------------------------- districts-map container -- */
+  .districts-map {
+    width: 100vw;
+    max-width: 100vw;
+    margin-inline: calc(50% - 50vw);
+    padding-inline: clamp(1rem, 4vw, 2rem);
+    margin-block: clamp(1rem, 3vw, 2rem);
+  }
+  .districts-map__box {
+    position: relative;
+    max-width: var(--container-wide);
+    margin-inline: auto;
+    aspect-ratio: 4 / 5;
+    border: 1px solid var(--aw-color-border);
+    border-radius: var(--gv-radius-lg);
+    overflow: hidden;
+    /* Token gradient poster — the SVG map paints on top with zero shift. */
+    background:
+      radial-gradient(120% 90% at 8% 4%, color-mix(in srgb, var(--aw-color-primary) 22%, transparent), transparent 60%),
+      radial-gradient(
+        90% 80% at 100% 14%,
+        color-mix(in srgb, var(--aw-color-ceramic) 15%, transparent),
+        transparent 58%
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--aw-color-primary) 8%, var(--aw-color-surface-2)),
+        var(--aw-color-surface-2) 72%
+      );
+  }
+  @media (min-width: 768px) {
+    .districts-map__box {
+      aspect-ratio: 16 / 10;
+    }
+  }
+
+  /* Bi-directional peer highlight shared with the SVG districts map.
+     Toggled by peer-highlight.ts — never by initRayonyFilter. */
+  .rayony-card.is-peer-hot {
+    border-color: color-mix(in srgb, var(--aw-color-primary) 55%, var(--aw-color-border));
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--aw-color-primary) 15%, transparent);
+  }
+
+  /* ---------------------------------------------------------------- grid -- */
+  .rayony-grid {
+    margin-top: var(--space-6);
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 640px) {
+    .rayony-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-5);
+    }
+  }
+  @media (min-width: 1024px) {
+    .rayony-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .rayony-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-5);
+    text-decoration: none;
+    color: var(--aw-color-text-default);
+  }
+  .rayony-card:focus-visible {
+    outline: 2px solid var(--aw-color-primary);
+    outline-offset: 2px;
+  }
+  .rc__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+  .rc__title {
+    min-width: 0;
+    font-family: var(--aw-font-heading);
+    font-size: var(--step-h3);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: var(--aw-color-text-heading);
+    transition: color var(--dur-sm) var(--gv-ease-out-quart);
+  }
+  .rayony-card:hover .rc__title {
+    color: var(--aw-color-primary);
+  }
+  .rc__rent {
+    flex: none;
+    padding: 3px 9px;
+    border-radius: var(--gv-radius-xs);
+    background: color-mix(in srgb, var(--aw-color-data) 12%, transparent);
+    color: var(--aw-color-data);
+    font-size: 0.8125rem;
+    font-weight: 650;
+    white-space: nowrap;
+  }
+  .rc__excerpt {
+    flex: 1;
+    margin-top: var(--space-1);
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--aw-color-text-muted);
+  }
+  .rc__metro {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    color: var(--aw-color-text-muted);
+  }
+  .rc__metro-icon {
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    margin-top: 1px;
+    color: var(--aw-color-primary);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rc__title {
+      transition: none;
+    }
+  }
+
+  /* --------------------------------------------------- editorial footer -- */
+  .foot-links {
+    margin-top: clamp(3rem, 6vw, 4.5rem);
+  }
+  .foot-links__list {
+    list-style: none;
+    margin: var(--space-4) 0 0;
+    padding: 0;
+    border-top: 1px solid var(--aw-color-border);
+  }
+  .foot-links__list li {
+    border-bottom: 1px solid var(--aw-color-border);
+  }
+  .foot-links__list a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    min-height: 44px;
+    padding-block: var(--space-4);
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--aw-color-text-default);
+    text-decoration: none;
+    transition: color var(--dur-sm) var(--gv-ease-out-quart);
+  }
+  .foot-links__list a:hover {
+    color: var(--aw-color-primary);
+  }
+  .foot-links__list a:focus-visible {
+    outline: 2px solid var(--aw-color-primary);
+    outline-offset: 3px;
+    border-radius: var(--gv-radius-xs);
+  }
+  .foot-links__arrow {
+    flex: none;
+    color: var(--aw-color-text-muted);
+    transition:
+      transform var(--dur-sm) var(--gv-ease-spring),
+      color var(--dur-sm) var(--gv-ease-out-quart);
+  }
+  .foot-links__list a:hover .foot-links__arrow {
+    transform: translateX(4px);
+    color: var(--aw-color-primary);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .foot-links__list a,
+    .foot-links__arrow {
+      transition: none;
+    }
+    .foot-links__list a:hover .foot-links__arrow {
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  function initRayonyFilter() {
+    const root = document.getElementById('rayony-filter');
+    const grid = document.getElementById('rayony-grid');
+    const countEl = document.getElementById('rayony-count');
+    const emptyEl = document.getElementById('rayony-empty');
+    if (!root || !grid || !countEl || !emptyEl) return;
+    if (root.dataset.ready) return;
+    root.dataset.ready = '1';
+
+    const input = root.querySelector<HTMLInputElement>('input[name="q"]');
+    const sortSel = root.querySelector<HTMLSelectElement>('select[name="sort"]');
+    const segBtns = Array.from(root.querySelectorAll<HTMLButtonElement>('.rayony-seg'));
+    const cards = Array.from(grid.querySelectorAll<HTMLAnchorElement>('.rayony-card'));
+    const total = cards.length;
+
+    let price: [number, number] = [0, 99999];
+
+    const norm = (s: string) =>
+      (s || '')
+        .toLowerCase()
+        .replace(/ё/g, 'е')
+        .replace(/[«»"'().,–—-]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    const apply = () => {
+      const q = norm(input?.value ?? '');
+      const terms = q ? q.split(' ') : [];
+
+      let visible = 0;
+      for (const card of cards) {
+        const hay = norm(`${card.dataset.title ?? ''} ${card.dataset.metro ?? ''} ${card.dataset.excerpt ?? ''}`);
+        const p = Number(card.dataset.price ?? 0);
+        const matchText = terms.every((t) => hay.includes(t));
+        const matchPrice = p >= price[0] && p <= price[1];
+        const show = matchText && matchPrice;
+        card.classList.toggle('is-hidden', !show);
+        if (show) visible++;
+      }
+
+      const mode = sortSel?.value ?? 'order';
+      const shown = cards.filter((c) => !c.classList.contains('is-hidden'));
+      shown.sort((a, b) => {
+        if (mode === 'price-asc') return Number(a.dataset.price) - Number(b.dataset.price);
+        if (mode === 'price-desc') return Number(b.dataset.price) - Number(a.dataset.price);
+        if (mode === 'title') return (a.dataset.title ?? '').localeCompare(b.dataset.title ?? '', 'ru');
+        return Number(a.dataset.order) - Number(b.dataset.order);
+      });
+      shown.forEach((c) => grid.appendChild(c));
+
+      emptyEl.classList.toggle('hidden', visible !== 0);
+      countEl.textContent = visible === total ? `Все ${total} районов` : `Показано: ${visible} из ${total}`;
+    };
+
+    input?.addEventListener('input', apply);
+    sortSel?.addEventListener('change', apply);
+    segBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        segBtns.forEach((b) => {
+          b.classList.remove('is-active');
+          b.setAttribute('aria-pressed', 'false');
+        });
+        btn.classList.add('is-active');
+        btn.setAttribute('aria-pressed', 'true');
+        const [lo, hi] = (btn.dataset.price ?? 'all').split('-');
+        price = btn.dataset.price === 'all' ? [0, 99999] : [Number(lo), Number(hi)];
+        apply();
+      });
+    });
+
+    apply();
+  }
+
+  initRayonyFilter();
+  document.addEventListener('astro:page-load', initRayonyFilter);
+</script>

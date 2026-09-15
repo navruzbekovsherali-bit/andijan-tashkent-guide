@@ -1,0 +1,50 @@
+---
+/**
+ * SplitReveal — wraps a heading so the motion layer (common/Motion.astro) can
+ * split it into lines and play the editorial line-mask reveal
+ * (clip / translateY per line, 40ms stagger, --gv-ease-out-soft).
+ *
+ * Renders plain, fully-visible HTML. All motion is added post-paint by JS and
+ * only under (prefers-reduced-motion: no-preference); with no JS / reduce / a
+ * failed split the text simply stays visible. GSAP-only, no SplitText plugin.
+ *
+ * Pass heading markup via the `html` prop (keeps inline spans like
+ * `.gv-gradient-text` and hard `<br>` breaks) or as children.
+ */
+import type { HTMLTag } from 'astro/types';
+
+export interface Props {
+  as?: HTMLTag;
+  class?: string;
+  html?: string;
+}
+
+const { as: Tag = 'h2', class: className, html } = Astro.props;
+const cls = ['gv-split-reveal', className].filter(Boolean).join(' ');
+---
+
+{
+  html != null ? (
+    <Tag class={cls} data-split-reveal set:html={html} />
+  ) : (
+    <Tag class={cls} data-split-reveal>
+      <slot />
+    </Tag>
+  )
+}
+
+<style is:global>
+  /* Line wrappers are created at runtime by Motion.astro. The clip lives here
+     so the mask is correct the instant the inner is offset, before the tween. */
+  [data-split-reveal] .gv-line {
+    display: block;
+    overflow: hidden;
+  }
+  [data-split-reveal] .gv-line-inner {
+    display: block;
+    will-change: transform;
+  }
+  [data-split-reveal] .gv-w {
+    display: inline-block;
+  }
+</style>

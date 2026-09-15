@@ -1,0 +1,470 @@
+---
+/**
+ * MOTION LAYER (Phase 2) — single client-script island, rendered once by
+ * Layout.astro right after <Enhancements />.
+ *
+ *  - Smooth scroll via Lenis (skipped entirely under prefers-reduced-motion).
+ *  - GSAP ScrollTrigger wired to Lenis; refreshed after fonts + on navigation.
+ *  - [data-reveal] progressive reveal system (initial hidden state set in JS
+ *    only after <html>.gv-motion-ready → no CLS, no FOUC-blank, no-JS safe).
+ *  - [data-split-reveal] editorial line-mask headline reveal (SplitReveal.astro).
+ *  - Header scroll-progress bar + hide-on-scroll-down.
+ *  - View-Transitions page swap: incoming <main> rises 12px, concurrently
+ *    with a site-wide "route" motif — a hairline that draws itself across
+ *    the top of the viewport with a travelling dot, riffing on HomeHero's
+ *    Андижан→Ташкент route-draw. See #gv-route-transition below.
+ *
+ * Everything is gated by gsap.matchMedia('(prefers-reduced-motion: no-preference)');
+ * the reduce branch registers nothing at all. Re-inits on astro:page-load,
+ * tears down on astro:before-swap — no leaks, no double-binding.
+ *
+ * TODO(phase-later): consolidate [data-reveal] with common/Intersect.astro.
+ */
+---
+
+{
+  /* Route-transition overlay — persists across client-side navigations so its
+     GSAP timeline can run uninterrupted through the astro:before-swap →
+     astro:after-swap boundary. Fixed + zero footprint in flow → CLS 0.
+     Fully inert (display:none) under prefers-reduced-motion: reduce, see
+     tailwind.css. Hidden by default (opacity 0); the script below drives it
+     only on real page-to-page navigations, never on in-page anchor scrolls. */
+}
+<div id="gv-route-transition" class="gv-route-transition" aria-hidden="true" transition:persist="gv-route-transition">
+  <svg class="gv-route-transition__svg" viewBox="0 0 1000 2" preserveAspectRatio="none" role="presentation">
+    <line
+      x1="0"
+      y1="1"
+      x2="1000"
+      y2="1"
+      pathLength="1"
+      vector-effect="non-scaling-stroke"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      class="gv-route-transition__path"></line>
+  </svg>
+  <span class="gv-route-transition__marker"></span>
+</div>
+
+<script>
+  import gsap from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  import { CustomEase } from 'gsap/CustomEase';
+  import Lenis from 'lenis';
+
+  declare global {
+    interface Window {
+      __lenis?: Lenis | null;
+      __gvMotionBound?: boolean;
+    }
+  }
+
+  gsap.registerPlugin(ScrollTrigger, CustomEase);
+  // Match the design-token easings (tailwind.css :root) exactly.
+  CustomEase.create('gv-soft', '0.22, 1, 0.36, 1'); // --gv-ease-out-soft
+  CustomEase.create('gv-quart', '0.25, 1, 0.5, 1'); // --gv-ease-out-quart
+
+  const REVEAL_Y = 16; // px — never exceed 24 (CLS budget)
+  const DUR_MD = 0.42; // --dur-md
+  const DUR_LG = 0.72; // --dur-lg
+  const HEADER_OFFSET = 84; // sticky-header clearance for anchored scrolls
+  const root = document.documentElement;
+
+  let lenis: Lenis | null = null;
+  let lenisRaf: ((time: number) => void) | null = null;
+  let mm: ReturnType<typeof gsap.matchMedia> | null = null;
+  let clickHandler: ((e: MouseEvent) => void) | null = null;
+
+  /* ---------------------------------------------------------------- Lenis -- */
+  function startLenis() {
+    if (lenis) return;
+    lenis = new Lenis({ lerp: 0.1, duration: 1.1, syncTouch: false });
+    window.__lenis = lenis;
+    lenis.on('scroll', ScrollTrigger.update);
+    lenisRaf = (time: number) => {
+      lenis?.raf(time * 1000);
+    };
+    gsap.ticker.add(lenisRaf);
+    gsap.ticker.lagSmoothing(0);
+  }
+
+  function stopLenis() {
+    if (lenisRaf) {
+      gsap.ticker.remove(lenisRaf);
+      lenisRaf = null;
+    }
+    lenis?.destroy();
+    lenis = null;
+    window.__lenis = null;
+  }
+
+  /* --------------------------------------------------- anchor / hash nav -- */
+  function onClick(e: MouseEvent) {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const link = (e.target as HTMLElement | null)?.closest('a');
+    const href = link?.getAttribute('href');
+    if (!href || href.charAt(0) !== '#' || href.length < 2) return;
+    const id = decodeURIComponent(href.slice(1));
+    const target = document.getElementById(id) ?? document.querySelector<HTMLElement>(`a[name="${CSS.escape(id)}"]`);
+    if (!target) return;
+    e.preventDefault();
+    if (lenis) lenis.scrollTo(target, { offset: -HEADER_OFFSET });
+    else target.scrollIntoView();
+    history.pushState(null, '', href);
+  }
+
+  /* ------------------------------------------------------ reveal system -- */
+  function revealYFor(el: HTMLElement): number {
+    return el.dataset.reveal === 'fade' ? 0 : REVEAL_Y;
+  }
+
+  function clampMs(raw: string | undefined, fallback: number): number {
+    const n = raw == null || raw === '' ? fallback : parseFloat(raw);
+    return Number.isFinite(n) ? Math.max(0, Math.min(n, 2000)) : fallback;
+  }
+
+  function setupReveals(): ReturnType<typeof gsap.context> {
+    return gsap.context(() => {
+      // Containers: stagger their descendant [data-reveal] items on one trigger.
+      gsap.utils.toArray<HTMLElement>('[data-reveal-stagger]').forEach((container) => {
+        const items = gsap.utils.toArray<HTMLElement>(container.querySelectorAll('[data-reveal]'));
+        if (!items.length) return;
+        const stagger = clampMs(container.dataset.revealStagger, 70) / 1000;
+        const delay = clampMs(container.dataset.revealDelay, 0) / 1000;
+        items.forEach((el) => gsap.set(el, { autoAlpha: 0, y: revealYFor(el) }));
+        gsap.to(items, {
+          autoAlpha: 1,
+          y: 0,
+          duration: DUR_MD,
+          ease: 'gv-soft',
+          stagger,
+          delay,
+          overwrite: 'auto',
+          scrollTrigger: { trigger: container, start: 'top 85%', once: true },
+        });
+      });
+
+      // Singles: everything else with [data-reveal] not inside a stagger container.
+      const singles = gsap.utils
+        .toArray<HTMLElement>('[data-reveal]')
+        .filter((el) => !el.closest('[data-reveal-stagger]'));
+
+      const masks = singles.filter((el) => el.dataset.reveal === 'mask');
+      const plain = singles.filter((el) => el.dataset.reveal !== 'mask');
+
+      masks.forEach((el) => {
+        gsap.set(el, { autoAlpha: 1, clipPath: 'inset(0 0 100% 0)' });
+        gsap.to(el, {
+          clipPath: 'inset(0 0 0% 0)',
+          duration: DUR_LG,
+          ease: 'gv-soft',
+          overwrite: 'auto',
+          scrollTrigger: { trigger: el, start: 'top 85%', once: true },
+        });
+      });
+
+      if (plain.length) {
+        plain.forEach((el) => gsap.set(el, { autoAlpha: 0, y: revealYFor(el) }));
+        ScrollTrigger.batch(plain, {
+          start: 'top 85%',
+          once: true,
+          batchMax: 6,
+          onEnter: (batch) =>
+            gsap.to(batch, {
+              autoAlpha: 1,
+              y: 0,
+              duration: DUR_MD,
+              ease: 'gv-soft',
+              stagger: 0.07,
+              overwrite: 'auto',
+            }),
+        });
+      }
+    });
+  }
+
+  /* ------------------------------------------- headline line-mask reveal -- */
+  function splitIntoLines(el: HTMLElement): HTMLElement[] {
+    const units: Array<HTMLElement | { br: true }> = [];
+    const frag = document.createDocumentFragment();
+
+    el.childNodes.forEach((node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const parts = (node.textContent ?? '').split(/(\s+)/);
+        parts.forEach((part) => {
+          if (part === '') return;
+          if (/^\s+$/.test(part)) {
+            frag.appendChild(document.createTextNode(part));
+          } else {
+            const w = document.createElement('span');
+            w.className = 'gv-w';
+            w.textContent = part;
+            frag.appendChild(w);
+            units.push(w);
+          }
+        });
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        const elNode = node as HTMLElement;
+        if (elNode.tagName === 'BR') {
+          const br = elNode.cloneNode(true) as HTMLElement;
+          frag.appendChild(br);
+          // Only a rendered <br> forces a line break (mobile hides some).
+          if (br.getClientRects().length || elNode.getClientRects().length) units.push({ br: true });
+        } else {
+          const w = document.createElement('span');
+          w.className = 'gv-w';
+          w.appendChild(elNode.cloneNode(true));
+          frag.appendChild(w);
+          units.push(w);
+        }
+      }
+    });
+
+    el.textContent = '';
+    el.appendChild(frag);
+
+    // Group units into visual lines by their measured top offset.
+    const lines: HTMLElement[][] = [];
+    let currentLine: HTMLElement[] = [];
+    let lineTop: number | null = null;
+    units.forEach((u) => {
+      if (!(u instanceof HTMLElement)) {
+        if (currentLine.length) lines.push(currentLine);
+        currentLine = [];
+        lineTop = null;
+        return;
+      }
+      const top = Math.round(u.getBoundingClientRect().top);
+      if (lineTop === null) lineTop = top;
+      if (Math.abs(top - lineTop) > 4) {
+        if (currentLine.length) lines.push(currentLine);
+        currentLine = [];
+        lineTop = top;
+      }
+      currentLine.push(u);
+    });
+    if (currentLine.length) lines.push(currentLine);
+    if (!lines.length) throw new Error('gv-split: no lines');
+
+    // Rebuild: each line gets an overflow-clipped wrapper + a transformable inner.
+    el.textContent = '';
+    const inners: HTMLElement[] = [];
+    lines.forEach((lineUnits) => {
+      const line = document.createElement('span');
+      line.className = 'gv-line';
+      const inner = document.createElement('span');
+      inner.className = 'gv-line-inner';
+      lineUnits.forEach((u, i) => {
+        inner.appendChild(u);
+        if (i < lineUnits.length - 1) inner.appendChild(document.createTextNode(' '));
+      });
+      line.appendChild(inner);
+      el.appendChild(line);
+      el.appendChild(document.createTextNode(' '));
+      inners.push(inner);
+    });
+    return inners;
+  }
+
+  function setupSplitReveals(): ReturnType<typeof gsap.context> {
+    return gsap.context(() => {
+      gsap.utils.toArray<HTMLElement>('[data-split-reveal]').forEach((el) => {
+        if (el.dataset.gvSplit) return;
+        const original = el.innerHTML;
+        let inners: HTMLElement[];
+        try {
+          inners = splitIntoLines(el);
+        } catch {
+          el.innerHTML = original; // fully visible fallback
+          el.style.visibility = 'visible';
+          return;
+        }
+        el.dataset.gvSplit = '1';
+        el.style.visibility = 'visible';
+        gsap.set(inners, { yPercent: 100 });
+
+        const aboveFold = el.getBoundingClientRect().top < window.innerHeight * 0.9;
+        const tween = {
+          yPercent: 0,
+          duration: DUR_LG,
+          ease: 'gv-soft',
+          stagger: 0.04,
+        };
+        if (aboveFold) {
+          requestAnimationFrame(() => gsap.to(inners, tween));
+        } else {
+          gsap.to(inners, {
+            ...tween,
+            scrollTrigger: { trigger: el, start: 'top 85%', once: true },
+          });
+        }
+      });
+    });
+  }
+
+  /* --------------------------------- header progress + hide-on-scroll -- */
+  function setupHeader(): (() => void) | undefined {
+    const header = document.getElementById('header');
+    if (!header) return undefined;
+    const bar = header.querySelector<HTMLElement>('#gv-scroll-progress > span');
+
+    const progressST = ScrollTrigger.create({
+      start: 0,
+      end: 'max',
+      onUpdate: (self) => {
+        if (bar) bar.style.transform = `scaleX(${self.progress})`;
+      },
+    });
+
+    let hidden = false;
+    const setHidden = (v: boolean) => {
+      if (v === hidden || (v && header.classList.contains('expanded'))) return;
+      hidden = v;
+      header.classList.toggle('gv-header-hidden', v);
+    };
+    const hideST = ScrollTrigger.create({
+      start: 0,
+      end: 'max',
+      onUpdate: (self) => {
+        if (self.scroll() < 240) setHidden(false);
+        else setHidden(self.direction === 1);
+      },
+    });
+
+    return () => {
+      progressST.kill();
+      hideST.kill();
+      header.classList.remove('gv-header-hidden');
+      if (bar) bar.style.transform = '';
+    };
+  }
+
+  /* ---------------------------------------------------- orchestration -- */
+  function init() {
+    if (mm) return;
+    mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      root.classList.add('gv-motion-ready');
+      startLenis();
+
+      const revealCtx = setupReveals();
+      const splitCtx = setupSplitReveals();
+      const cleanupHeader = setupHeader();
+
+      clickHandler = onClick;
+      document.addEventListener('click', clickHandler);
+
+      if (document.fonts && document.fonts.status !== 'loaded') {
+        document.fonts.ready.then(() => ScrollTrigger.refresh());
+      }
+      if (location.hash.length > 1) {
+        const t = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+        if (t) requestAnimationFrame(() => lenis?.scrollTo(t, { offset: -HEADER_OFFSET, immediate: true }));
+      }
+      ScrollTrigger.refresh();
+
+      return () => {
+        revealCtx.revert();
+        splitCtx.revert();
+        cleanupHeader?.();
+        if (clickHandler) {
+          document.removeEventListener('click', clickHandler);
+          clickHandler = null;
+        }
+        stopLenis();
+        root.classList.remove('gv-motion-ready');
+      };
+    });
+  }
+
+  function destroy() {
+    mm?.revert();
+    mm = null;
+    ScrollTrigger.getAll().forEach((t) => t.kill());
+  }
+
+  /* --------------------------------------------- route-transition motif -- *
+   * Runs CONCURRENTLY with the astro:after-swap fade+rise above, not before
+   * it — both start off their own lifecycle hook within the same navigation,
+   * so the new page's content is never gated behind this. Total overlay
+   * lifecycle (draw + arrive pulse + fade-out) is ~0.68s starting at
+   * before-swap, i.e. it lingers only ~150-200ms past the ~0.5s fade+rise.
+   *
+   * The wrap is `transition:persist`ed (same pattern as #header) so this is
+   * the SAME DOM node before and after the swap: the timeline keeps running
+   * straight through it with no re-query, no flicker, no restart.
+   *
+   * destroy() (called first, below) already kills every ScrollTrigger,
+   * including the header's scroll-progress one — so there is no window
+   * where a scroll-driven onUpdate and this timeline could both be writing
+   * to the DOM at once. This overlay is also a dedicated element (not
+   * #gv-scroll-progress) precisely so the two never have to coordinate.
+   */
+  const ROUTE_DRAW = 0.4; // s — line draws + marker travels left → right
+  const ROUTE_ARRIVE = 0.16; // s — marker "lands" (small scale pulse)
+  const ROUTE_FADE = 0.22; // s — whole overlay fades out
+  let routeTl: gsap.core.Timeline | null = null;
+
+  function getRouteEls() {
+    const wrap = document.getElementById('gv-route-transition');
+    const path = wrap?.querySelector<SVGLineElement>('.gv-route-transition__path');
+    const marker = wrap?.querySelector<HTMLElement>('.gv-route-transition__marker');
+    if (!wrap || !path || !marker) return null;
+    return { wrap, path, marker };
+  }
+
+  function playRouteTransition() {
+    const els = getRouteEls();
+    if (!els) return;
+    const { wrap, path, marker } = els;
+
+    // A rapid second navigation interrupts cleanly: kill the in-flight
+    // timeline and re-arm from a clean starting state — no stuck/duplicated
+    // overlay, since there is only ever this one persisted element.
+    routeTl?.kill();
+    gsap.set(wrap, { autoAlpha: 1 });
+    gsap.set(path, { strokeDashoffset: 1 });
+    gsap.set(marker, { left: '0%', xPercent: -50, yPercent: -50, scale: 0 });
+
+    routeTl = gsap.timeline({
+      onComplete: () => {
+        routeTl = null;
+        gsap.set(wrap, { autoAlpha: 0 });
+      },
+    });
+    routeTl
+      .to(marker, { scale: 1, duration: 0.14, ease: 'gv-quart' }, 0)
+      .to(path, { strokeDashoffset: 0, duration: ROUTE_DRAW, ease: 'gv-quart' }, 0)
+      .to(marker, { left: '100%', duration: ROUTE_DRAW, ease: 'gv-quart' }, 0)
+      .to(marker, { scale: 1.3, duration: ROUTE_ARRIVE * 0.55, ease: 'gv-quart' }, ROUTE_DRAW - 0.02)
+      .to(marker, { scale: 1, duration: ROUTE_ARRIVE * 0.75, ease: 'gv-quart' }, '>')
+      .to(wrap, { autoAlpha: 0, duration: ROUTE_FADE, ease: 'gv-quart' }, ROUTE_DRAW + 0.1);
+  }
+
+  if (!window.__gvMotionBound) {
+    window.__gvMotionBound = true;
+    document.addEventListener('astro:page-load', init);
+    document.addEventListener('astro:before-swap', () => {
+      destroy();
+      // Anchor-link scrolls (handled entirely by onClick/Lenis above) never
+      // fire astro:before-swap — only real cross-page navigations do, which
+      // covers back/forward too (ClientRouter routes those through the same
+      // lifecycle hooks).
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      playRouteTransition();
+    });
+    document.addEventListener('astro:after-swap', () => {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const main = document.querySelector('main');
+      if (!main) return;
+      gsap.fromTo(
+        main,
+        { autoAlpha: 0, y: 12 },
+        { autoAlpha: 1, y: 0, duration: 0.5, ease: 'gv-soft', clearProps: 'opacity,visibility,transform' }
+      );
+    });
+  }
+
+  init();
+</script>

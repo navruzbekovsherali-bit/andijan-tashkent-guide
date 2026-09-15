@@ -1,0 +1,131 @@
+---
+/**
+ * HomeStats — the "Жизнь в цифрах" band. 3–4 tabular stat blocks; numbers in
+ * `--aw-color-data` with `.tnum`. Numeric values that have `countTo` animate via
+ * the existing `[data-countup]` system (final value shown with no JS / reduced
+ * motion). The band carries a single `data-reveal`.
+ *
+ * Values are DERIVED from real district data by the caller — nothing fabricated.
+ */
+import Overline from '~/components/ui/Overline.astro';
+import CountUp from '~/components/common/CountUp.astro';
+
+interface StatBlock {
+  /** Static display value; ignored when `countTo` is set. */
+  value?: string;
+  label: string;
+  /** When set, renders a count-up to this number. */
+  countTo?: number;
+  prefix?: string;
+  suffix?: string;
+}
+
+interface Props {
+  overline?: string;
+  stats: StatBlock[];
+}
+
+const { overline = 'Жизнь в цифрах', stats } = Astro.props;
+---
+
+<section class="hs" data-reveal>
+  <div class="hs__shell">
+    <div class="hs__overline"><Overline>{overline}</Overline></div>
+
+    <dl class="hs__grid">
+      {
+        stats.map((s) => (
+          <div class="hs__cell">
+            <dd class="hs__value tnum">
+              {s.countTo != null ? <CountUp to={s.countTo} prefix={s.prefix ?? ''} suffix={s.suffix ?? ''} /> : s.value}
+            </dd>
+            <dt class="hs__label">{s.label}</dt>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>
+
+<style>
+  .hs__shell {
+    max-width: var(--container-default);
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 2rem);
+    padding-block: clamp(3rem, 6vw, 5rem);
+  }
+  .hs__overline {
+    display: block;
+    margin-bottom: var(--space-5);
+  }
+
+  .hs__grid {
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    border-block: 1px solid var(--aw-color-border);
+  }
+  .hs__cell {
+    padding-block: var(--space-5);
+  }
+  .hs__cell + .hs__cell {
+    border-top: 1px solid var(--aw-color-border);
+  }
+
+  .hs__value {
+    margin: 0;
+    font-family: var(--aw-font-heading);
+    font-size: var(--step-stat);
+    font-weight: 560;
+    line-height: 1.1;
+    color: var(--aw-color-data);
+  }
+  .hs__label {
+    margin-top: var(--space-2);
+    font-size: 0.875rem;
+    line-height: 1.45;
+    color: var(--aw-color-text-muted);
+  }
+
+  @media (min-width: 640px) {
+    .hs__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .hs__cell {
+      padding-inline: var(--space-6);
+    }
+    .hs__cell:nth-child(odd) {
+      padding-left: 0;
+    }
+    .hs__cell:nth-child(even) {
+      padding-right: 0;
+      border-left: 1px solid var(--aw-color-border);
+    }
+    .hs__cell + .hs__cell {
+      border-top: 0;
+    }
+    .hs__cell:nth-child(n + 3) {
+      border-top: 1px solid var(--aw-color-border);
+    }
+  }
+
+  @media (min-width: 900px) {
+    .hs__grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    .hs__cell {
+      padding-inline: var(--space-6);
+      border-left: 1px solid var(--aw-color-border);
+    }
+    .hs__cell:first-child {
+      padding-left: 0;
+      border-left: 0;
+    }
+    .hs__cell:last-child {
+      padding-right: 0;
+    }
+    .hs__cell:nth-child(n + 3) {
+      border-top: 0;
+    }
+  }
+</style>

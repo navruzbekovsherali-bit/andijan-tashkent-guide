@@ -1,0 +1,966 @@
+---
+/**
+ * Wraps rendered markdown (<slot />) and adapts it per `variant`:
+ *
+ *  - 'guide'    — on the client, groups the markdown into collapsible <details>
+ *                 panels split on every <h2>, with a chip TOC and
+ *                 "expand / collapse all" controls. Degrades to full content
+ *                 with no JS.
+ *  - 'stepper'  — keeps the markdown flat + fully expanded (GuideLayout lays the
+ *                 numbered progress spine over it).
+ *  - 'district' — the rayon pages. The 7 fixed category sections
+ *                 (Транспорт … Парки) are rendered server-side, all open,
+ *                 separated by hairlines, under a prominent sticky category
+ *                 tab bar. Tapping a tab smooth-scrolls to its section and a
+ *                 scroll-spy marks the tab for the section in view. With no JS
+ *                 the tabs are plain anchor links and every section is visible.
+ *  - 'topics'   — the /arenda treatment: same sticky tab bar + always-open,
+ *                 hairline-separated sections as 'district', but generic —
+ *                 tab labels and icons are auto-derived from the page's own
+ *                 `## N. Heading` markdown instead of a fixed category list.
+ *                 There's no fact-rail above the content (unlike district), so
+ *                 the tab bar sticks directly under the site header.
+ */
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+  /** index of the panel open on first load; -1 = all closed (guide only) */
+  defaultOpen?: number;
+  variant?: 'district' | 'guide' | 'stepper' | 'topics';
+}
+const { defaultOpen = 0, variant = 'guide' } = Astro.props;
+
+/* 'topics' — auto tab bar. Keyword → icon lookup tested in order (first match
+   wins), same idea as DISTRICT_CATS but derived from the heading text instead
+   of a fixed list. Falls back to a generic list icon. */
+const TOPIC_ICON_RULES: { test: RegExp; icon: string }[] = [
+  { test: /юридич|документ/i, icon: 'tabler:file-text' },
+  { test: /безопасност|антифрод|мошенн/i, icon: 'tabler:shield-check' },
+  { test: /площад|поиск/i, icon: 'tabler:search' },
+  { test: /чек-лист|осмотр/i, icon: 'tabler:clipboard-check' },
+];
+const pickTopicIcon = (headingText: string): string =>
+  TOPIC_ICON_RULES.find((r) => r.test.test(headingText))?.icon ?? 'tabler:list';
+
+/* Same truncation rule as the client-side `shortLabel()` used for the guide
+   TOC chips (~22 chars here vs ~28 there — tab pills are tighter). */
+const shortTopicLabel = (text: string): string => {
+  let clean = text
+    .replace(/^\s*\d+\.\s*/, '')
+    .split(/[:(–—]/)[0]
+    .trim();
+  if (clean.length > 22) {
+    const cut = clean.slice(0, 20);
+    clean = cut.slice(0, cut.lastIndexOf(' ') > 9 ? cut.lastIndexOf(' ') : 20) + '…';
+  }
+  return clean;
+};
+
+/* District category tabs — fixed order, matches the `## 1.`…`## 7.` sections
+   every rayon guide ships (verified across all 12 files). */
+const DISTRICT_CATS = [
+  { label: 'Транспорт', icon: 'tabler:train' },
+  { label: 'Аренда и цены', icon: 'tabler:home' },
+  { label: 'Школы', icon: 'tabler:school' },
+  { label: 'Детские сады', icon: 'tabler:baby-carriage' },
+  { label: 'Медицина', icon: 'tabler:first-aid-kit' },
+  { label: 'Кафе и рестораны', icon: 'tabler:coffee' },
+  { label: 'Парки', icon: 'tabler:trees' },
+] as const;
+
+/* For 'district': render the slot to HTML now and cut it into its <h2> sections
+   so they can be emitted server-side (open, anchor-addressable, zero CLS). */
+let districtSections: string[] = [];
+if (variant === 'district') {
+  const html = await Astro.slots.render('default');
+  districtSections = html
+    .split(/(?=<h2[\s>])/i)
+    .filter((part) => /<h2[\s>]/i.test(part))
+    .map((part) => part.replace(/^\s*<h2[\s>][\s\S]*?<\/h2>\s*/i, ''));
+}
+const districtOk = variant === 'district' && districtSections.length >= 2;
+
+/* For 'topics': same server-side <h2> split as 'district', but the label +
+   icon per section are derived from the heading text itself rather than a
+   fixed category array. */
+interface TopicSection {
+  heading: string;
+  label: string;
+  icon: string;
+  html: string;
+}
+let topicSections: TopicSection[] = [];
+if (variant === 'topics') {
+  const html = await Astro.slots.render('default');
+  const parts = html.split(/(?=<h2[\s>])/i).filter((part) => /<h2[\s>]/i.test(part));
+  topicSections = parts.map((part) => {
+    const headingMatch = part.match(/^\s*<h2[^>]*>([\s\S]*?)<\/h2>/i);
+    const headingText = (headingMatch?.[1] ?? '')
+      .replace(/<[^>]+>/g, '')
+      .replace(/^\s*\d+\.\s*/, '')
+      .trim();
+    const body = part.replace(/^\s*<h2[\s>][\s\S]*?<\/h2>\s*/i, '');
+    return {
+      heading: headingText || 'Раздел',
+      label: shortTopicLabel(headingText),
+      icon: pickTopicIcon(headingText),
+      html: body,
+    };
+  });
+}
+const topicsOk = variant === 'topics' && topicSections.length >= 2;
+/* If the markdown doesn't split into ≥2 sections, fall back to the plain
+   'guide' behaviour (collapsible <details> + TOC) rather than rendering a
+   broken/empty tab bar. */
+const resolvedFallbackVariant = variant === 'topics' && !topicsOk ? 'guide' : variant;
+---
+
+{
+  districtOk ? (
+    <div class="collapsible collapsible--district" data-variant="district">
+      <nav class="rd-tabs" aria-label="Разделы района">
+        <ul class="rd-tabs__list">
+          {DISTRICT_CATS.map((cat, i) => (
+            <li>
+              <a class="rd-tab" href={`#rayon-${i + 1}`} data-rd-tab={i + 1}>
+                <Icon name={cat.icon} class="rd-tab__icon" aria-hidden="true" />
+                <span>{cat.label}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <div class="collapsible-body rd-body prose prose-base md:prose-lg max-w-none prose-headings:font-heading prose-headings:font-bold prose-img:rounded-xl prose-img:shadow-lg mt-6">
+        {districtSections.map((sectionHtml, i) => (
+          <section class="rd-sect" id={`rayon-${i + 1}`} data-rd-sect={i + 1} aria-labelledby={`rayon-${i + 1}-h`}>
+            <h2 class="rd-sect__head" id={`rayon-${i + 1}-h`}>
+              <Icon name={DISTRICT_CATS[i]?.icon ?? 'tabler:point'} class="rd-sect__icon" aria-hidden="true" />
+              <span>{DISTRICT_CATS[i]?.label ?? `Раздел ${i + 1}`}</span>
+            </h2>
+            <div class="rd-sect__body" set:html={sectionHtml} />
+          </section>
+        ))}
+      </div>
+    </div>
+  ) : topicsOk ? (
+    <div class="collapsible collapsible--topics" data-variant="topics">
+      <nav class="rd-tabs" aria-label="Разделы">
+        <ul class="rd-tabs__list">
+          {topicSections.map((sec, i) => (
+            <li>
+              <a class="rd-tab" href={`#topic-${i + 1}`} data-rd-tab={i + 1}>
+                <Icon name={sec.icon} class="rd-tab__icon" aria-hidden="true" />
+                <span>{sec.label}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <div class="collapsible-body rd-body prose prose-base md:prose-lg max-w-none prose-headings:font-heading prose-headings:font-bold prose-img:rounded-xl prose-img:shadow-lg mt-6">
+        {topicSections.map((sec, i) => (
+          <section class="rd-sect" id={`topic-${i + 1}`} data-rd-sect={i + 1} aria-labelledby={`topic-${i + 1}-h`}>
+            <h2 class="rd-sect__head" id={`topic-${i + 1}-h`}>
+              <Icon name={sec.icon} class="rd-sect__icon" aria-hidden="true" />
+              <span>{sec.heading}</span>
+            </h2>
+            <div class="rd-sect__body" set:html={sec.html} />
+          </section>
+        ))}
+      </div>
+    </div>
+  ) : (
+    <div class="collapsible" data-default-open={defaultOpen} data-variant={resolvedFallbackVariant}>
+      <nav class="collapsible-toc mt-8 flex flex-wrap gap-2 empty:hidden" aria-label="Разделы" />
+
+      <div class="collapsible-controls mt-4 hidden gap-1 text-sm">
+        <button type="button" data-act="expand" class="collapsible-ctl">
+          Развернуть всё
+        </button>
+        <button type="button" data-act="collapse" class="collapsible-ctl">
+          Свернуть всё
+        </button>
+      </div>
+
+      <div class="collapsible-body prose prose-base md:prose-lg max-w-none prose-headings:font-heading prose-headings:font-bold prose-img:rounded-xl prose-img:shadow-lg mt-6">
+        <slot />
+      </div>
+    </div>
+  )
+}
+
+<style>
+  /* ---------- Reading rhythm & hierarchy ---------- */
+  .collapsible-body {
+    color: var(--aw-color-text-default);
+    line-height: 1.7;
+  }
+  .collapsible-body :global(p) {
+    margin: 0.85em 0;
+  }
+  .collapsible-body :global(h2),
+  .collapsible-body :global(h3),
+  .collapsible-body :global(h4) {
+    color: var(--aw-color-text-heading);
+    letter-spacing: -0.01em;
+  }
+  .collapsible-body :global(h2) {
+    font-size: var(--step-h2, 1.6rem);
+    margin: 2rem 0 0.9rem;
+    line-height: 1.25;
+  }
+  .collapsible-body :global(h3) {
+    font-size: var(--step-h3, 1.18rem);
+    margin: 1.6rem 0 0.6rem;
+    line-height: 1.3;
+  }
+  .collapsible-body :global(h4) {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 1.2rem 0 0.4rem;
+    color: var(--aw-color-text-default);
+  }
+  .collapsible-body :global(a) {
+    color: var(--aw-color-primary);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+  .collapsible-body :global(strong),
+  .collapsible-body :global(b) {
+    color: var(--aw-color-text-heading);
+    font-weight: 650;
+  }
+
+  /* ---------- Lists: readable, scannable ---------- */
+  .collapsible-body :global(ul),
+  .collapsible-body :global(ol) {
+    margin: 0.85em 0;
+    padding-left: 1.35em;
+  }
+  .collapsible-body :global(li) {
+    margin: 0.4em 0;
+    padding-left: 0.2em;
+  }
+  .collapsible-body :global(li)::marker {
+    color: color-mix(in srgb, var(--aw-color-primary) 60%, var(--aw-color-text-muted));
+  }
+  .collapsible-body :global(li > ul),
+  .collapsible-body :global(li > ol) {
+    margin: 0.35em 0 0.5em;
+  }
+
+  /* Key figures pulled out of the prose */
+  .collapsible-body :global(.gv-stat) {
+    font-weight: 650;
+    color: var(--aw-color-primary);
+    font-variant-numeric: tabular-nums slashed-zero;
+    font-feature-settings:
+      'tnum' 1,
+      'ss01' 1,
+      'zero' 1,
+      'case' 1;
+    white-space: nowrap;
+  }
+  /* Short "Label:" that opens a list item */
+  .collapsible-body :global(.gv-lead) {
+    font-weight: 650;
+    color: var(--aw-color-text-heading);
+  }
+
+  /* ---------- Collapsible section panels ---------- */
+  .collapsible-body :global(details.section-panel) {
+    margin: 0.6rem 0;
+    border: 1px solid var(--aw-color-border);
+    border-radius: 0.9rem;
+    overflow: hidden;
+    background: var(--aw-color-bg-page);
+    transition: border-color 0.18s ease;
+  }
+  .collapsible-body :global(details.section-panel[open]) {
+    border-color: color-mix(in srgb, var(--aw-color-primary) 40%, var(--aw-color-border));
+  }
+  .collapsible-body :global(details.section-panel > summary) {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.05rem 1.25rem;
+    font-weight: 650;
+    font-size: 1.05rem;
+    line-height: 1.35;
+    color: var(--aw-color-text-heading);
+  }
+  .collapsible-body :global(details.section-panel > summary::-webkit-details-marker) {
+    display: none;
+  }
+  .collapsible-body :global(details.section-panel > summary:hover) {
+    background: var(--aw-color-surface-2);
+  }
+  .collapsible-body :global(details.section-panel[open] > summary) {
+    border-bottom: 1px solid var(--aw-color-border);
+    background: var(--aw-color-surface-2);
+  }
+  .collapsible-body :global(details.section-panel .section-panel__inner) {
+    padding: 1.1rem 1.25rem 1.35rem;
+  }
+  .collapsible-body :global(details.section-panel .section-panel__inner > :first-child) {
+    margin-top: 0;
+  }
+  .collapsible-body :global(details.section-panel .section-panel__chevron) {
+    flex: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    color: var(--aw-color-text-muted);
+    background: var(--aw-color-surface-2);
+    transition:
+      transform 0.2s ease,
+      background 0.2s ease,
+      color 0.2s ease;
+  }
+  .collapsible-body :global(details.section-panel[open] .section-panel__chevron) {
+    transform: rotate(180deg);
+    color: var(--aw-color-primary);
+    background: color-mix(in srgb, var(--aw-color-primary) 14%, transparent);
+  }
+  @media (max-width: 640px) {
+    .collapsible-body :global(details.section-panel > summary) {
+      padding: 0.9rem 1rem;
+      font-size: 1rem;
+    }
+    .collapsible-body :global(details.section-panel .section-panel__inner) {
+      padding: 0.9rem 1rem 1.1rem;
+    }
+  }
+
+  /* ---------- Markdown tables ---------- */
+  .collapsible-body :global(div[style*='overflow']) {
+    max-width: 100%;
+    margin: 1.1rem 0;
+    border: 1px solid var(--aw-color-border);
+    border-radius: 0.75rem;
+    -webkit-overflow-scrolling: touch;
+  }
+  .collapsible-body :global(table) {
+    margin: 0;
+    font-size: 0.9375rem;
+    border-collapse: collapse;
+    width: 100%;
+    /* Figures in tables read as data — tabular + slashed zero. */
+    font-variant-numeric: tabular-nums slashed-zero;
+    font-feature-settings:
+      'tnum' 1,
+      'zero' 1;
+  }
+  .collapsible-body :global(thead th) {
+    background: var(--aw-color-surface-2);
+    color: var(--aw-color-text-heading);
+    font-weight: 600;
+    text-align: left;
+  }
+  .collapsible-body :global(th),
+  .collapsible-body :global(td) {
+    border: 1px solid var(--aw-color-border);
+    padding: 0.6rem 0.85rem;
+    vertical-align: top;
+  }
+  .collapsible-body :global(tbody tr:nth-child(even)) {
+    background: color-mix(in srgb, var(--aw-color-surface-2) 55%, transparent);
+  }
+  @media (max-width: 640px) {
+    .collapsible-body :global(table) {
+      font-size: 0.875rem;
+    }
+    .collapsible-body :global(th),
+    .collapsible-body :global(td) {
+      padding: 0.5rem 0.6rem;
+    }
+  }
+
+  /* Bar-in-cell price comparison. The enhancement script tags every table cell
+     that holds a `$` value with `.has-bar` and a `--bar` ratio (0–1, scaled to
+     that column's max), painting a faint clay-amber bar behind the figure.
+     No JS or reduced motion → the class is never added → plain table. */
+  .collapsible-body :global(td.has-bar) {
+    background-image: linear-gradient(
+      to right,
+      color-mix(in srgb, var(--aw-color-data-fill) 22%, transparent) 0,
+      color-mix(in srgb, var(--aw-color-data-fill) 22%, transparent) calc(var(--bar, 0) * 100%),
+      transparent calc(var(--bar, 0) * 100%)
+    );
+    background-repeat: no-repeat;
+  }
+  /* Clear the sticky fact rail on the district template when a TOC chip
+     scrolls a panel to the top. */
+  .collapsible-body :global(details.section-panel) {
+    scroll-margin-top: 5rem;
+  }
+
+  /* ---------- Callout blocks ---------- */
+  .collapsible-body :global(.md-callout) {
+    margin: 1.35rem 0;
+    padding: 1rem 1.15rem 1rem 1.15rem;
+    border: 1px solid color-mix(in srgb, var(--aw-color-primary) 22%, var(--aw-color-border));
+    border-left: 3px solid var(--aw-color-primary);
+    border-radius: var(--gv-radius-md);
+    background: var(--aw-color-info-surface);
+  }
+  .collapsible-body :global(.md-callout > :first-child) {
+    margin-top: 0;
+  }
+  .collapsible-body :global(.md-callout > :last-child) {
+    margin-bottom: 0;
+  }
+  .collapsible-body :global(.md-callout--warn) {
+    border-color: color-mix(in srgb, var(--aw-color-warning) 30%, var(--aw-color-border));
+    border-left-color: var(--aw-color-warning);
+    background: var(--aw-color-warning-surface);
+  }
+  .collapsible-body :global(.md-callout--warn strong),
+  .collapsible-body :global(.md-callout--warn h3),
+  .collapsible-body :global(.md-callout--warn h4) {
+    color: var(--aw-color-warning);
+  }
+  /* Danger variant — the /arenda scam-warning tier (calloutsRehypePlugin DANGER).
+     Used sparingly: the "Топ-5 схем мошенничества" block + the golden rule. */
+  .collapsible-body :global(.md-callout--danger) {
+    border-color: color-mix(in srgb, var(--aw-color-danger) 32%, var(--aw-color-border));
+    border-left-color: var(--aw-color-danger);
+    background: var(--aw-color-danger-surface);
+  }
+  .collapsible-body :global(.md-callout--danger strong),
+  .collapsible-body :global(.md-callout--danger h2),
+  .collapsible-body :global(.md-callout--danger h3),
+  .collapsible-body :global(.md-callout--danger h4) {
+    color: var(--aw-color-danger);
+  }
+  /* 🚩 affordance on the leading heading — pure ::before, no reflow risk. */
+  .collapsible-body :global(.md-callout--danger > h2:first-child)::before,
+  .collapsible-body :global(.md-callout--danger > h3:first-child)::before,
+  .collapsible-body :global(.md-callout--danger > h4:first-child)::before {
+    content: '🚩\00a0';
+  }
+  /* A bare <p> danger callout (the golden-rule line) gets a ⚠ lead instead. */
+  .collapsible-body :global(p.md-callout--danger)::before {
+    content: '⚠ ';
+    font-weight: 700;
+    color: var(--aw-color-danger);
+  }
+
+  /* ---------- Checklist cards (checklistRehypePlugin) ---------- */
+  .collapsible-body :global(ul.md-checklist) {
+    list-style: none;
+    margin: 1.35rem 0;
+    padding: 1.1rem 1.25rem;
+    border: 1px solid var(--aw-color-border);
+    border-left: 3px solid var(--aw-color-positive);
+    border-radius: var(--gv-radius-md);
+    background: var(--aw-color-surface-2);
+  }
+  .collapsible-body :global(ul.md-checklist > li) {
+    position: relative;
+    list-style: none;
+    margin: 0.5em 0;
+    padding-left: 1.7rem;
+  }
+  .collapsible-body :global(ul.md-checklist > li)::marker {
+    content: '';
+  }
+  .collapsible-body :global(ul.md-checklist > li)::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    top: 0.05em;
+    width: 1.15rem;
+    height: 1.15rem;
+    display: grid;
+    place-items: center;
+    font-size: 0.72rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--aw-color-positive);
+    background: color-mix(in srgb, var(--aw-color-positive) 16%, transparent);
+    border-radius: 999px;
+  }
+  .collapsible-body :global(ul.md-checklist > li.md-checklist__title) {
+    margin: 0 0 0.7em;
+    padding-left: 0;
+    font-weight: 650;
+    color: var(--aw-color-text-heading);
+  }
+  .collapsible-body :global(ul.md-checklist > li.md-checklist__title)::before {
+    content: none;
+  }
+  .collapsible-body :global(ul.md-checklist ul) {
+    margin-top: 0.35em;
+  }
+
+  /* ---------- "Безопасно / Небезопасно" comparison (raw block in arenda.md) ---------- */
+  .collapsible-body :global(.cmp) {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+    margin: 1.6rem 0;
+  }
+  @media (min-width: 640px) {
+    .collapsible-body :global(.cmp) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .collapsible-body :global(.cmp__col) {
+    border: 1px solid var(--aw-color-border);
+    border-radius: var(--gv-radius-md);
+    padding: 1rem 1.15rem;
+    background: var(--aw-color-bg-page);
+  }
+  .collapsible-body :global(.cmp__col--safe) {
+    border-left: 3px solid var(--aw-color-positive);
+  }
+  .collapsible-body :global(.cmp__col--unsafe) {
+    border-left: 3px solid var(--aw-color-danger);
+    background: var(--aw-color-danger-surface);
+  }
+  .collapsible-body :global(.cmp__h) {
+    margin: 0 0 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .collapsible-body :global(.cmp__col--safe .cmp__h) {
+    color: var(--aw-color-positive);
+  }
+  .collapsible-body :global(.cmp__col--unsafe .cmp__h) {
+    color: var(--aw-color-danger);
+  }
+  .collapsible-body :global(.cmp ul) {
+    margin: 0;
+    padding-left: 1.15rem;
+  }
+  .collapsible-body :global(.cmp li) {
+    margin: 0.35em 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  /* ---------- TOC chips & controls ---------- */
+  .collapsible-toc__item {
+    border: 1px solid var(--aw-color-border);
+    background: var(--aw-color-surface-2);
+    border-radius: 999px;
+    padding: 0.5rem 0.95rem;
+    min-height: 2.25rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--aw-color-text-default);
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease,
+      color 0.15s ease;
+  }
+  .collapsible-toc__item:hover {
+    background: color-mix(in srgb, var(--aw-color-primary) 12%, transparent);
+    border-color: color-mix(in srgb, var(--aw-color-primary) 45%, var(--aw-color-border));
+    color: var(--aw-color-primary);
+  }
+  .collapsible-ctl {
+    padding: 0.4rem 0.75rem;
+    border-radius: 0.55rem;
+    font-weight: 600;
+    color: var(--aw-color-primary);
+    transition: background 0.15s ease;
+  }
+  .collapsible-ctl:hover {
+    background: color-mix(in srgb, var(--aw-color-primary) 10%, transparent);
+  }
+
+  /* ============================================================ district == */
+  /* Prominent, sticky category tab bar. Pins just under the sticky `.d-rail`
+     fact rail (its measured height lands in `--rd-rail-h`; the constant is the
+     no-JS fallback). */
+  .rd-tabs {
+    position: sticky;
+    top: calc(3.5rem + var(--rd-rail-h, 3rem));
+    z-index: 15;
+    margin-top: var(--space-5);
+    background: var(--aw-color-bg-page);
+    border-bottom: 1px solid var(--aw-color-border);
+  }
+  .rd-tabs__list {
+    display: flex;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0.5rem 0;
+    list-style: none;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    overscroll-behavior-x: contain;
+  }
+  .rd-tabs__list::-webkit-scrollbar {
+    display: none;
+  }
+  .rd-tabs__list > li {
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 0;
+    scroll-snap-align: start;
+  }
+  .rd-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 40px;
+    padding: 0.5rem 0.95rem;
+    border: 1px solid var(--aw-color-border);
+    border-radius: var(--gv-radius-pill);
+    background: var(--aw-color-surface-2);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    color: var(--aw-color-text-default);
+    text-decoration: none;
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease,
+      color 0.15s ease;
+  }
+  .rd-tab__icon {
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    color: var(--aw-color-primary);
+  }
+  .rd-tab:hover {
+    background: color-mix(in srgb, var(--aw-color-primary) 12%, transparent);
+    border-color: color-mix(in srgb, var(--aw-color-primary) 45%, var(--aw-color-border));
+    color: var(--aw-color-primary);
+  }
+  .rd-tab:focus-visible {
+    outline: 2px solid var(--aw-color-primary);
+    outline-offset: 2px;
+  }
+  .rd-tab.is-active {
+    background: var(--aw-color-primary);
+    border-color: var(--aw-color-primary);
+    color: var(--aw-color-on-primary);
+    box-shadow: 0 1px 6px -1px color-mix(in srgb, var(--aw-color-primary) 45%, transparent);
+  }
+  .rd-tab.is-active .rd-tab__icon {
+    color: var(--aw-color-on-primary);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rd-tab {
+      transition: none;
+    }
+  }
+
+  /* Always-open category sections, hairline-separated. */
+  .rd-sect {
+    scroll-margin-top: calc(3.5rem + var(--rd-rail-h, 3rem) + var(--rd-tabs-h, 3.25rem) + 0.75rem);
+  }
+  .rd-sect + .rd-sect {
+    margin-top: clamp(1.75rem, 4vw, 2.75rem);
+    padding-top: clamp(1.75rem, 4vw, 2.75rem);
+    border-top: 1px solid var(--aw-color-border);
+  }
+  .rd-body .rd-sect__head {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 0 0 1rem;
+    font-family: var(--aw-font-heading);
+    font-size: var(--step-h2, 1.6rem);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: var(--aw-color-text-heading);
+  }
+  .rd-sect__icon {
+    flex: none;
+    width: 1.4rem;
+    height: 1.4rem;
+    color: var(--aw-color-primary);
+  }
+  .rd-sect__body > :global(:first-child) {
+    margin-top: 0;
+  }
+
+  /* ============================================================= topics == */
+  /* Same tab bar + section visuals as district, but there's no `.d-rail`
+     fact-rail above /arenda's content — the tabs pin directly under the
+     sticky site header instead of stacking under a second bar. The JS still
+     measures `.d-rail` (absent here → 0) so this only matters for the no-JS
+     sticky/scroll-margin fallback. */
+  .collapsible--topics .rd-tabs {
+    top: 3.5rem;
+  }
+  .collapsible--topics .rd-sect {
+    scroll-margin-top: calc(3.5rem + var(--rd-tabs-h, 3.25rem) + 0.75rem);
+  }
+</style>
+
+<script>
+  // Window-level listeners/observers registered by initDistrictTabs for the
+  // page currently on screen — torn down on astro:before-swap (see bottom).
+  let tabsCleanup: Array<() => void> = [];
+
+  function initCollapsible(root: HTMLElement) {
+    if (root.dataset.variant === 'district' || root.dataset.variant === 'topics') return;
+    if (root.dataset.ready) return;
+    const body = root.querySelector<HTMLElement>('.collapsible-body');
+    const toc = root.querySelector<HTMLElement>('.collapsible-toc');
+    const controls = root.querySelector<HTMLElement>('.collapsible-controls');
+    if (!body || !toc || !controls) return;
+
+    const defaultOpen = parseInt(root.dataset.defaultOpen ?? '0', 10);
+    const variant = root.dataset.variant ?? 'guide';
+
+    // Stepper: leave the markdown flat + fully expanded. GuideLayout's stepper
+    // script builds the numbered steps + progress spine from this same body.
+    if (variant === 'stepper') return;
+
+    // Split the rendered markdown into { heading, items } groups by <h2>.
+    const groups: { heading: HTMLElement; items: ChildNode[] }[] = [];
+    let current: { heading: HTMLElement; items: ChildNode[] } | null = null;
+    for (const node of Array.from(body.childNodes)) {
+      if (node.nodeType === 1 && (node as HTMLElement).tagName === 'H2') {
+        current = { heading: node as HTMLElement, items: [] };
+        groups.push(current);
+      } else if (current) {
+        current.items.push(node);
+      }
+    }
+    if (groups.length < 2) return;
+
+    root.dataset.ready = '1';
+
+    const shortLabel = (text: string) => {
+      let clean = text
+        .replace(/^\s*\d+\.\s*/, '')
+        .split(/[:(–—]/)[0]
+        .trim();
+      if (clean.length > 28) {
+        const cut = clean.slice(0, 26);
+        clean = cut.slice(0, cut.lastIndexOf(' ') > 12 ? cut.lastIndexOf(' ') : 26) + '…';
+      }
+      return clean;
+    };
+
+    groups.forEach((g, i) => {
+      const details = document.createElement('details');
+      details.className = 'section-panel';
+      if (g.heading.id) details.id = g.heading.id;
+      if (i === defaultOpen) details.open = true;
+
+      const summary = document.createElement('summary');
+      const titleSpan = document.createElement('span');
+      titleSpan.textContent = g.heading.textContent?.replace(/^\s*\d+\.\s*/, '') || '';
+      const chevron = document.createElement('span');
+      chevron.className = 'section-panel__chevron';
+      chevron.setAttribute('aria-hidden', 'true');
+      chevron.textContent = '▾';
+      summary.append(titleSpan, chevron);
+
+      const inner = document.createElement('div');
+      inner.className = 'section-panel__inner';
+      g.items.forEach((n) => inner.appendChild(n));
+
+      g.heading.replaceWith(details);
+      details.append(summary, inner);
+
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'collapsible-toc__item';
+      chip.textContent = shortLabel(g.heading.textContent || '');
+      chip.addEventListener('click', () => {
+        details.open = true;
+        details.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      toc.appendChild(chip);
+    });
+
+    controls.classList.remove('hidden');
+    controls.classList.add('flex');
+    controls.querySelector('[data-act="expand"]')?.addEventListener('click', () => {
+      body.querySelectorAll<HTMLDetailsElement>('details.section-panel').forEach((d) => (d.open = true));
+    });
+    controls.querySelector('[data-act="collapse"]')?.addEventListener('click', () => {
+      body.querySelectorAll<HTMLDetailsElement>('details.section-panel').forEach((d) => (d.open = false));
+    });
+
+    // Open a panel that the URL fragment points at.
+    if (location.hash.length > 1) {
+      const target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+      if (target instanceof HTMLDetailsElement) {
+        target.open = true;
+        target.scrollIntoView({ block: 'start' });
+      }
+    }
+  }
+
+  /**
+   * Shared by 'district' and 'topics': sticky category tab bar over always-
+   * open, hairline-separated sections. Selectors are generic (`.rd-tabs`,
+   * `.rd-tab`, `.rd-sect`), so this one function drives both variants.
+   *  - measures `.d-rail` (present on district, absent on topics → 0) + the
+   *    tab bar itself so scroll targets clear both bars
+   *  - tap a tab → smooth-scroll to its section (Lenis, fallback native)
+   *  - IntersectionObserver scroll-spy marks the tab in view as active
+   *  - reduced-motion → let the plain `#anchor` jump run (scroll-margin-top)
+   *
+   * Registers its window-level listeners + observer in `tabsCleanup` so
+   * `astro:before-swap` can tear them down — otherwise every rayon/`topics`
+   * page visited in one session would leak a `resize`/`load` listener bound
+   * to that page's now-detached nav/rail.
+   */
+  function initDistrictTabs(root: HTMLElement) {
+    if (root.dataset.ready) return;
+    const nav = root.querySelector<HTMLElement>('.rd-tabs');
+    const list = root.querySelector<HTMLElement>('.rd-tabs__list');
+    const tabs = Array.from(root.querySelectorAll<HTMLAnchorElement>('.rd-tab'));
+    const sects = Array.from(root.querySelectorAll<HTMLElement>('.rd-sect'));
+    if (!nav || !list || !tabs.length || !sects.length) return;
+    root.dataset.ready = '1';
+
+    const docEl = document.documentElement;
+    const rail = document.querySelector<HTMLElement>('.d-rail');
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const measure = () => {
+      const railH = rail ? Math.round(rail.getBoundingClientRect().height) : 0;
+      docEl.style.setProperty('--rd-rail-h', `${railH}px`);
+      docEl.style.setProperty('--rd-tabs-h', `${Math.round(nav.getBoundingClientRect().height)}px`);
+    };
+    measure();
+    window.addEventListener('resize', measure, { passive: true });
+    window.addEventListener('load', measure, { once: true });
+    tabsCleanup.push(() => {
+      window.removeEventListener('resize', measure);
+      window.removeEventListener('load', measure);
+    });
+
+    const scrollOffset = () => {
+      const rem = parseFloat(getComputedStyle(docEl).fontSize) || 16;
+      const railH = rail ? rail.getBoundingClientRect().height : 0;
+      return 3.5 * rem + railH + nav.getBoundingClientRect().height + 0.75 * rem;
+    };
+
+    const setActive = (idx: number) => {
+      tabs.forEach((t, k) => {
+        const on = k === idx;
+        t.classList.toggle('is-active', on);
+        if (on) t.setAttribute('aria-current', 'true');
+        else t.removeAttribute('aria-current');
+      });
+      const chip = tabs[idx];
+      if (!chip) return;
+      const cLeft = chip.offsetLeft;
+      const cRight = cLeft + chip.offsetWidth;
+      const vLeft = list.scrollLeft;
+      const vRight = vLeft + list.clientWidth;
+      const behavior: ScrollBehavior = reduce ? 'auto' : 'smooth';
+      if (cLeft < vLeft + 12) list.scrollTo({ left: Math.max(0, cLeft - 16), behavior });
+      else if (cRight > vRight - 12) list.scrollTo({ left: cRight - list.clientWidth + 16, behavior });
+    };
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', (e) => {
+        const target = sects[i];
+        if (!target) return;
+        if (reduce) {
+          setActive(i);
+          return; // native #anchor jump; scroll-margin-top does the offset
+        }
+        e.preventDefault();
+        e.stopPropagation(); // pre-empt Motion.astro's global #-anchor handler
+        const lenis = (window as unknown as { __lenis?: { scrollTo: (t: HTMLElement, o?: unknown) => void } }).__lenis;
+        if (lenis) lenis.scrollTo(target, { offset: -scrollOffset() });
+        else target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        history.replaceState(null, '', `#${target.id}`);
+        setActive(i);
+      });
+    });
+
+    if ('IntersectionObserver' in window) {
+      const spy = new IntersectionObserver(
+        (entries) => {
+          for (const en of entries) {
+            if (!en.isIntersecting) continue;
+            const idx = sects.indexOf(en.target as HTMLElement);
+            if (idx >= 0) setActive(idx);
+          }
+        },
+        { rootMargin: '-45% 0px -45% 0px', threshold: 0 }
+      );
+      sects.forEach((s) => spy.observe(s));
+      tabsCleanup.push(() => spy.disconnect());
+    }
+
+    const m = location.hash.match(/^#rayon-(\d+)$/);
+    const start = m ? Number(m[1]) - 1 : 0;
+    setActive(start >= 0 && start < sects.length ? start : 0);
+  }
+
+  // Bar-in-cell: parse `$` figures per table column and expose a `--bar` ratio
+  // so the scoped CSS can draw a faint proportional bar behind each price.
+  // Guarded: skipped entirely under reduced motion (plain table stays).
+  function initRentBars(root: HTMLElement) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    root.querySelectorAll<HTMLTableElement>('table').forEach((table) => {
+      if (table.dataset.barsReady) return;
+      const rows = Array.from(table.querySelectorAll<HTMLTableRowElement>('tbody tr'));
+      if (!rows.length) return;
+
+      const colMax: number[] = [];
+      const cells: { cell: HTMLElement; col: number; val: number }[] = [];
+
+      rows.forEach((tr) => {
+        Array.from(tr.children).forEach((node, col) => {
+          const cell = node as HTMLElement;
+          const text = cell.textContent ?? '';
+          if (!text.includes('$')) return;
+          const nums = (text.match(/\$\s?\d[\d\s]*/g) ?? [])
+            .map((s) => parseInt(s.replace(/[^\d]/g, ''), 10))
+            .filter((n) => Number.isFinite(n) && n > 0);
+          if (!nums.length) return;
+          const val = Math.max(...nums);
+          colMax[col] = Math.max(colMax[col] ?? 0, val);
+          cells.push({ cell, col, val });
+        });
+      });
+
+      if (!cells.length) return;
+      table.dataset.barsReady = '1';
+      cells.forEach(({ cell, col, val }) => {
+        const max = colMax[col] || 0;
+        const ratio = max > 0 ? Math.max(0.06, Math.min(1, val / max)) : 0;
+        cell.style.setProperty('--bar', ratio.toFixed(3));
+        cell.classList.add('has-bar');
+      });
+    });
+  }
+
+  function run() {
+    document.querySelectorAll<HTMLElement>('.collapsible').forEach((el) => {
+      if (el.dataset.variant === 'district' || el.dataset.variant === 'topics') initDistrictTabs(el);
+      else initCollapsible(el);
+      initRentBars(el);
+    });
+  }
+
+  run();
+  document.addEventListener('astro:page-load', run);
+  document.addEventListener('astro:before-swap', () => {
+    tabsCleanup.forEach((fn) => fn());
+    tabsCleanup = [];
+  });
+</script>

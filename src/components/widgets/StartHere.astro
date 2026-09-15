@@ -1,0 +1,196 @@
+---
+/**
+ * StartHere — the "Начните здесь" 3-up. Editorial device: big index numerals
+ * 01–03 + hairline dividers, NOT boxed cards. Whole item is a link with a large
+ * tap target and a visible :focus-visible ring.
+ *
+ * Desktop: 3-col grid with vertical hairlines. Mobile: stacked, horizontal
+ * hairlines. The <ul> carries `data-reveal-stagger`; each link `data-reveal`.
+ */
+import { twMerge } from 'tailwind-merge';
+import Overline from '~/components/ui/Overline.astro';
+
+interface StartHereItem {
+  title: string;
+  description: string;
+  href: string;
+}
+
+interface Props {
+  overline?: string;
+  title?: string;
+  items: StartHereItem[];
+  class?: string;
+}
+
+const { overline, title, items, class: className = '' } = Astro.props;
+---
+
+<section class={twMerge('sh', className)}>
+  <div class="sh__shell">
+    {
+      (overline || title) && (
+        <header class="sh__head" data-reveal>
+          {overline && <Overline>{overline}</Overline>}
+          {title && <h2 class="sh__heading">{title}</h2>}
+        </header>
+      )
+    }
+
+    <ul class="sh__grid" data-reveal-stagger>
+      {
+        items.map((item, i) => (
+          <li class="sh__item">
+            <a class="sh__link" href={item.href} data-reveal>
+              <span class="sh__index tnum">{String(i + 1).padStart(2, '0')}</span>
+              <span class="sh__title">{item.title}</span>
+              <span class="sh__desc">{item.description}</span>
+              <span class="sh__arrow" aria-hidden="true">
+                →
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .sh__shell {
+    max-width: var(--container-default);
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 2rem);
+    padding-block: clamp(4rem, 8vw, 8rem);
+  }
+
+  .sh__head {
+    margin-bottom: var(--space-6);
+  }
+  .sh__heading {
+    margin-top: var(--space-3);
+    font-family: var(--aw-font-heading);
+    font-size: var(--step-h2);
+    font-weight: 620;
+    line-height: 1.15;
+    letter-spacing: -0.014em;
+    color: var(--aw-color-text-heading);
+  }
+
+  .sh__grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    border-top: 1px solid var(--aw-color-border);
+  }
+  .sh__item {
+    border-bottom: 1px solid var(--aw-color-border);
+  }
+
+  .sh__link {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      'index arrow'
+      'title title'
+      'desc desc';
+    gap: var(--space-2) var(--space-4);
+    align-items: start;
+    padding-block: var(--space-6);
+    min-height: 44px;
+    color: var(--aw-color-text-default);
+    text-decoration: none;
+    transition:
+      background var(--dur-sm) var(--gv-ease-out-quart),
+      color var(--dur-sm) var(--gv-ease-out-quart);
+  }
+  .sh__link:hover {
+    color: var(--aw-color-text-heading);
+  }
+  .sh__link:focus-visible {
+    outline: 2px solid var(--aw-color-primary);
+    outline-offset: 3px;
+    border-radius: var(--gv-radius-xs);
+  }
+
+  .sh__index {
+    grid-area: index;
+    font-size: 0.9375rem;
+    font-weight: 650;
+    letter-spacing: 0.02em;
+    color: var(--aw-color-text-muted);
+  }
+  .sh__title {
+    grid-area: title;
+    font-family: var(--aw-font-heading);
+    font-size: var(--step-h3);
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: var(--aw-color-text-heading);
+    transition: color var(--dur-sm) var(--gv-ease-out-quart);
+  }
+  .sh__link:hover .sh__title {
+    color: var(--aw-color-primary);
+  }
+  .sh__desc {
+    grid-area: desc;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--aw-color-text-muted);
+  }
+  .sh__arrow {
+    grid-area: arrow;
+    justify-self: end;
+    font-size: 1.125rem;
+    line-height: 1;
+    color: var(--aw-color-text-muted);
+    transition:
+      transform var(--dur-sm) var(--gv-ease-spring),
+      color var(--dur-sm) var(--gv-ease-out-quart);
+  }
+  .sh__link:hover .sh__arrow {
+    transform: translateX(4px);
+    color: var(--aw-color-primary);
+  }
+
+  @media (min-width: 768px) {
+    .sh__grid {
+      grid-template-columns: repeat(3, 1fr);
+      border-bottom: 1px solid var(--aw-color-border);
+    }
+    .sh__item {
+      border-bottom: 0;
+    }
+    .sh__item + .sh__item {
+      border-left: 1px solid var(--aw-color-border);
+    }
+    .sh__link {
+      grid-template-areas:
+        'index arrow'
+        'title title'
+        'desc desc';
+      padding: var(--space-7) var(--space-6);
+      height: 100%;
+    }
+    .sh__item:first-child .sh__link {
+      padding-left: 0;
+    }
+    .sh__item:last-child .sh__link {
+      padding-right: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sh__link,
+    .sh__title,
+    .sh__arrow {
+      transition: none;
+    }
+    .sh__link:hover .sh__arrow {
+      transform: none;
+    }
+  }
+</style>

@@ -1,0 +1,120 @@
+---
+// Font family is provided by Astro's native Fonts API (see `fonts` in
+// astro.config.ts and <Font /> in Layout.astro), exposed as `--font-inter`.
+---
+
+<style is:inline>
+  /*
+   * ─────────────────────────────────────────────────────────────────────
+   * TOKEN TAXONOMY — layer 1: PRIMITIVES
+   * ─────────────────────────────────────────────────────────────────────
+   * This file defines the raw brand/theme values as `--aw-color-*` /
+   * `--aw-font-*` custom properties, once for `:root` (light) and again for
+   * `.dark` with FULL parity (every token exists in both).
+   *
+   *   primitive  →  this file            (--aw-color-primary: #2450E6)
+   *   semantic   →  tailwind.css @theme  (--color-primary: var(--aw-color-primary))
+   *   component  →  .btn / .u-card / …   (consume the semantic layer)
+   *
+   * Design-value scales (spacing / radius / elevation / easing / duration /
+   * containers / type steps) live in tailwind.css `:root{}`.
+   * Never hard-code a hex in a component — add a primitive here instead.
+   * ─────────────────────────────────────────────────────────────────────
+   */
+  :root {
+    --aw-font-sans: var(--font-inter);
+    --aw-font-serif: var(--font-inter);
+    --aw-font-heading: var(--font-inter);
+    /* Swappable display face — keep Inter for now; a serif may be mapped here later. */
+    --aw-font-display: var(--aw-font-sans);
+
+    /* Brand */
+    --aw-color-primary: #2450e6;
+    --aw-color-primary-strong: #1b3bb0;
+    --aw-color-secondary: #1b3bb0;
+    --aw-color-accent: #5a3ce0; /* decorative violet only — not for UI affordances */
+    /* Text/icon colour for content drawn ON a solid --aw-color-primary(-strong)
+       fill (buttons, active tabs/segments). Kept separate from --aw-color-primary
+       itself because that token is tuned differently per theme when used the
+       OTHER way round (as foreground text/links on --aw-color-bg-page): in dark
+       mode it's brightened for that job, which fails 4.5:1 as white-on-primary
+       button text (2.88:1) — see accessibility audit. */
+    --aw-color-on-primary: #ffffff;
+
+    /* Supporting hues */
+    --aw-color-ceramic: #0e8c93;
+    --aw-color-ceramic-text: #0a6e74;
+    --aw-color-data: #8f4e00;
+    --aw-color-data-fill: #f0a93b;
+
+    /* Text */
+    --aw-color-text-heading: #17181c;
+    --aw-color-text-default: #33343a;
+    --aw-color-text-muted: #65656e;
+
+    /* Surfaces */
+    --aw-color-bg-page: #fcfbf8;
+    --aw-color-bg-page-dark: #0e0f13;
+    --aw-color-surface-2: #f5f4f0;
+    --aw-color-surface-3: #eceae3;
+    --aw-color-border: #e2dfd5;
+
+    /* Semantic accents for callouts / stats */
+    --aw-color-positive: #0f7a52;
+    --aw-color-warning: #9a4f14;
+    --aw-color-warning-surface: #fbf1e6;
+    --aw-color-danger: #b4322a;
+    --aw-color-danger-surface: #fbedec;
+    --aw-color-info-surface: #eef2fd;
+
+    color-scheme: light;
+
+    ::selection {
+      background-color: #d8e2fe;
+    }
+  }
+
+  .dark {
+    --aw-font-sans: var(--font-inter);
+    --aw-font-serif: var(--font-inter);
+    --aw-font-heading: var(--font-inter);
+    --aw-font-display: var(--aw-font-sans);
+
+    --aw-color-primary: #6e93ff;
+    --aw-color-primary-strong: #a8beff;
+    --aw-color-secondary: #a8beff;
+    --aw-color-accent: #9e86ff;
+    /* Dark ink (= --aw-color-bg-page) reads 6.64:1 / 10.47:1 on the dark-mode
+       primary/primary-strong fills above — white would only read 2.88:1 / 1.83:1. */
+    --aw-color-on-primary: var(--aw-color-bg-page);
+
+    --aw-color-ceramic: #37c7ce;
+    --aw-color-ceramic-text: #37c7ce;
+    --aw-color-data: #f2b45a;
+    --aw-color-data-fill: #c9821f;
+
+    --aw-color-text-heading: #f4f3ef;
+    --aw-color-text-default: #d4d4da;
+    --aw-color-text-muted: #9a9aa4;
+
+    --aw-color-bg-page: #0e0f13;
+    --aw-color-bg-page-dark: #0a0b0e;
+    --aw-color-surface-2: #16181e;
+    --aw-color-surface-3: #1e212a;
+    --aw-color-border: #2a2e39;
+
+    --aw-color-positive: #3fd69b;
+    --aw-color-warning: #e9a24a;
+    --aw-color-warning-surface: #211a12;
+    --aw-color-danger: #ff6b5e;
+    --aw-color-danger-surface: #241413;
+    --aw-color-info-surface: #141a29;
+
+    color-scheme: dark;
+
+    ::selection {
+      background-color: #24304d;
+      color: #f4f3ef;
+    }
+  }
+</style>

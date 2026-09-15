@@ -1,0 +1,29 @@
+---
+/**
+ * Site-wide Organization JSON-LD — rendered once in Layout.astro.
+ *
+ * Only facts already published on the site: the office address is the same
+ * one shown on /kontakty and pinned on the /rayony districts map
+ * (ул. Абая, 6А, Ташкент, рядом со станцией метро «Алишер Навои»). No rating,
+ * review, phone, or FAQ data is fabricated here — see AGENTS/audit notes.
+ */
+import { SITE } from 'astrowind:config';
+import { getCanonical, getHomePermalink } from '~/utils/permalinks';
+
+const siteUrl = String(getCanonical(getHomePermalink()));
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: SITE?.name,
+  url: siteUrl,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'улица Абая, 6А',
+    addressLocality: 'Ташкент',
+    addressCountry: 'UZ',
+  },
+};
+---
+
+<script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />

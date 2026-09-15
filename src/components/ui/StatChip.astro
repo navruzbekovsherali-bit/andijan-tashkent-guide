@@ -1,0 +1,72 @@
+---
+import { Icon } from 'astro-icon/components';
+import { twMerge } from 'tailwind-merge';
+
+/**
+ * StatChip — a labelled numeric chip (price, duration, distance, count).
+ * The value renders with the global `.tnum` utility (tabular, slashed zero).
+ * `tone="data"` paints the value in the "data" hue (prices / times);
+ * `tone="ceramic"` uses the ceramic accent.
+ */
+interface Props {
+  label: string;
+  value: string;
+  icon?: string;
+  tone?: 'default' | 'data' | 'ceramic';
+  class?: string;
+}
+
+const { label, value, icon, tone = 'default', class: className = '' } = Astro.props;
+---
+
+<span class={twMerge('gv-statchip', `gv-statchip--${tone}`, className)}>
+  {icon && <Icon name={icon} class="gv-statchip__icon" />}
+  <span class="gv-statchip__text">
+    <span class="gv-statchip__label">{label}</span>
+    <span class="gv-statchip__value tnum">{value}</span>
+  </span>
+</span>
+
+<style>
+  .gv-statchip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--aw-color-border);
+    border-radius: var(--gv-radius-sm);
+    background: var(--aw-color-surface-2);
+    line-height: 1.1;
+  }
+  .gv-statchip__icon {
+    flex: none;
+    width: 1.125rem;
+    height: 1.125rem;
+    color: var(--aw-color-text-muted);
+  }
+  .gv-statchip__text {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .gv-statchip__label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--aw-color-text-muted);
+  }
+  .gv-statchip__value {
+    font-size: 0.9375rem;
+    font-weight: 650;
+    color: var(--aw-color-text-heading);
+  }
+  .gv-statchip--data .gv-statchip__value,
+  .gv-statchip--data .gv-statchip__icon {
+    color: var(--aw-color-data);
+  }
+  .gv-statchip--ceramic .gv-statchip__value,
+  .gv-statchip--ceramic .gv-statchip__icon {
+    color: var(--aw-color-ceramic-text);
+  }
+</style>

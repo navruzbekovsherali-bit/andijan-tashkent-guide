@@ -1,0 +1,33 @@
+---
+import { Icon } from 'astro-icon/components';
+
+export interface Props {
+  icon?: string;
+  title?: string;
+  description?: string;
+}
+
+const {
+  icon = 'tabler:route',
+  title = await Astro.slots.render('title'),
+  description = await Astro.slots.render('description'),
+} = Astro.props;
+---
+
+<section class="not-prose">
+  <div class="mx-auto max-w-4xl px-4 sm:px-6 py-6">
+    <div
+      class="flex items-center gap-3 rounded-2xl border border-[var(--aw-color-border)] bg-[var(--aw-color-surface-2)] px-4 py-3.5 sm:px-5"
+    >
+      <span
+        class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[color-mix(in_srgb,var(--aw-color-primary)_14%,transparent)] text-primary"
+      >
+        <Icon name={icon} class="h-5 w-5" />
+      </span>
+      <p class="text-[0.95rem] leading-snug">
+        <span class="font-semibold text-[var(--aw-color-text-heading)]" set:html={title} />
+        <span class="text-muted" set:html={description} />
+      </p>
+    </div>
+  </div>
+</section>

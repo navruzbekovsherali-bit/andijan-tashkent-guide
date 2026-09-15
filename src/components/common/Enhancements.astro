@@ -1,0 +1,141 @@
+---
+/**
+ * Two tiny vanilla effects adapted from React Bits (reactbits.dev):
+ *  - SpotlightCard  → cursor-follow glow on `.u-card` (CSS in tailwind.css; JS here sets --spot-x/y)
+ *  - CountUp        → scroll-triggered number tween on `[data-countup]`
+ * Both are dependency-free, respect pointer type and prefers-reduced-motion,
+ * and degrade to plain static output.
+ */
+---
+
+<script>
+  // --- SpotlightCard (React Bits) ported to vanilla -------------------------
+  function initSpotlight() {
+    const w = window as typeof window & { __spotlightBound?: boolean };
+    if (w.__spotlightBound) return;
+    if (window.matchMedia('(hover: none)').matches) return;
+    w.__spotlightBound = true;
+
+    let raf = 0;
+    let pending: { card: HTMLElement; x: number; y: number } | null = null;
+
+    document.addEventListener(
+      'pointermove',
+      (e) => {
+        const card = (e.target as HTMLElement | null)?.closest<HTMLElement>('.u-card');
+        if (!card) return;
+        const r = card.getBoundingClientRect();
+        pending = { card, x: e.clientX - r.left, y: e.clientY - r.top };
+        if (raf) return;
+        raf = requestAnimationFrame(() => {
+          raf = 0;
+          if (!pending) return;
+          pending.card.style.setProperty('--spot-x', `${pending.x}px`);
+          pending.card.style.setProperty('--spot-y', `${pending.y}px`);
+        });
+      },
+      { passive: true }
+    );
+  }
+
+  // --- CountUp (React Bits) ported to vanilla ------------------------------
+  function initCountUp() {
+    const els = document.querySelectorAll<HTMLElement>('[data-countup]:not([data-cu-ready])');
+    if (!els.length) return;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const run = (el: HTMLElement) => {
+      const from = Number(el.dataset.from ?? 0);
+      const to = Number(el.dataset.to ?? 0);
+      const dur = Number(el.dataset.dur ?? 1300);
+      const pre = el.dataset.prefix ?? '';
+      const suf = el.dataset.suffix ?? '';
+      const dec = (String(to).split('.')[1] ?? '').length;
+      const fmt = (n: number) => pre + n.toFixed(dec) + suf;
+      if (reduce || dur <= 0) {
+        el.textContent = fmt(to);
+        return;
+      }
+      const t0 = performance.now();
+      const tick = (now: number) => {
+        const p = Math.min(1, (now - t0) / dur);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = fmt(from + (to - from) * eased);
+        if (p < 1) requestAnimationFrame(tick);
+        else el.textContent = fmt(to);
+      };
+      requestAnimationFrame(tick);
+    };
+
+    if (!('IntersectionObserver' in window)) {
+      els.forEach((el) => {
+        el.dataset.cuReady = '1';
+        run(el);
+      });
+      return;
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const en of entries) {
+          if (!en.isIntersecting) continue;
+          io.unobserve(en.target);
+          run(en.target as HTMLElement);
+        }
+      },
+      { rootMargin: '0px 0px -10% 0px' }
+    );
+    els.forEach((el) => {
+      el.dataset.cuReady = '1';
+      io.observe(el);
+    });
+  }
+
+  // --- Magnet (React Bits) ported to vanilla ------------------------------
+  function initMagnet() {
+    const w = window as typeof window & { __magnetBound?: boolean };
+    if (w.__magnetBound) return;
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    w.__magnetBound = true;
+
+    const PAD = 90;
+    const STRENGTH = 4;
+    let raf = 0;
+    let pending: { el: HTMLElement; x: number; y: number } | null = null;
+
+    window.addEventListener(
+      'pointermove',
+      (e) => {
+        const els = document.querySelectorAll<HTMLElement>('[data-magnet]');
+        els.forEach((el) => {
+          const r = el.getBoundingClientRect();
+          const cx = r.left + r.width / 2;
+          const cy = r.top + r.height / 2;
+          const within = Math.abs(e.clientX - cx) < r.width / 2 + PAD && Math.abs(e.clientY - cy) < r.height / 2 + PAD;
+          if (within) {
+            pending = { el, x: (e.clientX - cx) / STRENGTH, y: (e.clientY - cy) / STRENGTH };
+            el.style.transition = 'transform 0.25s ease-out';
+            if (!raf)
+              raf = requestAnimationFrame(() => {
+                raf = 0;
+                if (pending) pending.el.style.transform = `translate3d(${pending.x}px, ${pending.y}px, 0)`;
+              });
+          } else if (el.style.transform && el.style.transform !== 'translate3d(0px, 0px, 0)') {
+            el.style.transition = 'transform 0.5s ease-in-out';
+            el.style.transform = 'translate3d(0px, 0px, 0)';
+          }
+        });
+      },
+      { passive: true }
+    );
+  }
+
+  function run() {
+    initSpotlight();
+    initCountUp();
+    initMagnet();
+  }
+  run();
+  document.addEventListener('astro:page-load', run);
+</script>

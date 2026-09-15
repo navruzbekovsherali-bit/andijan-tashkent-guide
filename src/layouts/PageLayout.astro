@@ -1,0 +1,35 @@
+---
+import Layout from '~/layouts/Layout.astro';
+import Header from '~/components/widgets/Header.astro';
+import Footer from '~/components/widgets/Footer.astro';
+import LanguageSwitcher from '~/components/common/LanguageSwitcher.astro';
+
+import { getHeaderData, getFooterData, getHomeHref } from '~/navigation';
+
+import type { MetaData } from '~/types';
+
+export interface Props {
+  metadata?: MetaData;
+}
+
+const { metadata } = Astro.props;
+const lang = Astro.currentLocale === 'uz' ? 'uz' : 'ru';
+const headerData = getHeaderData(lang);
+const footerData = getFooterData(lang);
+const homeHref = getHomeHref(lang);
+---
+
+<Layout metadata={metadata} lang={lang}>
+  <slot name="header">
+    <Header {...headerData} homeHref={homeHref} lang={lang} isSticky showToggleTheme>
+      <LanguageSwitcher slot="lang-switcher" />
+      <LanguageSwitcher slot="lang-switcher-mobile" />
+    </Header>
+  </slot>
+  <main id="main-content" tabindex="-1">
+    <slot />
+  </main>
+  <slot name="footer">
+    <Footer {...footerData} homeHref={homeHref} />
+  </slot>
+</Layout>

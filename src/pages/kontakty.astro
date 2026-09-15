@@ -1,0 +1,691 @@
+---
+import { Icon } from 'astro-icon/components';
+
+import Layout from '~/layouts/PageLayout.astro';
+import Overline from '~/components/ui/Overline.astro';
+import SplitReveal from '~/components/ui/SplitReveal.astro';
+import { getPermalink } from '~/utils/permalinks';
+
+const metadata = {
+  title: 'Контакты, экстренные службы и офис',
+  description:
+    'Адрес офиса на ул. Абая, 6А в Ташкенте с картами, единые номера экстренных служб Узбекистана и ссылки на официальные госсервисы для релокантов.',
+};
+
+const officeQuery = 'Ташкент, улица Абая, 6А';
+const maps = [
+  {
+    label: 'Яндекс.Карты',
+    href: `https://yandex.uz/maps/?text=${encodeURIComponent(officeQuery)}`,
+    icon: 'tabler:map-pin',
+  },
+  {
+    label: '2GIS',
+    href: `https://2gis.uz/tashkent/search/${encodeURIComponent('улица Абая 6А')}`,
+    icon: 'tabler:map-2',
+  },
+  {
+    label: 'Google Maps',
+    href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(officeQuery)}`,
+    icon: 'tabler:brand-google-maps',
+  },
+];
+
+const emergency = [
+  { num: '112', label: 'Единая служба спасения', note: 'один номер для всех экстренных случаев' },
+  { num: '101', label: 'Пожарная охрана и МЧС', note: 'пожар, ЧС, помощь на перевале Камчик' },
+  { num: '102', label: 'Милиция', note: 'правопорядок, кражи, мошенничество' },
+  { num: '103', label: 'Скорая медицинская помощь', note: 'угроза жизни и здоровью' },
+  { num: '104', label: 'Аварийная газовая служба', note: 'запах газа, неисправность колонки' },
+];
+
+const agencies = [
+  {
+    company: 'LOCUS Development Group',
+    tagline: 'Подбор жилья для сотрудников. Просто, надёжно, без лишних действий с вашей стороны.',
+    address: 'г. Ташкент, Чиланзарский р-н, Чиланзар-6, дом 44',
+    people: [
+      {
+        name: 'Сардор',
+        role: undefined as string | undefined,
+        phones: [{ phone: '+998940888988', phoneDisplay: '+998 94 088 89 88' }],
+      },
+      {
+        name: 'Зуля',
+        role: undefined as string | undefined,
+        phones: [{ phone: '+998971023332', phoneDisplay: '+998 97 102 33 32' }],
+      },
+    ],
+    email: 'locusdevelopmentgroupuz@gmail.com',
+    messengers: [{ label: 'Telegram / WhatsApp: @locus_apartment', href: 'https://t.me/locus_apartment' }],
+  },
+  {
+    company: 'ООО «NMS ESTATE»',
+    director: 'Директор — Наврузов М. Ш., действует на основании Устава',
+    tagline: 'Подбор жилья для сотрудников. Просто, надёжно, без лишних действий с вашей стороны.',
+    address: 'г. Ташкент, ЖК «Boulevard», корп. 3А, офис 127',
+    people: [
+      {
+        name: 'Хумора',
+        role: 'агент',
+        phones: [
+          { phone: '+998900665050', phoneDisplay: '+998 90 066 50 50' },
+          { phone: '+998959808683', phoneDisplay: '+998 95 980 86 83' },
+        ],
+      },
+    ],
+    messengers: [
+      { label: 'Telegram: @agent_nedvijimosti', href: 'https://t.me/agent_nedvijimosti' },
+      { label: 'Telegram: @khumora5050', href: 'https://t.me/khumora5050' },
+    ],
+  },
+  {
+    company: 'Comfort Home Agency',
+    tagline: 'Жильё для сотрудников — комфортный подбор, надёжный сервис и минимум забот для вашей компании.',
+    address: 'г. Ташкент, улица Нукус, 88',
+    people: [
+      {
+        name: 'Мехриддин',
+        role: undefined as string | undefined,
+        phones: [{ phone: '+998990040700', phoneDisplay: '+998 99 004 07 00' }],
+      },
+      {
+        name: 'Сарвар',
+        role: undefined as string | undefined,
+        phones: [{ phone: '+998500234119', phoneDisplay: '+998 50 023 41 19' }],
+      },
+    ],
+    email: 'galibbayeva2001@icloud.com',
+    messengers: [
+      { label: 'Telegram: @Sindarov_Mexriddin', href: 'https://t.me/Sindarov_Mexriddin' },
+      { label: 'Telegram: @Comfort_homeeeee', href: 'https://t.me/Comfort_homeeeee' },
+    ],
+  },
+];
+
+const services = [
+  {
+    label: 'my.gov.uz',
+    desc: 'Единый портал госуслуг: временная регистрация, направление в детсад',
+    href: 'https://my.gov.uz',
+  },
+  { label: 'maktab.uz', desc: 'Приём и перевод детей в школу', href: 'https://maktab.uz' },
+  { label: 'ijara.soliq.uz', desc: 'E-ijara — постановка договора аренды на учёт', href: 'https://ijara.soliq.uz' },
+  { label: 'emehmon.uz', desc: 'Регистрация иностранных граждан по месту проживания', href: 'https://emehmon.uz' },
+  {
+    label: 'Joymee',
+    desc: '130 000+ объявлений об аренде и продаже жилья по всему Узбекистану',
+    href: 'https://joymee.uz',
+  },
+  { label: 'uybor.uz', desc: 'Профильный портал недвижимости Узбекистана', href: 'https://uybor.uz' },
+];
+---
+
+<Layout metadata={metadata}>
+  <div class="k-wrap">
+    <header class="k-hero">
+      <Overline>Контакты</Overline>
+      <SplitReveal as="h1" class="k-hero__title">Контакты и как добраться</SplitReveal>
+      <p class="k-hero__lead">
+        Адрес офиса с картами, единые номера экстренных служб Узбекистана и официальные сервисы, которые понадобятся в
+        первые недели после переезда.
+      </p>
+    </header>
+
+    <!-- Office -->
+    <section class="k-office u-card">
+      <div class="k-office__head">
+        <span class="k-office__badge">
+          <Icon name="tabler:building" class="h-5 w-5" />
+        </span>
+        <div class="min-w-0">
+          <h2 class="k-office__title">Офис компании</h2>
+          <p class="k-office__addr">г. Ташкент, улица Абая, 6А — рядом со станцией метро «Алишер Навои».</p>
+        </div>
+      </div>
+
+      <div class="k-maps">
+        {
+          maps.map((m) => (
+            <a href={m.href} target="_blank" rel="noopener noreferrer" class="k-maps__btn">
+              <Icon name={m.icon} class="h-4 w-4 shrink-0" />
+              {m.label}
+            </a>
+          ))
+        }
+      </div>
+
+      <a href={`geo:0,0?q=${encodeURIComponent(officeQuery)}`} class="k-geo">
+        <Icon name="tabler:current-location" class="h-5 w-5 shrink-0" />
+        <span>Открыть в приложении карт на телефоне</span>
+        <span class="k-geo__arrow" aria-hidden="true">→</span>
+      </a>
+    </section>
+
+    <!-- Emergency -->
+    <section class="k-section">
+      <h2 class="k-h2">Экстренные службы</h2>
+      <p class="k-sub">Звонки бесплатны с любого мобильного, работают по всему Узбекистану.</p>
+      <ul class="k-tel" data-reveal-stagger>
+        {
+          emergency.map((e) => (
+            <li>
+              <a href={`tel:${e.num}`} class="k-tel__row" data-reveal>
+                <span class="k-tel__num tnum">{e.num}</span>
+                <span class="k-tel__text">
+                  <span class="k-tel__label">{e.label}</span>
+                  <span class="k-tel__note">{e.note}</span>
+                </span>
+                <Icon name="tabler:phone" class="k-tel__icon" />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <!-- Trusted agencies -->
+    <section class="k-section">
+      <h2 class="k-h2">Проверенные агентства</h2>
+      <p class="k-sub">Партнёры, которые помогают сотрудникам компании подобрать жильё, — можно обращаться напрямую.</p>
+
+      <ul class="k-agency-list" data-reveal-stagger>
+        {
+          agencies.map((a) => (
+            <li class="k-agency u-card" data-reveal>
+              <div class="k-agency__head">
+                <span class="k-agency__badge">
+                  <Icon name="tabler:building-community" class="h-5 w-5" />
+                </span>
+                <div class="min-w-0">
+                  <h3 class="k-agency__name">{a.company}</h3>
+                  {a.director && <p class="k-agency__director">{a.director}</p>}
+                  <p class="k-agency__tagline">{a.tagline}</p>
+                </div>
+              </div>
+
+              <p class="k-agency__addr">
+                <Icon name="tabler:map-pin" class="k-agency__addr-icon" />
+                {a.address}
+              </p>
+
+              <div class="k-agency__people">
+                {a.people.map((p) => (
+                  <div class="k-agency__person-group">
+                    <span class="k-agency__person-label">
+                      {p.name}
+                      {p.role && <span class="k-agency__person-role"> · {p.role}</span>}
+                    </span>
+                    <div class="k-agency__person-phones">
+                      {p.phones.map((ph) => (
+                        <a href={`tel:${ph.phone}`} class="k-agency__person">
+                          <span class="k-agency__person-phone tnum">{ph.phoneDisplay}</span>
+                          <Icon name="tabler:phone" class="k-agency__person-icon" />
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div class="k-maps k-agency__actions">
+                {a.messengers.map((m) => (
+                  <a href={m.href} target="_blank" rel="noopener noreferrer" class="k-maps__btn">
+                    <Icon name="tabler:brand-telegram" class="h-4 w-4 shrink-0" />
+                    {m.label}
+                  </a>
+                ))}
+                {a.email && (
+                  <a href={`mailto:${a.email}`} class="k-maps__btn">
+                    <Icon name="tabler:mail" class="h-4 w-4 shrink-0" />
+                    {a.email}
+                  </a>
+                )}
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <!-- Services -->
+    <section class="k-section">
+      <h2 class="k-h2">Официальные сервисы</h2>
+      <ul class="k-services" data-reveal-stagger>
+        {
+          services.map((s) => (
+            <li>
+              <a href={s.href} target="_blank" rel="noopener noreferrer" class="k-services__row" data-reveal>
+                <Icon name="tabler:external-link" class="k-services__icon" />
+                <span class="min-w-0">
+                  <span class="k-services__label">{s.label}</span>
+                  <span class="k-services__desc">{s.desc}</span>
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <aside class="k-note">
+      <Overline>Контакты отдела адаптации</Overline>
+      <p>
+        Прямые телефоны и мессенджеры отдела адаптации выдаются вместе с оффером и приветственным письмом. По вопросам
+        переезда, ходатайств для школы или детского сада пишите на корпоративную почту, указанную в вашем договоре.
+      </p>
+      <a class="k-note__link" href={getPermalink('/pereezd')}>Пошаговый гайд по переезду →</a>
+    </aside>
+  </div>
+</Layout>
+
+<style>
+  .k-wrap {
+    max-width: 52rem;
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 2rem);
+    padding-block: clamp(3.5rem, 7vw, 6rem) clamp(4rem, 8vw, 8rem);
+  }
+
+  /* ------------------------------------------------------------- hero -- */
+  .k-hero__title {
+    margin-top: var(--space-3);
+    font-family: var(--aw-font-heading);
+    font-size: var(--step-display);
+    font-weight: 640;
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    color: var(--aw-color-text-heading);
+    text-wrap: balance;
+  }
+  .k-hero__lead {
+    margin-top: var(--space-5);
+    max-width: 40rem;
+    font-size: clamp(1.05rem, 0.98rem + 0.5vw, 1.25rem);
+    line-height: 1.6;
+    color: var(--aw-color-text-muted);
+  }
+
+  /* ----------------------------------------------------------- office -- */
+  .k-office {
+    margin-top: clamp(2.5rem, 5vw, 3.5rem);
+    padding: clamp(1.25rem, 3vw, 1.75rem);
+  }
+  .k-office__head {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+  .k-office__badge {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    flex: none;
+    border-radius: var(--gv-radius-md);
+    background: color-mix(in srgb, var(--aw-color-primary) 12%, transparent);
+    color: var(--aw-color-primary);
+  }
+  .k-office__title {
+    font-family: var(--aw-font-heading);
+    font-size: var(--step-h3);
+    font-weight: 600;
+    color: var(--aw-color-text-heading);
+  }
+  .k-office__addr {
+    margin-top: 0.25rem;
+    color: var(--aw-color-text-muted);
+    line-height: 1.55;
+  }
+  .k-maps {
+    margin-top: var(--space-4);
+    display: grid;
+    gap: var(--space-2);
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 560px) {
+    .k-maps {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  .k-maps__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0.65rem 0.9rem;
+    border: 1px solid var(--aw-color-border);
+    border-radius: var(--gv-radius-md);
+    background: var(--aw-color-surface-2);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--aw-color-text-default);
+    text-decoration: none;
+    transition:
+      border-color var(--dur-sm) var(--gv-ease-out-quart),
+      color var(--dur-sm) var(--gv-ease-out-quart);
+  }
+  .k-maps__btn:hover {
+    border-color: color-mix(in srgb, var(--aw-color-primary) 55%, var(--aw-color-border));
+    color: var(--aw-color-primary);
+  }
+  .k-maps__btn:focus-visible {
+    outline: 2px solid var(--aw-color-primary);
+    outline-offset: 2px;
+  }
+  .k-geo {
+    margin-top: var(--space-3);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 48px;
+    padding: 0.7rem 1rem;
+    border: 1px solid color-mix(in srgb, var(--aw-color-primary) 40%, var(--aw-color-border));
+    border-radius: var(--gv-radius-md);
+    background: color-mix(in srgb, var(--aw-color-primary) 8%, transparent);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--aw-color-primary);
+    text-decoration: none;
+  }
+  .k-geo__arrow {
+    margin-left: auto;
+    transition: transform var(--dur-sm) var(--gv-ease-spring);
+  }
+  .k-geo:hover .k-geo__arrow {
+    transform: translateX(4px);
+  }
+  .k-geo:focus-visible {
+    outline: 2px solid var(--aw-color-primary);
+    outline-offset: 2px;
+  }
+
+  /* --------------------------------------------------------- agencies -- */
+  .k-agency-list {
+    list-style: none;
+    margin: var(--space-5) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-4);
+  }
+  .k-agency {
+    padding: clamp(1.25rem, 3vw, 1.75rem);
+  }
+  .k-agency__head {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+  .k-agency__badge {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    flex: none;
+    border-radius: var(--gv-radius-md);
+    background: color-mix(in srgb, var(--aw-color-ceramic) 16%, transparent);
+    color: var(--aw-color-ceramic-text);
+  }
+  .k-agency__name {
+    font-family: var(--aw-font-heading);
+    font-size: var(--step-h3);
+    font-weight: 600;
+    color: var(--aw-color-text-heading);
+  }
+  .k-agency__director {
+    margin-top: 0.15rem;
+    font-size: 0.8125rem;
+    color: var(--aw-color-text-muted);
+  }
+  .k-agency__tagline {
+    margin-top: 0.25rem;
+    color: var(--aw-color-text-muted);
+    line-height: 1.5;
+  }
+  .k-agency__addr {
+    margin-top: var(--space-3);
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--aw-color-text-muted);
+  }
+  .k-agency__addr-icon {
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    margin-top: 2px;
+    color: var(--aw-color-text-muted);
+  }
+  .k-agency__people {
+    margin-top: var(--space-4);
+    display: grid;
+    gap: var(--space-2);
+  }
+  @media (min-width: 480px) {
+    .k-agency__people {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  .k-agency__person-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    padding: 0.6rem 0.85rem;
+    border: 1px solid var(--aw-color-border);
+    border-radius: var(--gv-radius-md);
+    background: var(--aw-color-surface-2);
+  }
+  .k-agency__person-label {
+    font-weight: 600;
+    color: var(--aw-color-text-heading);
+  }
+  .k-agency__person-role {
+    font-weight: 400;
+    color: var(--aw-color-text-muted);
+  }
+  .k-agency__person-phones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .k-agency__person {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--aw-color-border);
+    border-radius: var(--gv-radius-sm);
+    background: var(--aw-color-bg-page);
+    text-decoration: none;
+    transition: border-color var(--dur-sm) var(--gv-ease-out-quart);
+  }
+  .k-agency__person:hover {
+    border-color: color-mix(in srgb, var(--aw-color-data) 55%, var(--aw-color-border));
+  }
+  .k-agency__person:focus-visible {
+    outline: 2px solid var(--aw-color-primary);
+    outline-offset: 2px;
+  }
+  .k-agency__person-phone {
+    font-weight: 650;
+    color: var(--aw-color-data);
+    white-space: nowrap;
+  }
+  .k-agency__person-icon {
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    color: var(--aw-color-text-muted);
+  }
+  .k-agency__actions {
+    margin-top: var(--space-3);
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 560px) {
+    .k-agency__actions {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .k-agency__person {
+      transition: none;
+    }
+  }
+
+  /* ---------------------------------------------------------- sections -- */
+  .k-section {
+    margin-top: clamp(3rem, 6vw, 4.5rem);
+  }
+  .k-h2 {
+    font-family: var(--aw-font-heading);
+    font-size: var(--step-h2);
+    font-weight: 620;
+    letter-spacing: -0.014em;
+    color: var(--aw-color-text-heading);
+  }
+  .k-sub {
+    margin-top: 0.4rem;
+    font-size: 0.875rem;
+    color: var(--aw-color-text-muted);
+  }
+
+  /* ------------------------------------------- emergency: oversized tel -- */
+  .k-tel {
+    list-style: none;
+    margin: var(--space-5) 0 0;
+    padding: 0;
+    border-top: 1px solid var(--aw-color-border);
+  }
+  .k-tel li {
+    border-bottom: 1px solid var(--aw-color-border);
+  }
+  .k-tel__row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    min-height: 64px;
+    padding-block: var(--space-3);
+    text-decoration: none;
+    transition: background var(--dur-sm) var(--gv-ease-out-quart);
+  }
+  .k-tel__row:hover {
+    background: color-mix(in srgb, var(--aw-color-data) 7%, transparent);
+  }
+  .k-tel__row:focus-visible {
+    outline: 2px solid var(--aw-color-primary);
+    outline-offset: 2px;
+    border-radius: var(--gv-radius-xs);
+  }
+  .k-tel__num {
+    flex: none;
+    min-width: 3ch;
+    font-family: var(--aw-font-heading);
+    font-size: var(--step-h2);
+    font-weight: 640;
+    line-height: 1;
+    color: var(--aw-color-data);
+  }
+  .k-tel__text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .k-tel__label {
+    font-weight: 600;
+    color: var(--aw-color-text-heading);
+  }
+  .k-tel__note {
+    font-size: 0.875rem;
+    color: var(--aw-color-text-muted);
+  }
+  .k-tel__icon {
+    flex: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-left: auto;
+    color: var(--aw-color-text-muted);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .k-tel__row,
+    .k-geo__arrow {
+      transition: none;
+    }
+    .k-geo:hover .k-geo__arrow {
+      transform: none;
+    }
+  }
+
+  /* --------------------------------------------------------- services -- */
+  .k-services {
+    list-style: none;
+    margin: var(--space-5) 0 0;
+    padding: 0;
+    border-top: 1px solid var(--aw-color-border);
+  }
+  .k-services li {
+    border-bottom: 1px solid var(--aw-color-border);
+  }
+  .k-services__row {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    min-height: 44px;
+    padding-block: var(--space-4);
+    text-decoration: none;
+    transition: color var(--dur-sm) var(--gv-ease-out-quart);
+  }
+  .k-services__row:hover {
+    color: var(--aw-color-primary);
+  }
+  .k-services__row:focus-visible {
+    outline: 2px solid var(--aw-color-primary);
+    outline-offset: 2px;
+    border-radius: var(--gv-radius-xs);
+  }
+  .k-services__icon {
+    flex: none;
+    width: 1.15rem;
+    height: 1.15rem;
+    margin-top: 2px;
+    color: var(--aw-color-primary);
+  }
+  .k-services__label {
+    display: block;
+    font-weight: 600;
+    color: var(--aw-color-text-heading);
+  }
+  .k-services__desc {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--aw-color-text-muted);
+  }
+
+  /* ---------------------------------------------------- footer note -- */
+  .k-note {
+    margin-top: clamp(3rem, 6vw, 4.5rem);
+    border-top: 1px solid var(--aw-color-border);
+    padding-top: var(--space-5);
+  }
+  .k-note p {
+    margin-top: var(--space-3);
+    max-width: 44rem;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--aw-color-text-muted);
+  }
+  .k-note__link {
+    display: inline-block;
+    margin-top: var(--space-3);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--aw-color-primary);
+    text-decoration: none;
+  }
+  .k-note__link:hover {
+    text-decoration: underline;
+  }
+</style>

@@ -1,0 +1,148 @@
+---
+import { Icon } from 'astro-icon/components';
+import { withLangPrefix, type Lang } from '~/navigation';
+
+/**
+ * Fixed bottom tab bar for phones — inspired by React Bits "Dock" (reactbits.dev),
+ * rebuilt as a plain Astro/CSS nav (no React, no magnification). Gives a
+ * "Home" affordance and section jumps from any screen; hidden ≥ md and while
+ * the mobile menu overlay is open.
+ */
+export interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'ru' } = Astro.props;
+const p = (path: string) => withLangPrefix(lang, path);
+const uzPrefix = lang === 'uz' ? '\\/uz' : '';
+
+const items =
+  lang === 'uz'
+    ? [
+        { label: 'Бош саҳифа', href: p('/'), icon: 'tabler:home', match: new RegExp(`^${uzPrefix}\\/?$`) },
+        {
+          label: 'Туманлар',
+          href: p('/rayony'),
+          icon: 'tabler:map-pin',
+          match: new RegExp(`^${uzPrefix}\\/rayon(y|\\/)`),
+        },
+        {
+          label: 'Ҳужжатлар',
+          href: p('/pereezd'),
+          icon: 'tabler:file-text',
+          match: new RegExp(`^${uzPrefix}\\/pereezd`),
+        },
+        { label: 'Ижара', href: p('/arenda'), icon: 'tabler:key', match: new RegExp(`^${uzPrefix}\\/arenda`) },
+        { label: 'Алоқа', href: p('/kontakty'), icon: 'tabler:phone', match: new RegExp(`^${uzPrefix}\\/kontakty`) },
+      ]
+    : [
+        { label: 'Главная', href: p('/'), icon: 'tabler:home', match: /^\/$/ },
+        { label: 'Районы', href: p('/rayony'), icon: 'tabler:map-pin', match: /^\/rayon(y|\/)/ },
+        { label: 'Документы', href: p('/pereezd'), icon: 'tabler:file-text', match: /^\/pereezd/ },
+        { label: 'Аренда', href: p('/arenda'), icon: 'tabler:key', match: /^\/arenda/ },
+        { label: 'Контакты', href: p('/kontakty'), icon: 'tabler:phone', match: /^\/kontakty/ },
+      ];
+---
+
+<nav class="mobile-dock md:hidden" aria-label={lang === 'uz' ? 'Асосий навигация' : 'Основная навигация'}>
+  <ul>
+    {
+      items.map((it) => (
+        <li>
+          <a href={it.href} data-match={it.match.source}>
+            <Icon name={it.icon} class="dock-ic" />
+            <span>{it.label}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<style>
+  .mobile-dock {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 45;
+    background: color-mix(in srgb, var(--aw-color-bg-page) 88%, transparent);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid var(--aw-color-border);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    transition:
+      transform var(--dur-sm) var(--gv-ease-out-quart),
+      opacity var(--dur-sm) var(--gv-ease-out-quart);
+  }
+  .mobile-dock ul {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .mobile-dock a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 56px;
+    padding: 6px 2px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--aw-color-text-muted);
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mobile-dock a :global(.dock-ic) {
+    width: 22px;
+    height: 22px;
+    transition: transform var(--dur-micro) var(--gv-ease-out-quart);
+  }
+  .mobile-dock a[aria-current='page'] {
+    color: var(--aw-color-primary);
+  }
+  .mobile-dock a[aria-current='page'] :global(.dock-ic) {
+    transform: translateY(-1px) scale(1.06);
+  }
+  .mobile-dock a:active :global(.dock-ic) {
+    transform: scale(0.9);
+  }
+
+  /* Hidden while the header's mobile menu overlay is open */
+  :global(body.overflow-hidden) .mobile-dock {
+    transform: translateY(110%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mobile-dock,
+    .mobile-dock a :global(.dock-ic) {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  function markActiveDock() {
+    const dock = document.querySelector('.mobile-dock');
+    if (!dock) return;
+    const path = '/' + location.pathname.replace(/^\/+|\/+$/g, '');
+    dock.querySelectorAll<HTMLAnchorElement>('a[data-match]').forEach((a) => {
+      let on = false;
+      try {
+        on = new RegExp(a.dataset.match || '').test(path === '/' ? '/' : path + '/');
+      } catch {
+        // invalid pattern — leave `on` false
+      }
+      a.toggleAttribute('aria-current', on);
+      if (on) a.setAttribute('aria-current', 'page');
+    });
+  }
+  markActiveDock();
+  document.addEventListener('astro:page-load', markActiveDock);
+</script>

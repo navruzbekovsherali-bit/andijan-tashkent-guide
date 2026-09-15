@@ -1,0 +1,541 @@
+@import 'tailwindcss';
+
+@plugin "@tailwindcss/typography";
+
+@variant dark (&:where(.dark, .dark *));
+
+@custom-variant intersect (&:not([no-intersect]));
+
+/*
+ * ───────────────────────────────────────────────────────────────────────
+ * TOKEN TAXONOMY — layer 2: SEMANTIC (Tailwind utility generation)
+ * ───────────────────────────────────────────────────────────────────────
+ *   primitive  →  CustomStyles.astro   (--aw-color-primary: #2450E6)   light + .dark parity
+ *   semantic   →  this @theme block    (--color-primary: var(--aw-color-primary))  → bg-primary, text-primary…
+ *   component  →  .btn / .u-card / …   below, consuming the semantic + scale layers
+ *
+ * Non-color design values (spacing, radius, elevation, easing, duration,
+ * container widths, type steps) are plain custom properties in the `:root{}`
+ * block further down — deliberately NOT in @theme, so they stay raw
+ * `var(--space-4)` / `var(--gv-radius-sm)` hooks rather than generating utilities.
+ * ───────────────────────────────────────────────────────────────────────
+ */
+@theme {
+  --color-primary: var(--aw-color-primary);
+  --color-primary-strong: var(--aw-color-primary-strong);
+  --color-on-primary: var(--aw-color-on-primary);
+  --color-secondary: var(--aw-color-secondary);
+  --color-accent: var(--aw-color-accent);
+  --color-ceramic: var(--aw-color-ceramic);
+  --color-ceramic-text: var(--aw-color-ceramic-text);
+  --color-data: var(--aw-color-data);
+  --color-data-fill: var(--aw-color-data-fill);
+  --color-default: var(--aw-color-text-default);
+  --color-muted: var(--aw-color-text-muted);
+  --color-surface-2: var(--aw-color-surface-2);
+  --color-surface-3: var(--aw-color-surface-3);
+  --color-bordr: var(--aw-color-border);
+  --color-positive: var(--aw-color-positive);
+  --color-warning: var(--aw-color-warning);
+  --color-danger: var(--aw-color-danger);
+  --color-danger-surface: var(--aw-color-danger-surface);
+
+  --font-sans:
+    var(--aw-font-sans, ui-sans-serif), ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-serif: var(--aw-font-serif, ui-serif), ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+  --font-heading: var(--aw-font-heading, ui-sans-serif), ui-sans-serif, system-ui, sans-serif;
+
+  --animate-fade: fadeInUp 1s both;
+
+  @keyframes fadeInUp {
+    0% {
+      opacity: 0;
+      transform: translateY(2rem);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@utility bg-page {
+  background-color: var(--aw-color-bg-page);
+}
+
+@utility bg-dark {
+  background-color: var(--aw-color-bg-page-dark);
+}
+
+@utility bg-light {
+  background-color: var(--aw-color-bg-page);
+}
+
+@utility surface-2 {
+  background-color: var(--aw-color-surface-2);
+}
+
+@utility text-page {
+  color: var(--aw-color-text-page);
+}
+
+@utility text-muted {
+  color: var(--aw-color-text-muted);
+}
+
+/* Tabular, slashed-zero numerals for data (prices, times, tables, stats).
+   Never apply to running prose — only to figures. */
+@utility tnum {
+  font-variant-numeric: tabular-nums slashed-zero;
+  font-feature-settings:
+    'tnum' 1,
+    'ss01' 1,
+    'zero' 1,
+    'case' 1;
+}
+
+/* ---------- Component layer: buttons ---------- */
+@utility btn {
+  @apply inline-flex items-center justify-center rounded-[var(--gv-radius-sm)] border border-[var(--aw-color-border)] bg-transparent font-medium text-center text-base leading-snug transition-[background,border-color,color,box-shadow,transform] py-3 px-6 md:px-7 ease-[var(--gv-ease-out-quart)] duration-[var(--dur-sm)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--aw-color-bg-page)] hover:bg-[var(--aw-color-surface-2)] active:translate-y-px cursor-pointer;
+  color: var(--aw-color-text-default);
+}
+
+@utility btn-primary {
+  @apply btn font-semibold border-transparent;
+  background-color: var(--aw-color-primary);
+  color: var(--aw-color-on-primary);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--aw-color-primary) 25%, transparent);
+  &:hover {
+    background-color: var(--aw-color-primary-strong);
+    color: var(--aw-color-on-primary);
+    box-shadow: 0 4px 14px -4px color-mix(in srgb, var(--aw-color-primary) 45%, transparent);
+  }
+}
+
+@utility btn-secondary {
+  @apply btn;
+}
+
+@utility btn-tertiary {
+  @apply btn border-none shadow-none;
+  color: var(--aw-color-text-muted);
+  &:hover {
+    background-color: transparent;
+    color: var(--aw-color-text-heading);
+  }
+}
+
+/* ---------- Reusable surface primitives ---------- */
+.u-card {
+  position: relative;
+  background-color: var(--aw-color-bg-page);
+  border: 1px solid var(--aw-color-border);
+  border-radius: var(--gv-radius-lg);
+  box-shadow: var(--elev-1);
+  transition:
+    border-color var(--dur-sm) var(--gv-ease-out-quart),
+    box-shadow var(--dur-sm) var(--gv-ease-out-quart),
+    transform var(--dur-sm) var(--gv-ease-out-quart);
+  --spot-x: 50%;
+  --spot-y: 50%;
+}
+/* Cursor-follow glow — ported from React Bits "SpotlightCard" (reactbits.dev), vanilla */
+.u-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  background: radial-gradient(
+    260px circle at var(--spot-x) var(--spot-y),
+    color-mix(in srgb, var(--aw-color-primary) 16%, transparent),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity var(--dur-md) var(--gv-ease-out-soft);
+}
+:root:not([data-theme='light']) .u-card::after {
+  mix-blend-mode: screen;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) .u-card::after {
+    mix-blend-mode: multiply;
+  }
+}
+.dark .u-card::after {
+  mix-blend-mode: screen;
+}
+.u-card:hover::after,
+.u-card:focus-within::after {
+  opacity: 1;
+}
+@media (hover: none) {
+  .u-card::after {
+    display: none;
+  }
+}
+.u-card--hover:hover {
+  border-color: color-mix(in srgb, var(--aw-color-primary) 55%, var(--aw-color-border));
+  box-shadow: var(--elev-2);
+  transform: translateY(-2px);
+}
+
+/* Animated gradient word — ported from React Bits "GradientText" (reactbits.dev), CSS-only */
+.gv-gradient-text {
+  background-image: linear-gradient(100deg, var(--aw-color-primary), var(--aw-color-accent), var(--aw-color-primary));
+  background-size: 220% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: gv-gradient-pan 9s ease-in-out infinite;
+}
+@keyframes gv-gradient-pan {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gv-gradient-text {
+    animation: none;
+  }
+}
+
+/*
+ * ───────────────────────────────────────────────────────────────────────
+ * TOKEN TAXONOMY — design-value scales (spacing / radius / elevation /
+ * easing / duration / containers / type steps)
+ * ───────────────────────────────────────────────────────────────────────
+ * These are plain custom properties, NOT in @theme, so they surface as
+ * `var(--space-4)` / `var(--gv-radius-sm)` / `var(--elev-1)` hooks that the
+ * component layer (.btn, .u-card, callouts, Header/Footer/Dock, the
+ * src/components/ui/* primitives) consumes directly. Colors flow through
+ * the semantic @theme layer above; everything dimensional flows here.
+ * Elevation is theme-aware — the `.dark` block below swaps the light
+ * drop-shadow ladder for an inset-hairline + deep-shadow ladder.
+ * ───────────────────────────────────────────────────────────────────────
+ */
+:root {
+  /* Type scale — clamps are fluid min→max. Companion weight / tracking /
+     line-height per step noted inline; apply alongside the font-size. */
+  --step-display: clamp(2.75rem, 1.9rem + 4.2vw, 4.5rem); /* 640 · -0.02em · 1.02 */
+  --step-h1: clamp(2.05rem, 1.6rem + 2.3vw, 3rem); /* 640 · -0.018em · 1.08 */
+  --step-h2: clamp(1.55rem, 1.3rem + 1.2vw, 2.05rem); /* 620 · -0.014em · 1.15 */
+  --step-h3: clamp(1.2rem, 1.08rem + 0.55vw, 1.45rem); /* 600 · -0.01em · 1.25 */
+  --step-stat: clamp(1.5rem, 1.2rem + 1.5vw, 2.25rem); /* 560 · 0 · 1.1 */
+
+  /* Spacing — 4px base */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+  --space-11: 160px;
+  --space-12: 192px;
+
+  /* Radius — prefixed `--gv-` to avoid clobbering Tailwind v4's reserved
+     `--radius-*` @theme namespace (its `rounded-xs/sm/md/lg` utilities, which
+     stock AstroWind widgets consume). xs 6 · sm 10 · md 14 · lg 22 · pill 999 */
+  --gv-radius-xs: 6px;
+  --gv-radius-sm: 10px;
+  --gv-radius-md: 14px;
+  --gv-radius-lg: 22px;
+  --gv-radius-pill: 999px;
+
+  /* Elevation ladder — light: hairline + soft drop shadows */
+  --elev-0: 0 0 0 1px var(--aw-color-border);
+  --elev-1: 0 1px 2px rgba(20, 22, 30, 0.04), 0 2px 8px rgba(20, 22, 30, 0.05);
+  --elev-2: 0 4px 12px rgba(20, 22, 30, 0.07), 0 12px 32px rgba(20, 22, 30, 0.08);
+  --elev-3: 0 8px 24px rgba(20, 22, 30, 0.1), 0 24px 64px rgba(20, 22, 30, 0.14);
+
+  /* Easing — prefixed `--gv-` (Tailwind v4 reserves `--ease-*` for its
+     `ease-in`/`ease-out`/`ease-in-out` utilities). */
+  --gv-ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --gv-ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --gv-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --gv-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Duration */
+  --dur-micro: 120ms;
+  --dur-sm: 200ms;
+  --dur-md: 420ms;
+  --dur-lg: 720ms;
+
+  /* Container widths */
+  --container-prose: 68ch;
+  --container-default: 1200px;
+  --container-wide: 1360px;
+}
+
+/* Elevation ladder — dark: inset hairline + deep shadow, scaling per step */
+.dark {
+  --elev-0: 0 0 0 1px var(--aw-color-border);
+  --elev-1: inset 0 0 0 1px rgba(255, 255, 255, 0.06), 0 2px 8px rgba(0, 0, 0, 0.45);
+  --elev-2: inset 0 0 0 1px rgba(255, 255, 255, 0.07), 0 8px 24px rgba(0, 0, 0, 0.5);
+  --elev-3: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 16px 48px rgba(0, 0, 0, 0.6);
+}
+body {
+  font-feature-settings: 'cv05', 'ss01';
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Skip-to-content link (Layout.astro) — visually hidden until keyboard-focused. */
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  transform: translateY(-100%);
+  padding: 0.75rem 1.25rem;
+  background: var(--aw-color-bg-page);
+  color: var(--aw-color-text-heading);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  border: 1px solid var(--aw-color-border);
+  border-radius: 0 0 var(--gv-radius-sm) 0;
+  text-decoration: none;
+}
+.skip-link:focus {
+  transform: translateY(0);
+  outline: 2px solid var(--aw-color-primary);
+  outline-offset: -2px;
+}
+
+/* Room for the fixed mobile dock (see MobileDock.astro) */
+@media (max-width: 767px) {
+  body {
+    padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+  }
+}
+.font-heading,
+h1,
+h2,
+h3,
+h4 {
+  color: var(--aw-color-text-heading);
+}
+
+#header.scroll > div:first-child {
+  background-color: var(--aw-color-bg-page);
+  border-bottom: 1px solid color-mix(in srgb, var(--aw-color-border) 70%, transparent);
+  box-shadow: 0 1px 0 0 color-mix(in srgb, var(--aw-color-border) 55%, transparent);
+}
+@media (min-width: 768px) {
+  #header.scroll > div:first-child {
+    background-color: color-mix(in srgb, var(--aw-color-bg-page) 82%, transparent);
+    backdrop-filter: blur(12px);
+  }
+}
+.dark #header.scroll > div:first-child,
+#header.scroll.dark > div:first-child {
+  box-shadow: none;
+}
+
+#header.expanded nav {
+  position: fixed;
+  top: 70px;
+  left: 0;
+  right: 0;
+  bottom: 70px !important;
+  padding: 0 5px;
+}
+
+.dropdown:focus .dropdown-menu,
+.dropdown:focus-within .dropdown-menu,
+.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+[astro-icon].icon-light > * {
+  stroke-width: 1.2;
+}
+
+[astro-icon].icon-bold > * {
+  stroke-width: 2.4;
+}
+
+[data-aw-toggle-menu] path {
+  @apply transition;
+}
+[data-aw-toggle-menu].expanded g > path:first-child {
+  @apply -rotate-45 translate-y-[15px] translate-x-[-3px];
+}
+[data-aw-toggle-menu].expanded g > path:last-child {
+  @apply rotate-45 translate-y-[-8px] translate-x-[14px];
+}
+
+.dd *:first-child {
+  margin-top: 0;
+}
+
+/*
+ * ───────────────────────────────────────────────────────────────────────
+ * MOTION LAYER (Phase 2) — CSS side of src/components/common/Motion.astro
+ * ───────────────────────────────────────────────────────────────────────
+ * All motion is JS-driven and gated on
+ * gsap.matchMedia('(prefers-reduced-motion: no-preference)'). These rules
+ * are only the helpers/hints + the reduced-motion kill-switches.
+ * TODO(phase-later): consolidate [data-reveal] with common/Intersect.astro.
+ * ───────────────────────────────────────────────────────────────────────
+ */
+
+/* Lenis smooth-scroll (classes are added to <html> by the lib at runtime). */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* Clearance for sticky header on hash / :target landings (native + keyboard). */
+html {
+  scroll-padding-top: 5rem;
+}
+
+/* Reveal hook — the hidden initial state is set in JS (Motion.astro) only
+   after <html>.gv-motion-ready, so no-JS / reduce keeps everything visible
+   and CLS stays 0 (space is never reserved by these rules). */
+@media (prefers-reduced-motion: no-preference) {
+  html.gv-motion-ready [data-reveal] {
+    will-change: transform, opacity;
+  }
+}
+
+/* Header: scroll-progress rule + hide-on-scroll-down (translateY). */
+#header {
+  transition:
+    transform var(--dur-md) var(--gv-ease-out-soft),
+    opacity var(--dur-sm) ease-in-out;
+}
+#header.gv-header-hidden {
+  transform: translateY(-100%);
+}
+#gv-scroll-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  pointer-events: none;
+  z-index: 50;
+}
+#gv-scroll-progress > span {
+  display: block;
+  height: 100%;
+  background-color: var(--aw-color-primary);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  will-change: transform;
+}
+
+/* Route-transition motif (page-to-page nav) — a dedicated overlay, separate
+   from #gv-scroll-progress above, so the scroll-driven progress bar and this
+   nav-driven timeline never have to coordinate on the same element. Fixed +
+   zero flow footprint → CLS 0; driven entirely by Motion.astro's GSAP
+   timeline (opacity 0 / dashoffset 1 / marker at 0% are just the rest state,
+   restated here so it never flashes visible before JS runs). */
+.gv-route-transition {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  overflow: hidden;
+  z-index: 55;
+  pointer-events: none;
+  opacity: 0;
+  color: var(--aw-color-primary);
+}
+.gv-route-transition__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.gv-route-transition__path {
+  fill: none;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.gv-route-transition__marker {
+  position: absolute;
+  top: 50%;
+  left: 0%;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--aw-color-data);
+  transform: scale(0);
+  will-change: transform, left;
+}
+
+/* Prose links (guide bodies): animated underline sweep. The plain underline
+   stays as the resting/focus state so keyboard users always see it. */
+.collapsible-body a {
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+  text-underline-offset: 2px;
+  transition: text-decoration-color var(--dur-sm) var(--gv-ease-out-quart);
+}
+.collapsible-body a:hover {
+  text-decoration-color: currentColor;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .collapsible-body a {
+    text-decoration-color: transparent;
+    background-image: linear-gradient(to right, currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 0% 1px;
+    transition:
+      background-size var(--dur-sm) var(--gv-ease-out-quart),
+      text-decoration-color var(--dur-sm) var(--gv-ease-out-quart);
+  }
+  .collapsible-body a:hover {
+    background-size: 100% 1px;
+  }
+  .collapsible-body a:focus-visible {
+    text-decoration-color: currentColor;
+    background-size: 100% 1px;
+  }
+}
+
+/* Reduced motion: hard static. Lenis never starts (Motion.astro), and every
+   motion-layer transform/transition is neutralised here too. */
+@media (prefers-reduced-motion: reduce) {
+  #header {
+    transition: none;
+  }
+  #header.gv-header-hidden {
+    transform: none;
+  }
+  #gv-scroll-progress {
+    display: none;
+  }
+  .gv-route-transition {
+    display: none;
+  }
+  .collapsible-body a {
+    transition: none;
+  }
+}
