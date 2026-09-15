@@ -29,12 +29,15 @@ export const DISTRICTS: District[] = [
 // каждого раздела добавляй его путь сюда.
 const TRANSLATED_UZ_PATHS = new Set<string>(['/']);
 
+/** Есть ли у этого раздела уже переведённая узбекская страница (/uz/...). */
+export const hasUzTranslation = (path: string): boolean => TRANSLATED_UZ_PATHS.has(path);
+
 /**
  * Строит путь с учётом языка. Для uz: если раздел ещё не переведён —
  * временно возвращает путь на русскую версию (не /uz/...).
  */
 export const withLangPrefix = (lang: Lang, path: string): string => {
-  if (lang === 'uz' && TRANSLATED_UZ_PATHS.has(path)) {
+  if (lang === 'uz' && hasUzTranslation(path)) {
     return getPermalink(`/uz${path}`);
   }
   return getPermalink(path);

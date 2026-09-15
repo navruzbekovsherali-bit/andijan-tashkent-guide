@@ -1,5 +1,6 @@
 ---
 import { getRelativeLocaleUrl } from 'astro:i18n';
+import { hasUzTranslation } from '~/navigation';
 
 export interface Props {
   class?: string;
@@ -12,8 +13,12 @@ const currentLocale = (Astro.currentLocale === 'uz' ? 'uz' : 'ru') as 'ru' | 'uz
 // Тот же путь без языкового префикса — чтобы построить ссылку на его пару на другом языке.
 const withoutLocale = Astro.url.pathname.replace(/^\/uz(\/|$)/, '/');
 
+// Русская версия есть всегда (это основной язык сайта). Узбекская — пока только
+// для переведённых разделов; для остальных ведём на узбекскую главную, а не на
+// несуществующую /uz/... страницу (иначе — 404).
 const ruHref = getRelativeLocaleUrl('ru', withoutLocale);
-const uzHref = getRelativeLocaleUrl('uz', withoutLocale);
+const uzTranslated = hasUzTranslation(withoutLocale);
+const uzHref = getRelativeLocaleUrl('uz', uzTranslated ? withoutLocale : '/');
 ---
 
 <div
@@ -38,6 +43,9 @@ const uzHref = getRelativeLocaleUrl('uz', withoutLocale);
       currentLocale === 'uz' ? 'text-primary' : 'text-muted hover:text-primary',
     ]}
     aria-current={currentLocale === 'uz' ? 'page' : undefined}
+    title={!uzTranslated && currentLocale !== 'uz'
+      ? 'Этот раздел пока не переведён — откроется узбекская главная'
+      : undefined}
   >
     UZ
   </a>
