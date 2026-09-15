@@ -1,9 +1,8 @@
 ---
 // Узбекская (кириллица) версия главной страницы. Дублирует src/pages/index.astro
-// с переводом видимого текста. Ссылки на /rayony, /pereezd, /arenda пока ведут
-// на русские страницы через withLangPrefix — узбекские версии этих разделов
-// ещё не переведены. Как только появятся, достаточно добавить их путь в
-// TRANSLATED_UZ_PATHS в src/navigation.ts — здесь ничего менять не придётся.
+// с переводом видимого текста. Ссылки на /rayony, /pereezd, /arenda и т.д. идут
+// через withLangPrefix и автоматически откроют /uz/... версию, как только её
+// путь добавлен в TRANSLATED_UZ_PATHS в src/navigation.ts.
 import Layout from '~/layouts/PageLayout.astro';
 
 import HomeHero from '~/components/widgets/HomeHero.astro';
@@ -19,12 +18,11 @@ import CountUp from '~/components/common/CountUp.astro';
 import { Icon } from 'astro-icon/components';
 
 import { getCollection } from 'astro:content';
-import { DISTRICTS, withLangPrefix } from '~/navigation';
+import { withLangPrefix } from '~/navigation';
 
 const getPermalink = (path: string) => withLangPrefix('uz', path);
 
-const districts = (await getCollection('district')).sort((a, b) => a.data.order - b.data.order);
-const uzNameById = new Map(DISTRICTS.map((d) => [d.slug, d.uz]));
+const districts = (await getCollection('districtUz')).sort((a, b) => a.data.order - b.data.order);
 
 // --- Производные цифры (из реальных данных по районам — ничего не выдумано) ---
 const rentValues = districts
@@ -178,7 +176,7 @@ const metadata = {
     title="Андижондан қаерга кўчиб келишяпти"
     districts={districts.map((d) => ({
       id: d.id,
-      title: uzNameById.get(d.id) ?? d.data.title,
+      title: d.data.title,
       rentFrom: d.data.rentFrom,
       metro: d.data.metro,
     }))}
@@ -188,6 +186,7 @@ const metadata = {
     rentFromLabel="дан"
     rentLabelPosition="after"
     scrollerAriaLabel="Тошкент туманлари — горизонтал рўйхат"
+    cardHrefBase="/uz/rayon"
   />
 
   {/* --- Ичида нима бор --- */}

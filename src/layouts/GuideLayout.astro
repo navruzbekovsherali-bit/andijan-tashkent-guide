@@ -4,7 +4,8 @@ import Layout from '~/layouts/PageLayout.astro';
 import CollapsibleContent from '~/components/CollapsibleContent.astro';
 import Overline from '~/components/ui/Overline.astro';
 import SplitReveal from '~/components/ui/SplitReveal.astro';
-import { getPermalink, getCanonical, getHomePermalink } from '~/utils/permalinks';
+import { getCanonical, getHomePermalink } from '~/utils/permalinks';
+import { withLangPrefix } from '~/navigation';
 
 import type { MetaData } from '~/types';
 
@@ -27,19 +28,30 @@ export interface Props {
 
 const { frontmatter } = Astro.props;
 const variant = frontmatter?.variant === 'stepper' ? 'stepper' : frontmatter?.variant === 'topics' ? 'topics' : 'guide';
-const kicker = frontmatter?.overline ?? 'Гайд для релокантов';
+const lang = Astro.currentLocale === 'uz' ? 'uz' : 'ru';
+const kicker = frontmatter?.overline ?? (lang === 'uz' ? 'Кўчиб келувчилар учун йўриқнома' : 'Гайд для релокантов');
 
 const metadata: MetaData = {
   title: frontmatter?.title,
   description: frontmatter?.description,
 };
 
-const footLinks = [
-  { href: '/rayony', label: 'Выбрать район Ташкента' },
-  { href: '/pereezd', label: 'Гайд по переезду из Андижана' },
-  { href: '/arenda', label: 'Как снять квартиру в Ташкенте' },
-  { href: '/kontakty', label: 'Контакты, экстренные службы и как добраться' },
-];
+const getPermalink = (path: string) => withLangPrefix(lang, path);
+
+const footLinks =
+  lang === 'uz'
+    ? [
+        { href: '/rayony', label: 'Тошкент туманини танлаш' },
+        { href: '/pereezd', label: 'Андижондан кўчиш бўйича йўриқнома' },
+        { href: '/arenda', label: 'Тошкентда уйни қандай ижарага олиш' },
+        { href: '/kontakty', label: 'Алоқа, шошилинч хизматлар ва йўл' },
+      ]
+    : [
+        { href: '/rayony', label: 'Выбрать район Ташкента' },
+        { href: '/pereezd', label: 'Гайд по переезду из Андижана' },
+        { href: '/arenda', label: 'Как снять квартиру в Ташкенте' },
+        { href: '/kontakty', label: 'Контакты, экстренные службы и как добраться' },
+      ];
 
 // No visible breadcrumb UI on guide pages — this is the standard 2-level
 // (Главная → page) trail, built from the page's own real title/URL.
@@ -47,7 +59,12 @@ const breadcrumbLd = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Главная', item: String(getCanonical(getHomePermalink())) },
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: lang === 'uz' ? 'Бош саҳифа' : 'Главная',
+      item: String(getCanonical(lang === 'uz' ? getPermalink('/') : getHomePermalink())),
+    },
     { '@type': 'ListItem', position: 2, name: frontmatter?.title, item: String(getCanonical(Astro.url.pathname)) },
   ],
 };
@@ -55,7 +72,11 @@ const breadcrumbLd = {
 
 <Layout metadata={metadata}>
   <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbLd)} />
-  <article class:list={['guide', `guide--${variant}`]} data-guide-stepper={variant === 'stepper' ? '' : undefined}>
+  <article
+    class:list={['guide', `guide--${variant}`]}
+    data-guide-stepper={variant === 'stepper' ? '' : undefined}
+    data-lang={lang}
+  >
     <header class="guide__hero">
       <Overline>{kicker}</Overline>
       <SplitReveal as="h1" class="guide__title">{frontmatter.title}</SplitReveal>
@@ -65,7 +86,8 @@ const breadcrumbLd = {
       variant === 'stepper' && (
         <div class="stepper-actions">
           <button type="button" class="btn-download" data-download-checklist>
-            <Icon name="tabler:download" class="btn-download__icon" aria-hidden="true" /> Скачать чек-лист
+            <Icon name="tabler:download" class="btn-download__icon" aria-hidden="true" />{' '}
+            {lang === 'uz' ? 'Чек-листни юклаб олиш' : 'Скачать чек-лист'}
           </button>
         </div>
       )
@@ -73,7 +95,7 @@ const breadcrumbLd = {
 
     {
       variant === 'stepper' && (
-        <nav class="spine" data-spine aria-label="Шаги переезда">
+        <nav class="spine" data-spine aria-label={lang === 'uz' ? 'Кўчиш қадамлари' : 'Шаги переезда'}>
           <span class="spine__track" aria-hidden="true">
             <span class="spine__fill" data-spine-fill />
           </span>
@@ -85,13 +107,13 @@ const breadcrumbLd = {
       class:list={['guide__body', variant === 'stepper' && 'stepper-body']}
       data-reveal={variant === 'guide' ? '' : undefined}
     >
-      <CollapsibleContent defaultOpen={0} variant={variant}>
+      <CollapsibleContent defaultOpen={0} variant={variant} lang={lang}>
         <slot />
       </CollapsibleContent>
     </div>
 
-    <nav class="foot-links" aria-label="Дальше">
-      <Overline>Дальше</Overline>
+    <nav class="foot-links" aria-label={lang === 'uz' ? 'Кейинги' : 'Дальше'}>
+      <Overline>{lang === 'uz' ? 'Кейинги' : 'Дальше'}</Overline>
       <ul class="foot-links__list">
         {
           footLinks.map((l) => (
@@ -459,8 +481,24 @@ const breadcrumbLd = {
    * plain-glyph checkboxes, and the "Сводная таблица" <table> (wherever it
    * lives among the steps) is reproduced verbatim.
    */
-  function buildChecklistHtml(steps: Step[]): string {
-    const today = new Date().toLocaleDateString('ru-RU');
+  function buildChecklistHtml(steps: Step[], lang: 'ru' | 'uz'): string {
+    const today = new Date().toLocaleDateString(lang === 'uz' ? 'uz-UZ' : 'ru-RU');
+    const t =
+      lang === 'uz'
+        ? {
+            title: 'Кўчиш чек-листи: Андижон → Тошкент',
+            address: 'Абай кўчаси, 6А',
+            steps: 'Қадамлар',
+            summary: 'Умумий жадвал: қаерга бориш ва нима олиб бориш керак',
+            footer: 'Мослашув бўлими · «Андижондан Тошкентга кўчиш» саҳифасидан автоматик яратилди',
+          }
+        : {
+            title: 'Чек-лист переезда: Андижан → Ташкент',
+            address: 'ул. Абая, 6А',
+            steps: 'Шаги',
+            summary: 'Сводная таблица: куда идти и что брать',
+            footer: 'Отдел адаптации · сформировано автоматически со страницы «Переезд из Андижана в Ташкент»',
+          };
 
     const tocHtml = steps
       .map((s) => {
@@ -506,10 +544,10 @@ const breadcrumbLd = {
     }
 
     return `<!doctype html>
-<html lang="ru">
+<html lang="${lang}">
 <head>
 <meta charset="utf-8" />
-<title>Чек-лист переезда: Андижан → Ташкент</title>
+<title>${t.title}</title>
 <style>
   :root { color-scheme: light; }
   * { box-sizing: border-box; }
@@ -548,27 +586,27 @@ const breadcrumbLd = {
 </head>
 <body>
   <header>
-    <h1>Чек-лист переезда: Андижан → Ташкент</h1>
-    <p>ул. Абая, 6А · ${escapeHtml(today)}</p>
+    <h1>${t.title}</h1>
+    <p>${t.address} · ${escapeHtml(today)}</p>
   </header>
   <nav class="toc">
-    <h2>Шаги</h2>
+    <h2>${t.steps}</h2>
     <ul>${tocHtml}</ul>
   </nav>
   ${stepsHtml}
-  ${table ? `<section class="summary"><h2>Сводная таблица: куда идти и что брать</h2>${tableHtml}</section>` : ''}
-  <footer>Отдел адаптации · сформировано автоматически со страницы «Переезд из Андижана в Ташкент»</footer>
+  ${table ? `<section class="summary"><h2>${t.summary}</h2>${tableHtml}</section>` : ''}
+  <footer>${t.footer}</footer>
 </body>
 </html>`;
   }
 
-  function downloadChecklist(steps: Step[]) {
-    const html = buildChecklistHtml(steps);
+  function downloadChecklist(steps: Step[], lang: 'ru' | 'uz') {
+    const html = buildChecklistHtml(steps, lang);
     const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'chek-list-pereezd.html';
+    a.download = lang === 'uz' ? 'kochish-chek-list.html' : 'chek-list-pereezd.html';
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -577,6 +615,7 @@ const breadcrumbLd = {
 
   function initStepper(root: HTMLElement) {
     if (root.dataset.stepReady) return;
+    const lang: 'ru' | 'uz' = root.dataset.lang === 'uz' ? 'uz' : 'ru';
     const body = root.querySelector<HTMLElement>('.collapsible-body');
     const spine = root.querySelector<HTMLElement>('[data-spine]');
     if (!body) return;
@@ -589,7 +628,7 @@ const breadcrumbLd = {
     const steps: Step[] = [];
     root
       .querySelector<HTMLButtonElement>('[data-download-checklist]')
-      ?.addEventListener('click', () => downloadChecklist(steps));
+      ?.addEventListener('click', () => downloadChecklist(steps, lang));
 
     // Group the flat markdown into { heading, items } by <h2>. Anything before
     // the first <h2> is the intro — promoted to a lead.

@@ -27,7 +27,14 @@ export const DISTRICTS: District[] = [
 // Разделы, у которых уже есть узбекская версия. Остальные ссылки на uz-страницах
 // временно ведут на русский оригинал, чтобы не давать 404 — по мере перевода
 // каждого раздела добавляй его путь сюда.
-const TRANSLATED_UZ_PATHS = new Set<string>(['/']);
+const TRANSLATED_UZ_PATHS = new Set<string>([
+  '/',
+  '/rayony',
+  '/pereezd',
+  '/arenda',
+  '/kontakty',
+  ...DISTRICTS.map((d) => `/rayon/${d.slug}`),
+]);
 
 /** Есть ли у этого раздела уже переведённая узбекская страница (/uz/...). */
 export const hasUzTranslation = (path: string): boolean => TRANSLATED_UZ_PATHS.has(path);

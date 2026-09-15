@@ -27,17 +27,19 @@ interface Props {
   /** index of the panel open on first load; -1 = all closed (guide only) */
   defaultOpen?: number;
   variant?: 'district' | 'guide' | 'stepper' | 'topics';
+  lang?: 'ru' | 'uz';
 }
-const { defaultOpen = 0, variant = 'guide' } = Astro.props;
+const { defaultOpen = 0, variant = 'guide', lang = 'ru' } = Astro.props;
 
 /* 'topics' — auto tab bar. Keyword → icon lookup tested in order (first match
    wins), same idea as DISTRICT_CATS but derived from the heading text instead
-   of a fixed list. Falls back to a generic list icon. */
+   of a fixed list. Falls back to a generic list icon. Covers both ru and uz
+   heading wording since 'topics' pages exist in both languages. */
 const TOPIC_ICON_RULES: { test: RegExp; icon: string }[] = [
-  { test: /юридич|документ/i, icon: 'tabler:file-text' },
-  { test: /безопасност|антифрод|мошенн/i, icon: 'tabler:shield-check' },
-  { test: /площад|поиск/i, icon: 'tabler:search' },
-  { test: /чек-лист|осмотр/i, icon: 'tabler:clipboard-check' },
+  { test: /юридич|документ|ҳужжат/i, icon: 'tabler:file-text' },
+  { test: /безопасност|антифрод|мошенн|хавфсизлик|алдов/i, icon: 'tabler:shield-check' },
+  { test: /площад|поиск|қидир/i, icon: 'tabler:search' },
+  { test: /чек-лист|осмотр|кўздан кечириш/i, icon: 'tabler:clipboard-check' },
 ];
 const pickTopicIcon = (headingText: string): string =>
   TOPIC_ICON_RULES.find((r) => r.test.test(headingText))?.icon ?? 'tabler:list';
@@ -58,7 +60,7 @@ const shortTopicLabel = (text: string): string => {
 
 /* District category tabs — fixed order, matches the `## 1.`…`## 7.` sections
    every rayon guide ships (verified across all 12 files). */
-const DISTRICT_CATS = [
+const DISTRICT_CATS_RU = [
   { label: 'Транспорт', icon: 'tabler:train' },
   { label: 'Аренда и цены', icon: 'tabler:home' },
   { label: 'Школы', icon: 'tabler:school' },
@@ -67,6 +69,17 @@ const DISTRICT_CATS = [
   { label: 'Кафе и рестораны', icon: 'tabler:coffee' },
   { label: 'Парки', icon: 'tabler:trees' },
 ] as const;
+const DISTRICT_CATS_UZ = [
+  { label: 'Транспорт', icon: 'tabler:train' },
+  { label: 'Ижара ва нархлар', icon: 'tabler:home' },
+  { label: 'Мактаблар', icon: 'tabler:school' },
+  { label: 'Болалар боғчалари', icon: 'tabler:baby-carriage' },
+  { label: 'Тиббиёт', icon: 'tabler:first-aid-kit' },
+  { label: 'Кафе ва ресторанлар', icon: 'tabler:coffee' },
+  { label: 'Парклар', icon: 'tabler:trees' },
+] as const;
+const DISTRICT_CATS = lang === 'uz' ? DISTRICT_CATS_UZ : DISTRICT_CATS_RU;
+const sectionFallbackLabel = lang === 'uz' ? 'Бўлим' : 'Раздел';
 
 /* For 'district': render the slot to HTML now and cut it into its <h2> sections
    so they can be emitted server-side (open, anchor-addressable, zero CLS). */
@@ -101,7 +114,7 @@ if (variant === 'topics') {
       .trim();
     const body = part.replace(/^\s*<h2[\s>][\s\S]*?<\/h2>\s*/i, '');
     return {
-      heading: headingText || 'Раздел',
+      heading: headingText || sectionFallbackLabel,
       label: shortTopicLabel(headingText),
       icon: pickTopicIcon(headingText),
       html: body,
@@ -118,7 +131,7 @@ const resolvedFallbackVariant = variant === 'topics' && !topicsOk ? 'guide' : va
 {
   districtOk ? (
     <div class="collapsible collapsible--district" data-variant="district">
-      <nav class="rd-tabs" aria-label="Разделы района">
+      <nav class="rd-tabs" aria-label={lang === 'uz' ? 'Туман бўлимлари' : 'Разделы района'}>
         <ul class="rd-tabs__list">
           {DISTRICT_CATS.map((cat, i) => (
             <li>
@@ -136,7 +149,7 @@ const resolvedFallbackVariant = variant === 'topics' && !topicsOk ? 'guide' : va
           <section class="rd-sect" id={`rayon-${i + 1}`} data-rd-sect={i + 1} aria-labelledby={`rayon-${i + 1}-h`}>
             <h2 class="rd-sect__head" id={`rayon-${i + 1}-h`}>
               <Icon name={DISTRICT_CATS[i]?.icon ?? 'tabler:point'} class="rd-sect__icon" aria-hidden="true" />
-              <span>{DISTRICT_CATS[i]?.label ?? `Раздел ${i + 1}`}</span>
+              <span>{DISTRICT_CATS[i]?.label ?? `${sectionFallbackLabel} ${i + 1}`}</span>
             </h2>
             <div class="rd-sect__body" set:html={sectionHtml} />
           </section>
@@ -145,7 +158,7 @@ const resolvedFallbackVariant = variant === 'topics' && !topicsOk ? 'guide' : va
     </div>
   ) : topicsOk ? (
     <div class="collapsible collapsible--topics" data-variant="topics">
-      <nav class="rd-tabs" aria-label="Разделы">
+      <nav class="rd-tabs" aria-label={lang === 'uz' ? 'Бўлимлар' : 'Разделы'}>
         <ul class="rd-tabs__list">
           {topicSections.map((sec, i) => (
             <li>
@@ -172,14 +185,17 @@ const resolvedFallbackVariant = variant === 'topics' && !topicsOk ? 'guide' : va
     </div>
   ) : (
     <div class="collapsible" data-default-open={defaultOpen} data-variant={resolvedFallbackVariant}>
-      <nav class="collapsible-toc mt-8 flex flex-wrap gap-2 empty:hidden" aria-label="Разделы" />
+      <nav
+        class="collapsible-toc mt-8 flex flex-wrap gap-2 empty:hidden"
+        aria-label={lang === 'uz' ? 'Бўлимлар' : 'Разделы'}
+      />
 
       <div class="collapsible-controls mt-4 hidden gap-1 text-sm">
         <button type="button" data-act="expand" class="collapsible-ctl">
-          Развернуть всё
+          {lang === 'uz' ? 'Барчасини ёйиш' : 'Развернуть всё'}
         </button>
         <button type="button" data-act="collapse" class="collapsible-ctl">
-          Свернуть всё
+          {lang === 'uz' ? 'Барчасини йиғиш' : 'Свернуть всё'}
         </button>
       </div>
 

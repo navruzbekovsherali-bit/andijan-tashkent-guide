@@ -1,0 +1,426 @@
+---
+// Узбекская версия страницы района. Дублирует src/pages/rayon/[...slug].astro,
+// но читает контент из коллекции districtUz (src/data/districts-uz/*.md).
+import type { GetStaticPaths } from 'astro';
+import { getCollection, render } from 'astro:content';
+import { Icon } from 'astro-icon/components';
+
+import Layout from '~/layouts/PageLayout.astro';
+import CollapsibleContent from '~/components/CollapsibleContent.astro';
+import CountUp from '~/components/common/CountUp.astro';
+import Overline from '~/components/ui/Overline.astro';
+import SplitReveal from '~/components/ui/SplitReveal.astro';
+import { getCanonical } from '~/utils/permalinks';
+import { withLangPrefix } from '~/navigation';
+import type { MetaData } from '~/types';
+
+const getPermalink = (path: string) => withLangPrefix('uz', path);
+
+export const getStaticPaths = (async () => {
+  const districts = (await getCollection('districtUz')).sort((a, b) => a.data.order - b.data.order);
+
+  return districts.map((entry, i) => ({
+    params: { slug: entry.id },
+    props: {
+      entry,
+      prev: i > 0 ? districts[i - 1] : null,
+      next: i < districts.length - 1 ? districts[i + 1] : null,
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+const { entry, prev, next } = Astro.props;
+const { title, metro, rentFrom, excerpt } = entry.data;
+const { Content } = await render(entry);
+
+const rentNum = Number(String(rentFrom).replace(/[^\d]/g, '')) || 0;
+const rentPrefix = String(rentFrom).trim().startsWith('$') ? '$' : '';
+
+const metadata: MetaData = {
+  title: `${title} — кўчиб келувчилар учун Тошкент тумани`,
+  description: excerpt,
+};
+
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Бош саҳифа', item: String(getCanonical(getPermalink('/'))) },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: 'Тошкент туманлари',
+      item: String(getCanonical(getPermalink('/rayony'))),
+    },
+    { '@type': 'ListItem', position: 3, name: title, item: String(getCanonical(getPermalink(`/rayon/${entry.id}`))) },
+  ],
+};
+---
+
+<Layout metadata={metadata}>
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbLd)} />
+  <div class="d-wrap">
+    <nav class="d-crumb">
+      <a href={getPermalink('/rayony')}>Тошкент туманлари</a>
+      <Icon name="tabler:chevron-right" class="h-3.5 w-3.5" />
+      <span aria-current="page">{title}</span>
+    </nav>
+
+    <div class="d-kicker">
+      <Overline>Тошкент тумани</Overline>
+      <span class="d-stamp">2026 йилда янгиланган</span>
+    </div>
+
+    <SplitReveal as="h1" class="d-title">{title}</SplitReveal>
+    <p class="d-lead">{excerpt}</p>
+  </div>
+
+  <div class="d-rail">
+    <div class="d-rail__inner">
+      <span class="d-rail__name">{title}</span>
+      <span class="d-rail__facts">
+        <span class="d-rail__fact">
+          <Icon name="tabler:train" class="d-rail__icon" />
+          <span class="d-rail__k">Метро</span>
+          <span class="d-rail__v">{metro}</span>
+        </span>
+        <span class="d-rail__fact">
+          <Icon name="tabler:home" class="d-rail__icon" />
+          <span class="d-rail__k">Ижара дан</span>
+          <span class="d-rail__v tnum">
+            <CountUp to={rentNum} prefix={rentPrefix} duration={1100} />
+            <span class="d-rail__unit">/ ой · 1 хонали</span>
+          </span>
+        </span>
+      </span>
+    </div>
+  </div>
+
+  <div class="d-wrap">
+    <div class="d-content" data-reveal>
+      <CollapsibleContent variant="district" defaultOpen={0} lang="uz">
+        <Content />
+      </CollapsibleContent>
+    </div>
+
+    <nav class="d-nav" data-reveal>
+      {
+        prev ? (
+          <a class="d-nav__link" href={getPermalink(`/rayon/${prev.id}`)}>
+            <span class="d-nav__dir">← Олдинги туман</span>
+            <span class="d-nav__name">{prev.data.title}</span>
+          </a>
+        ) : (
+          <span class="d-nav__spacer" />
+        )
+      }
+      {
+        next ? (
+          <a class="d-nav__link d-nav__link--next" href={getPermalink(`/rayon/${next.id}`)}>
+            <span class="d-nav__dir">Кейинги туман →</span>
+            <span class="d-nav__name">{next.data.title}</span>
+          </a>
+        ) : (
+          <span class="d-nav__spacer" />
+        )
+      }
+    </nav>
+
+    <nav class="foot-links" aria-label="Кўчиш бўйича давоми">
+      <Overline>Кўчиш бўйича давоми</Overline>
+      <ul class="foot-links__list">
+        <li>
+          <a href={getPermalink('/pereezd')}>
+            <span>Ҳужжатлар, болаларни мактаб ва боғчага кўчириш, вақтинчалик рўйхат</span>
+            <span class="foot-links__arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+        <li>
+          <a href={getPermalink('/arenda')}>
+            <span>Уйни қандай ижарага олиш ва алдовчиларга дуч келмаслик</span>
+            <span class="foot-links__arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+        <li>
+          <a href={getPermalink('/rayony')}>
+            <span>Барча 12 туманни солиштириш</span>
+            <span class="foot-links__arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+        <li>
+          <a href={getPermalink('/kontakty')}>
+            <span>Алоқа, шошилинч хизматлар ва йўл</span>
+            <span class="foot-links__arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</Layout>
+
+<style>
+  .d-wrap {
+    max-width: 60rem;
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 2rem);
+  }
+  .d-wrap:first-of-type {
+    padding-top: clamp(2.5rem, 6vw, 4rem);
+  }
+  .d-wrap:last-of-type {
+    padding-bottom: clamp(4rem, 8vw, 8rem);
+  }
+
+  .d-crumb {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.875rem;
+    color: var(--aw-color-text-muted);
+  }
+  .d-crumb a {
+    color: var(--aw-color-text-muted);
+    text-decoration: none;
+  }
+  .d-crumb a:hover {
+    color: var(--aw-color-primary);
+  }
+  .d-crumb span[aria-current] {
+    color: var(--aw-color-text-default);
+  }
+
+  .d-kicker {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-5);
+  }
+  .d-stamp {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--aw-color-data);
+    border: 1px solid color-mix(in srgb, var(--aw-color-data) 35%, var(--aw-color-border));
+    border-radius: var(--gv-radius-pill);
+    padding: 0.3rem 0.7rem;
+  }
+  .d-stamp::before {
+    content: '';
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 999px;
+    background: var(--aw-color-data-fill);
+  }
+
+  .d-title {
+    margin-top: var(--space-3);
+    font-family: var(--aw-font-heading);
+    font-size: var(--step-display);
+    font-weight: 640;
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    color: var(--aw-color-text-heading);
+    text-wrap: balance;
+  }
+  .d-lead {
+    margin-top: var(--space-4);
+    max-width: 44rem;
+    font-size: clamp(1.05rem, 0.98rem + 0.5vw, 1.25rem);
+    line-height: 1.6;
+    color: var(--aw-color-text-muted);
+  }
+
+  .d-rail {
+    position: sticky;
+    top: 3.5rem;
+    z-index: 20;
+    margin-top: var(--space-6);
+  }
+  .d-rail__inner {
+    max-width: 60rem;
+    margin-inline: auto;
+    padding: 0.7rem clamp(1rem, 4vw, 2rem);
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-6);
+    background: var(--aw-color-bg-page);
+    border-block: 1px solid var(--aw-color-border);
+  }
+  .d-rail__name {
+    font-family: var(--aw-font-heading);
+    font-size: 0.95rem;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+    color: var(--aw-color-text-heading);
+  }
+  .d-rail__facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-6);
+    min-width: 0;
+  }
+  .d-rail__fact {
+    display: flex;
+    align-items: baseline;
+    gap: 0.45rem;
+    min-width: 0;
+    font-size: 0.8125rem;
+    line-height: 1.4;
+  }
+  .d-rail__icon {
+    flex: none;
+    width: 0.95rem;
+    height: 0.95rem;
+    align-self: center;
+    color: var(--aw-color-primary);
+  }
+  .d-rail__k {
+    flex: none;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-size: 0.6875rem;
+    color: var(--aw-color-text-muted);
+  }
+  .d-rail__v {
+    min-width: 0;
+    color: var(--aw-color-text-default);
+  }
+  .d-rail__fact:nth-child(2) .d-rail__v {
+    color: var(--aw-color-data);
+    font-weight: 650;
+  }
+  .d-rail__unit {
+    color: var(--aw-color-text-muted);
+    font-weight: 400;
+  }
+  @media (max-width: 560px) {
+    .d-rail__name {
+      display: none;
+    }
+    .d-rail__v .d-rail__unit {
+      display: none;
+    }
+  }
+
+  .d-content {
+    scroll-margin-top: 6rem;
+  }
+
+  .d-nav {
+    margin-top: clamp(3rem, 6vw, 4rem);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    border-top: 1px solid var(--aw-color-border);
+    padding-top: var(--space-6);
+  }
+  @media (min-width: 640px) {
+    .d-nav {
+      flex-direction: row;
+    }
+  }
+  .d-nav__link,
+  .d-nav__spacer {
+    flex: 1;
+  }
+  .d-nav__link {
+    display: block;
+    padding: var(--space-4);
+    border: 1px solid var(--aw-color-border);
+    border-radius: var(--gv-radius-lg);
+    text-decoration: none;
+    transition:
+      border-color var(--dur-sm) var(--gv-ease-out-quart),
+      transform var(--dur-sm) var(--gv-ease-out-quart);
+  }
+  .d-nav__link:hover {
+    border-color: color-mix(in srgb, var(--aw-color-primary) 55%, var(--aw-color-border));
+    transform: translateY(-2px);
+  }
+  .d-nav__link:focus-visible {
+    outline: 2px solid var(--aw-color-primary);
+    outline-offset: 2px;
+  }
+  .d-nav__link--next {
+    text-align: right;
+  }
+  .d-nav__dir {
+    font-size: 0.75rem;
+    color: var(--aw-color-text-muted);
+  }
+  .d-nav__name {
+    margin-top: 0.15rem;
+    display: block;
+    font-weight: 600;
+    color: var(--aw-color-text-heading);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .d-nav__link {
+      transition: none;
+    }
+    .d-nav__link:hover {
+      transform: none;
+    }
+  }
+
+  .foot-links {
+    margin-top: clamp(2.5rem, 5vw, 3.5rem);
+  }
+  .foot-links__list {
+    list-style: none;
+    margin: var(--space-4) 0 0;
+    padding: 0;
+    border-top: 1px solid var(--aw-color-border);
+  }
+  .foot-links__list li {
+    border-bottom: 1px solid var(--aw-color-border);
+  }
+  .foot-links__list a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    min-height: 44px;
+    padding-block: var(--space-4);
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--aw-color-text-default);
+    text-decoration: none;
+    transition: color var(--dur-sm) var(--gv-ease-out-quart);
+  }
+  .foot-links__list a:hover {
+    color: var(--aw-color-primary);
+  }
+  .foot-links__list a:focus-visible {
+    outline: 2px solid var(--aw-color-primary);
+    outline-offset: 3px;
+    border-radius: var(--gv-radius-xs);
+  }
+  .foot-links__arrow {
+    flex: none;
+    color: var(--aw-color-text-muted);
+    transition:
+      transform var(--dur-sm) var(--gv-ease-spring),
+      color var(--dur-sm) var(--gv-ease-out-quart);
+  }
+  .foot-links__list a:hover .foot-links__arrow {
+    transform: translateX(4px);
+    color: var(--aw-color-primary);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .foot-links__list a,
+    .foot-links__arrow {
+      transition: none;
+    }
+    .foot-links__list a:hover .foot-links__arrow {
+      transform: none;
+    }
+  }
+</style>

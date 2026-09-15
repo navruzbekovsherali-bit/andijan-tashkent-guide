@@ -18,16 +18,22 @@
  * CLS = 0: the outer box is locked by rayony.astro; `.dm` and the SVG sit
  * inside it as absolute overlays.
  */
-import type { CollectionEntry } from 'astro:content';
-
-import { getPermalink } from '~/utils/permalinks';
+import { withLangPrefix, type Lang } from '~/navigation';
 import { DISTRICTS_GEO, GEO_RING, GEO_VIEWBOX, OFFICE_POINT, polyLabelPoint, polyPath } from './districts-geo';
 
-export interface Props {
-  districts: CollectionEntry<'district'>[];
+// Accepts entries from either the `district` (ru) or `districtUz` collection —
+// both share the same schema, only the id, title and rentFrom fields are used.
+interface DistrictLike {
+  id: string;
+  data: { title: string; rentFrom: string };
 }
 
-const { districts } = Astro.props as Props;
+export interface Props {
+  districts: DistrictLike[];
+  lang?: Lang;
+}
+
+const { districts, lang = 'ru' } = Astro.props as Props;
 
 const byId = new Map(
   districts.map((e) => [
@@ -36,10 +42,26 @@ const byId = new Map(
       id: e.id,
       title: e.data.title,
       rentFrom: e.data.rentFrom,
-      href: getPermalink(`/rayon/${e.id}`),
+      href: withLangPrefix(lang, `/rayon/${e.id}`),
     },
   ])
 );
+
+const t =
+  lang === 'uz'
+    ? {
+        mapAriaLabel:
+          'Тошкентнинг схематик харитаси: 12 туман, ҳар бири ўз рангида. Йўриқномани очиш учун туманни босинг.',
+        rentFrom: (title: string, rentFrom: string) => `${title} — ижара ${rentFrom} дан`,
+        office: 'офис · Абай кўчаси, 6А',
+        legend: 'Ранг — туман. Йўриқномани очиш учун туманни босинг.',
+      }
+    : {
+        mapAriaLabel: 'Схематичная карта Ташкента: 12 районов, каждый своим цветом. Нажмите район, чтобы открыть гайд.',
+        rentFrom: (title: string, rentFrom: string) => `${title} — аренда от ${rentFrom}`,
+        office: 'офис · ул. Абая, 6А',
+        legend: 'Цвет — район. Нажмите район, чтобы открыть гайд.',
+      };
 
 /* On the narrowest screens only the larger blocks + the office keep a label.
    Shayxontohur is added here too: it's the longest district name (11
@@ -63,7 +85,7 @@ const vb = `${GEO_VIEWBOX.x} ${GEO_VIEWBOX.y} ${GEO_VIEWBOX.w} ${GEO_VIEWBOX.h}`
     viewBox={vb}
     preserveAspectRatio="xMidYMid meet"
     role="group"
-    aria-label="Схематичная карта Ташкента: 12 районов, каждый своим цветом. Нажмите район, чтобы открыть гайд."
+    aria-label={t.mapAriaLabel}
     xmlns="http://www.w3.org/2000/svg"
   >
     <rect x={GEO_VIEWBOX.x} y={GEO_VIEWBOX.y} width={GEO_VIEWBOX.w} height={GEO_VIEWBOX.h} class="dm__bg"></rect>
@@ -72,8 +94,8 @@ const vb = `${GEO_VIEWBOX.x} ${GEO_VIEWBOX.y} ${GEO_VIEWBOX.w} ${GEO_VIEWBOX.h}`
 
     {
       svgDistricts.map(({ id, d, path, lx, ly, small }) => (
-        <a class="dm__district" href={d.href} data-district={id} aria-label={`${d.title} — аренда от ${d.rentFrom}`}>
-          <title>{`${d.title} — аренда от ${d.rentFrom}`}</title>
+        <a class="dm__district" href={d.href} data-district={id} aria-label={t.rentFrom(d.title, d.rentFrom)}>
+          <title>{t.rentFrom(d.title, d.rentFrom)}</title>
           <path d={path} style={`fill:var(--dm-c-${id})`} />
           <text
             class:list={['dm__label', small && 'dm__label--sm']}
@@ -94,11 +116,11 @@ const vb = `${GEO_VIEWBOX.x} ${GEO_VIEWBOX.y} ${GEO_VIEWBOX.w} ${GEO_VIEWBOX.h}`
         class="dm__office-pin"
         d="M0,-7 C-3.6,-7 -6,-4.3 -6,-1 C-6,3.2 0,9 0,9 C0,9 6,3.2 6,-1 C6,-4.3 3.6,-7 0,-7 Z"></path>
       <circle class="dm__office-pin-hole" cy="-1" r="1.7"></circle>
-      <text class="dm__office-label" x="0" y="-10" text-anchor="middle">офис · ул. Абая, 6А</text>
+      <text class="dm__office-label" x="0" y="-10" text-anchor="middle">{t.office}</text>
     </g>
   </svg>
 
-  <p class="dm__legend">Цвет — район. Нажмите район, чтобы открыть гайд.</p>
+  <p class="dm__legend">{t.legend}</p>
 </div>
 
 <style is:global>
