@@ -35,7 +35,7 @@ const hello: Record<Audience, Record<Lang, string>> = {
 <Base lang={lang} title={title} description={lead} path={`/${aud}/`} audience={aud} current={aud}>
   <header class="hub-head">
     <div class="wrap">
-      <h1>{title}</h1>
+      <h1 style={`view-transition-name: aud-${aud}`}>{title}</h1>
       <p>{lead}</p>
       <Guide name={tr('guideName')}>
         <p>{hello[aud][lang]}</p>
@@ -53,7 +53,7 @@ const hello: Record<Audience, Record<Lang, string>> = {
             {g.pages.map((p) => (
               <li>
                 <a href={url(lang, `/guide/${p.slug}/`)}>
-                  <strong>{p.entry.data.title}</strong>
+                  <strong style={`view-transition-name: t-${p.slug}`}>{p.entry.data.title}</strong>
                   <span>{p.entry.data.description}</span>
                 </a>
               </li>

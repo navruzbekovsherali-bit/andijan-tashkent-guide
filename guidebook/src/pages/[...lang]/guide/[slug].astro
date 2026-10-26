@@ -51,7 +51,7 @@ const hubAud = audience === 'local' ? 'local' : 'expat';
     <div class="article-layout">
       <article>
         <header class="article-head">
-          <h1>{data.title}</h1>
+          <h1 style={`view-transition-name: t-${slug}`}>{data.title}</h1>
           <p class="lead">{data.description}</p>
           <div class="meta-row">
             {data.audience.length === 2 ? (

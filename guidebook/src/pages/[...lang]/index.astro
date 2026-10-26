@@ -44,14 +44,14 @@ const last = words.pop();
     <div class="choose">
       <a class="door reveal" href={url(lang, '/local/')} data-choose="local">
         <div>
-          <h2>{tr('local')}</h2>
+          <h2 style="view-transition-name: aud-local">{tr('local')}</h2>
           <p>{tr('localLead')}</p>
         </div>
         <span class="go"><Icon name="arrow" /></span>
       </a>
       <a class="door reveal" href={url(lang, '/expat/')} data-choose="expat">
         <div>
-          <h2>{tr('expat')}</h2>
+          <h2 style="view-transition-name: aud-expat">{tr('expat')}</h2>
           <p>{tr('expatLead')}</p>
         </div>
         <span class="go"><Icon name="arrow" /></span>

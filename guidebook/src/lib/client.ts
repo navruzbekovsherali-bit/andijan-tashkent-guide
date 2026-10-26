@@ -347,4 +347,178 @@ export function initSite() {
   drawStrokes();
   reveal();
   cleanupProgress = progress();
+  journeyRail();
+  phoneDemos();
+  followingGuide();
+}
+
+/* ---------- Animated phone demos (illustrative screens, marked as examples) ---------- */
+type Screen = { kind: 'dial' | 'result'; text: string; lines?: string[]; step: number };
+const DEMOS: Record<string, { title: string; steps: string[]; screens: Screen[] }> = {
+  imei: {
+    title: 'Пример: как проверить IMEI',
+    steps: ['Наберите *#06# — телефон покажет IMEI', 'Перепишите все IMEI (их может быть два)', 'Наберите *1170# — придёт статус регистрации'],
+    screens: [
+      { kind: 'dial', text: '*#06#', step: 0 },
+      { kind: 'result', text: 'IMEI', lines: ['IMEI 1: 35 1234 •••• 4821', 'IMEI 2: 35 1234 •••• 4839'], step: 1 },
+      { kind: 'dial', text: '*1170#', step: 2 },
+      { kind: 'result', text: 'UzIMEI', lines: ['IMEI 35 1234 •••• 4821', 'Статус: зарегистрирован'], step: 2 },
+    ],
+  },
+};
+
+function phoneDemos() {
+  document.querySelectorAll<HTMLElement>('.phone-demo:not([data-ready])').forEach((host) => {
+    const demo = DEMOS[host.dataset.demo || ''];
+    if (!demo) return;
+    host.dataset.ready = '';
+    host.innerHTML = `
+      <figure class="pd">
+        <div class="pd-phone" aria-hidden="true"><div class="pd-notch"></div><div class="pd-screen"></div></div>
+        <figcaption>
+          <strong>${escapeHtml(demo.title)}</strong>
+          <ol class="pd-steps">${demo.steps.map((s) => `<li>${escapeHtml(s)}</li>`).join('')}</ol>
+          <small>Экран условный, цифры вымышлены.</small>
+        </figcaption>
+      </figure>`;
+    const screen = host.querySelector<HTMLElement>('.pd-screen')!;
+    const steps = Array.from(host.querySelectorAll<HTMLElement>('.pd-steps li'));
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let i = 0;
+    let timer = 0;
+    let typing = 0;
+    let visible = false;
+
+    const render = (sc: Screen, typed: string) => {
+      steps.forEach((li, n) => li.classList.toggle('is-on', n === sc.step));
+      if (sc.kind === 'dial') {
+        const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'];
+        screen.innerHTML = `<div class="pd-dial"><div class="pd-typed">${escapeHtml(typed)}<span class="pd-caret"></span></div>
+          <div class="pd-keys">${keys.map((k) => `<span class="${typed.endsWith(k) ? 'is-hit' : ''}">${k}</span>`).join('')}</div>
+          <div class="pd-call"></div></div>`;
+      } else {
+        screen.innerHTML = `<div class="pd-result"><div class="pd-sheet"><b>${escapeHtml(sc.text)}</b>${(sc.lines || [])
+          .map((l) => `<span>${escapeHtml(l)}</span>`)
+          .join('')}<em>OK</em></div></div>`;
+      }
+    };
+
+    const play = () => {
+      clearTimeout(timer);
+      clearInterval(typing);
+      if (!visible) return;
+      const sc = demo.screens[i % demo.screens.length];
+      if (sc.kind === 'dial' && !reduce) {
+        let n = 0;
+        render(sc, '');
+        typing = window.setInterval(() => {
+          n++;
+          render(sc, sc.text.slice(0, n));
+          if (n >= sc.text.length) clearInterval(typing);
+        }, 260);
+      } else render(sc, sc.text);
+      timer = window.setTimeout(() => {
+        i++;
+        play();
+      }, sc.kind === 'dial' ? 2600 : 2400);
+    };
+
+    render(demo.screens[0], reduce ? demo.screens[0].text : '');
+    new IntersectionObserver((es) => {
+      visible = es[0].isIntersecting;
+      if (visible && !reduce) play();
+      else {
+        clearTimeout(timer);
+        clearInterval(typing);
+      }
+      if (visible && reduce) {
+        i = 1;
+        render(demo.screens[1], demo.screens[1].text);
+      }
+    }, { threshold: 0.35 }).observe(host);
+  });
+}
+
+/* ---------- Journey rail: the article's own route, filled as you read ---------- */
+function journeyRail() {
+  const prose = document.querySelector<HTMLElement>('.prose');
+  if (!prose) return () => {};
+  const heads = Array.from(prose.querySelectorAll<HTMLElement>(':scope > h2'));
+  if (heads.length < 3) return () => {};
+  prose.classList.add('has-rail');
+  const rail = document.createElement('div');
+  rail.className = 'journey';
+  rail.setAttribute('aria-hidden', 'true');
+  rail.innerHTML = '<span class="journey-fill"></span>' + heads.map(() => '<span class="journey-stop"></span>').join('');
+  prose.prepend(rail);
+  const fill = rail.querySelector<HTMLElement>('.journey-fill')!;
+  const stops = Array.from(rail.querySelectorAll<HTMLElement>('.journey-stop'));
+
+  const layout = () => {
+    const top0 = heads[0].offsetTop + heads[0].offsetHeight / 2;
+    heads.forEach((h, n) => (stops[n].style.top = `${h.offsetTop + h.offsetHeight / 2}px`));
+    rail.style.top = `${top0}px`;
+    rail.style.height = `${prose.scrollHeight - top0}px`;
+    stops.forEach((s) => (s.style.top = `${parseFloat(s.style.top) - top0}px`));
+  };
+  let ticking = false;
+  const update = () => {
+    ticking = false;
+    const r = rail.getBoundingClientRect();
+    const reach = Math.min(Math.max(window.innerHeight * 0.45 - r.top, 0), r.height);
+    fill.style.height = `${reach}px`;
+    stops.forEach((s) => s.classList.toggle('is-done', parseFloat(s.style.top) <= reach));
+  };
+  const onScroll = () => {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(update);
+    }
+  };
+  layout();
+  update();
+  document.fonts?.ready.then(() => {
+    layout();
+    update();
+  });
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', () => {
+    layout();
+    update();
+  });
+  return () => window.removeEventListener('scroll', onScroll);
+}
+
+/* ---------- Guide that follows the reader and points to the next step ---------- */
+function followingGuide() {
+  const next = document.querySelector<HTMLAnchorElement>('.pager .next');
+  const article = document.querySelector<HTMLElement>('article');
+  if (!next || !article || document.querySelector('.guide-fab')) return;
+  const title = next.querySelector('strong')?.textContent || '';
+  const label = document.documentElement.lang === 'en' ? 'Next step' : document.documentElement.lang === 'uz' ? 'Keyingi qadam' : 'Следующий шаг';
+  const fab = document.createElement('div');
+  fab.className = 'guide-fab';
+  fab.innerHTML = `
+    <a class="guide-fab-bubble" href="${next.getAttribute('href')}"><small>${label}</small>${escapeHtml(title)}</a>
+    <button type="button" class="guide-fab-btn" aria-label="${label}: ${escapeHtml(title)}">
+      <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="20" cy="15" r="6.5"/><path d="M9 33c1.5-6 6-9 11-9s9.5 3 11 9"/><path d="M17.5 15.5h.01M22.5 15.5h.01"/><path d="M17.8 18.4c1.3 1 3.1 1 4.4 0"/></svg>
+    </button>`;
+  document.body.append(fab);
+  fab.querySelector('button')!.addEventListener('click', () => fab.classList.toggle('is-open'));
+  let shown = false;
+  const pager = next.closest('.pager') as HTMLElement;
+  const check = () => {
+    const r = article.getBoundingClientRect();
+    const read = (window.innerHeight - r.top) / r.height;
+    // The pager itself takes over once it is on screen.
+    const pagerInView = pager.getBoundingClientRect().top < window.innerHeight - 40;
+    fab.classList.toggle('is-visible', read > 0.25 && !pagerInView);
+    if (!shown && read > 0.6) {
+      shown = true;
+      fab.classList.add('is-open');
+      setTimeout(() => fab.classList.remove('is-open'), 6000);
+    }
+  };
+  window.addEventListener('scroll', check, { passive: true });
+  check();
 }
