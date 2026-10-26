@@ -1,0 +1,66 @@
+---
+import Base from '../../../layouts/Base.astro';
+import Guide from '../../../components/Guide.astro';
+import { LANGS, DEFAULT_LANG, t, url, type Lang } from '../../../lib/i18n';
+import { getPages, forAudience, groupBySection, SECTIONS, type Audience } from '../../../lib/content';
+
+export function getStaticPaths() {
+  return LANGS.flatMap((lang) =>
+    (['local', 'expat'] as const).map((aud) => ({
+      params: { lang: lang === DEFAULT_LANG ? undefined : lang, aud },
+      props: { lang, aud },
+    })),
+  );
+}
+
+const { lang, aud } = Astro.props as { lang: Lang; aud: Audience };
+const tr = t(lang);
+const groups = groupBySection(forAudience(await getPages(lang), aud));
+const title = aud === 'local' ? tr('local') : tr('expat');
+const lead = aud === 'local' ? tr('localLead') : tr('expatLead');
+const hello: Record<Audience, Record<Lang, string>> = {
+  local: {
+    ru: 'Начните с «Первого дня и первой недели» — там весь план. Остальное открывайте, когда понадобится.',
+    en: 'Start with “First day and first week” — the whole plan is there. Open the rest when you need it.',
+    uz: '«Birinchi kun va birinchi hafta»dan boshlang — butun reja oʻsha yerda.',
+  },
+  expat: {
+    ru: 'Идите по линии сверху вниз: сначала сборы и первые 72 часа после прилёта, потом работа и жизнь здесь.',
+    en: 'Follow the line from top to bottom: packing and the first 72 hours first, then work and life here.',
+    uz: 'Chiziq boʻylab yuqoridan pastga yuring: avval yigʻilish va dastlabki 72 soat.',
+  },
+};
+---
+
+<Base lang={lang} title={title} description={lead} path={`/${aud}/`} audience={aud} current={aud}>
+  <header class="hub-head">
+    <div class="wrap">
+      <h1>{title}</h1>
+      <p>{lead}</p>
+      <Guide name={tr('guideName')}>
+        <p>{hello[aud][lang]}</p>
+      </Guide>
+    </div>
+  </header>
+
+  <div class="wrap">
+    {
+      groups.map((g) => (
+        <section class="route" style={`--line: var(--line-${SECTIONS[g.id].line})`}>
+          <span class="route-progress" aria-hidden="true" />
+          <h2>{SECTIONS[g.id].title[lang]}</h2>
+          <ol>
+            {g.pages.map((p) => (
+              <li>
+                <a href={url(lang, `/guide/${p.slug}/`)}>
+                  <strong>{p.entry.data.title}</strong>
+                  <span>{p.entry.data.description}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ))
+    }
+  </div>
+</Base>

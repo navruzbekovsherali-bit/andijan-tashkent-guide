@@ -1,0 +1,177 @@
+---
+import '../styles/global.css';
+import Icon from '../components/Icon.astro';
+import BrandMark from '../components/BrandMark.astro';
+import { LANGS, LANG_LABEL, t, url, type Lang } from '../lib/i18n';
+import { getPages, groupBySection, SECTIONS } from '../lib/content';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description?: string;
+  /** Path without language prefix, used for the language switcher. */
+  path: string;
+  /** Current audience context, if the page belongs to one. */
+  audience?: 'local' | 'expat' | 'both';
+  current?: 'home' | 'local' | 'expat' | 'faq' | 'page';
+}
+
+const { lang, title, description, path, audience = 'both', current = 'page' } = Astro.props;
+const tr = t(lang);
+const pages = await getPages(lang);
+const groups = groupBySection(pages);
+const pageTitle = current === 'home' ? tr('siteName') : `${title} — ${tr('siteName')}`;
+const here = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang={lang} data-theme="document" data-audience={audience}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{pageTitle}</title>
+    {description && <meta name="description" content={description} />}
+    <meta name="theme-color" content="#edf1ec" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="canonical" href={new URL(here, Astro.site)} />
+    {LANGS.map((l) => <link rel="alternate" hreflang={l} href={new URL(url(l, path), Astro.site)} />)}
+    <meta property="og:title" content={pageTitle} />
+    {description && <meta property="og:description" content={description} />}
+    <script is:inline>
+      (function () {
+        var d = document.documentElement;
+        d.classList.add('js');
+        try {
+          var th = localStorage.getItem('gb-theme');
+          if (th) d.dataset.theme = th;
+          var au = localStorage.getItem('gb-audience');
+          if (au && d.dataset.audience === 'both') d.dataset.pref = au;
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">{tr('skip')}</a>
+
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href={url(lang, '/')}>
+          <BrandMark />
+          <span>Hamkorbank<small>{tr('siteShort')}</small></span>
+        </a>
+        <nav class="header-nav" aria-label={tr('menu')}>
+          <a href={url(lang, '/local/')} data-nav="local">{tr('localShort')}</a>
+          <a href={url(lang, '/expat/')} data-nav="expat">{tr('expatShort')}</a>
+          <a href={url(lang, '/faq/')} data-nav="faq">{tr('faq')}</a>
+          <a href={url(lang, '/guide/contacts/')} data-nav="contacts">{tr('contacts')}</a>
+        </nav>
+        <!-- Preview-only: compare the three design worlds -->
+        <div class="style-switch" role="group" aria-label={tr('styleNote')}>
+          <span><Icon name="palette" size={16} /></span>
+          <button type="button" data-theme-set="document" title="Документ">A</button>
+          <button type="button" data-theme-set="route" title="Маршрут">B</button>
+          <button type="button" data-theme-set="notebook" title="Тетрадь">C</button>
+        </div>
+        <div class="header-actions">
+          <button class="icon-btn" type="button" data-sheet="search" aria-label={tr('search')}><Icon name="search" /></button>
+          <button class="icon-btn" type="button" data-sheet="drawer" aria-label={tr('menu')}><Icon name="menu" /></button>
+        </div>
+      </div>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <span>© Hamkorbank · {tr('siteShort')}</span>
+        <span>
+          <a href={url(lang, '/guide/emergency/')}>{tr('emergency')}</a> ·
+          <a href={url(lang, '/guide/contacts/')}>{tr('contacts')}</a>
+        </span>
+      </div>
+    </footer>
+
+    <!-- Bottom bar: everything reachable with a thumb -->
+    <nav class="bottom-bar" aria-label={tr('menu')}>
+      <a href={url(lang, '/')} data-nav="home"><Icon name="home" /><span>{tr('home')}</span></a>
+      <a href={url(lang, '/faq/')} data-nav="faq"><Icon name="question" /><span>{tr('faqShort')}</span></a>
+      <button type="button" data-sheet="search"><Icon name="search" /><span>{tr('search')}</span></button>
+      <button type="button" data-sheet="drawer" class="is-primary"><Icon name="menu" /><span>{tr('menu')}</span></button>
+    </nav>
+
+    <!-- Drawer -->
+    <div class="sheet drawer-sheet" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+      <div class="sheet-scrim" data-close></div>
+      <div class="sheet-panel">
+        <div class="sheet-grip" aria-hidden="true"></div>
+        <div class="sheet-head">
+          <h2 id="drawer-title">{tr('allSections')}</h2>
+          <button class="icon-btn" type="button" data-close aria-label={tr('close')}><Icon name="close" /></button>
+        </div>
+        <div class="sheet-body">
+          <div class="seg" role="group" aria-label={tr('audienceSwitch')}>
+            <button type="button" data-aud="local">{tr('localShort')}</button>
+            <button type="button" data-aud="expat">{tr('expatShort')}</button>
+          </div>
+          {
+            groups.map((g) => (
+              <section class="nav-group" style={`--line: var(--line-${SECTIONS[g.id].line})`}>
+                <h3 class="nav-group-title">
+                  <span class="dot" />
+                  {SECTIONS[g.id].title[lang]}
+                </h3>
+                <ul class="nav-list">
+                  {g.pages.map((p) => (
+                    <li data-aud-list={p.entry.data.audience.join(' ')}>
+                      <a href={url(lang, `/guide/${p.slug}/`)}>{p.entry.data.title}</a>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))
+          }
+          <div class="drawer-foot">
+            <ul class="nav-list">
+              <li><a href={url(lang, '/faq/')}>{tr('faq')}</a></li>
+            </ul>
+            <div>
+              <p class="label">Язык · Language · Til</p>
+              <div class="seg three">
+                {LANGS.map((l) => <a href={url(l, path)} aria-current={l === lang ? 'true' : undefined} hreflang={l}>{LANG_LABEL[l]}</a>)}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="sheet search-sheet" id="search" role="dialog" aria-modal="true" aria-labelledby="search-title" data-lang={lang}>
+      <div class="sheet-scrim" data-close></div>
+      <div class="sheet-panel">
+        <div class="sheet-grip" aria-hidden="true"></div>
+        <div class="sheet-head">
+          <h2 id="search-title">{tr('search')}</h2>
+          <button class="icon-btn" type="button" data-close aria-label={tr('close')}><Icon name="close" /></button>
+        </div>
+        <div class="sheet-body">
+          <label class="search-field">
+            <span class="visually-hidden">{tr('search')}</span>
+            <Icon name="search" />
+            <input type="search" id="search-input" placeholder={tr('searchPlaceholder')} autocomplete="off" enterkeyhint="search" />
+          </label>
+          <p class="search-hint" id="search-hint" data-empty={tr('searchEmpty')} data-hint={tr('searchHint')}>{tr('searchHint')}</p>
+          <ul class="results" id="search-results" aria-live="polite"></ul>
+        </div>
+      </div>
+    </div>
+
+
+    <script>
+      import { initSite } from '../lib/client';
+      initSite();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,157 @@
+---
+import { render } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import Icon from '../../../components/Icon.astro';
+import Guide from '../../../components/Guide.astro';
+import { LANGS, DEFAULT_LANG, t, url, type Lang } from '../../../lib/i18n';
+import { getPages, forAudience, readingMinutes, SECTIONS } from '../../../lib/content';
+
+export async function getStaticPaths() {
+  const out = [];
+  for (const lang of LANGS) {
+    const pages = await getPages(lang);
+    for (const p of pages) {
+      out.push({ params: { lang: lang === DEFAULT_LANG ? undefined : lang, slug: p.slug }, props: { lang, slug: p.slug } });
+    }
+  }
+  return out;
+}
+
+const { lang, slug } = Astro.props as { lang: Lang; slug: string };
+const tr = t(lang);
+const pages = await getPages(lang);
+const page = pages.find((p) => p.slug === slug)!;
+const { entry, fallback } = page;
+const data = entry.data;
+const { Content, headings } = await render(entry);
+const toc = headings.filter((h) => h.depth === 2);
+const section = SECTIONS[data.section];
+const audience = data.audience.length === 1 ? data.audience[0] : 'both';
+
+// Prev/next along the reader's own line (expat line for shared pages unless they came from local).
+const line = forAudience(pages, audience === 'local' ? 'local' : 'expat');
+const i = line.findIndex((p) => p.slug === slug);
+const prev = i > 0 ? line[i - 1] : undefined;
+const next = i >= 0 && i < line.length - 1 ? line[i + 1] : undefined;
+
+const fmtDate = (d: Date) =>
+  d.toLocaleDateString(lang === 'en' ? 'en-GB' : lang === 'uz' ? 'uz-UZ' : 'ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+const hubAud = audience === 'local' ? 'local' : 'expat';
+---
+
+<Base lang={lang} title={data.title} description={data.description} path={`/guide/${slug}/`} audience={audience}>
+  <div class="read-progress" aria-hidden="true"></div>
+  <div class="wrap" style={`--line: var(--line-${section.line})`}>
+    <nav class="crumbs" aria-label="breadcrumbs">
+      <a href={url(lang, '/')}>{tr('home')}</a>
+      <span class="sep">/</span>
+      <a href={url(lang, `/${hubAud}/`)}><span class="line-dot"></span>{section.title[lang]}</a>
+    </nav>
+
+    <div class="article-layout">
+      <article>
+        <header class="article-head">
+          <h1>{data.title}</h1>
+          <p class="lead">{data.description}</p>
+          <div class="meta-row">
+            {data.audience.length === 2 ? (
+              <span class="chip">{tr('both')}</span>
+            ) : (
+              <span class="chip">{data.audience[0] === 'local' ? tr('localShort') : tr('expatShort')}</span>
+            )}
+            <span class="chip"><Icon name="clock" size={14} />{readingMinutes(entry.body)} {tr('minutes')}</span>
+            {data.checked && (
+              <span class="stamp">
+                <Icon name="check" size={14} />
+                {tr('checked')} {fmtDate(data.checked)}
+              </span>
+            )}
+          </div>
+          {fallback && <p class="fallback-note">{tr('translationSoon')}</p>}
+          {data.needsConfirmation && (
+            <p class="confirm-note">
+              <Icon name="alert" size={20} />
+              <span>{tr('confirm')}</span>
+            </p>
+          )}
+        </header>
+
+        {data.tldr.length > 0 && (
+          <Guide name={tr('short')}>
+            <ul>
+              {data.tldr.map((x) => (
+                <li>{x}</li>
+              ))}
+            </ul>
+          </Guide>
+        )}
+
+        <div class="prose">
+          <Content />
+        </div>
+
+        {data.faq.length > 0 && (
+          <section>
+            <h2 class="section-title">{tr('faq')}</h2>
+            <div class="faq-list">
+              {data.faq.map((f) => (
+                <details class="faq-item">
+                  <summary>
+                    <span>{f.q}</span>
+                    <Icon name="chevron" />
+                  </summary>
+                  <div class="faq-a">
+                    <p>{f.a}</p>
+                  </div>
+                </details>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {data.sources.length > 0 && (
+          <footer class="sources">
+            <h2>{tr('sources')}</h2>
+            <ul>
+              {data.sources.map((s) => (
+                <li>
+                  <a href={s.url} rel="noopener" target="_blank">{s.title}</a>
+                </li>
+              ))}
+            </ul>
+          </footer>
+        )}
+
+        <nav class="pager" aria-label={`${tr('prev')} / ${tr('next')}`}>
+          {prev ? (
+            <a class="prev" href={url(lang, `/guide/${prev.slug}/`)}>
+              <small><Icon name="back" size={16} />{tr('prev')}</small>
+              <strong>{prev.entry.data.title}</strong>
+            </a>
+          ) : (
+            <span />
+          )}
+          {next && (
+            <a class="next" href={url(lang, `/guide/${next.slug}/`)}>
+              <small>{tr('next')}<Icon name="arrow" size={16} /></small>
+              <strong>{next.entry.data.title}</strong>
+            </a>
+          )}
+        </nav>
+      </article>
+
+      {toc.length > 1 && (
+        <aside class="toc" aria-label={tr('onThisPage')}>
+          <p>{tr('onThisPage')}</p>
+          <ol>
+            {toc.map((h) => (
+              <li>
+                <a href={`#${h.slug}`}>{h.text}</a>
+              </li>
+            ))}
+          </ol>
+        </aside>
+      )}
+    </div>
+  </div>
+</Base>

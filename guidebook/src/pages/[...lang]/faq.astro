@@ -1,0 +1,75 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import { langPaths } from '../../lib/paths';
+import { t, url, type Lang } from '../../lib/i18n';
+import { getPages, groupBySection, SECTIONS } from '../../lib/content';
+
+export const getStaticPaths = langPaths;
+const { lang } = Astro.props as { lang: Lang };
+const tr = t(lang);
+const groups = groupBySection(await getPages(lang))
+  .map((g) => ({ ...g, items: g.pages.flatMap((p) => p.entry.data.faq.map((f) => ({ ...f, p }))) }))
+  .filter((g) => g.items.length > 0);
+---
+
+<Base lang={lang} title={tr('faq')} description={tr('faqLead')} path="/faq/" current="faq">
+  <header class="hub-head">
+    <div class="wrap">
+      <h1>{tr('faq')}</h1>
+      <p>{tr('faqLead')}</p>
+    </div>
+  </header>
+  <div class="wrap">
+    <label class="search-field" style="max-width: var(--measure)">
+      <span class="visually-hidden">{tr('faqSearch')}</span>
+      <Icon name="search" />
+      <input type="search" id="faq-filter" placeholder={tr('faqSearch')} autocomplete="off" />
+    </label>
+    <p class="search-hint" id="faq-empty" hidden>{tr('searchEmpty')}</p>
+
+    {
+      groups.map((g) => (
+        <section class="faq-group" style={`--line: var(--line-${SECTIONS[g.id].line})`}>
+          <h2 class="section-title">{SECTIONS[g.id].title[lang]}</h2>
+          <div class="faq-list">
+            {g.items.map((f) => (
+              <details class="faq-item" data-aud-list={f.p.entry.data.audience.join(' ')} data-q={`${f.q} ${f.a}`.toLowerCase()}>
+                <summary>
+                  <span>{f.q}</span>
+                  <Icon name="chevron" />
+                </summary>
+                <div class="faq-a">
+                  <p>{f.a}</p>
+                  <a class="faq-src" href={url(lang, `/guide/${f.p.slug}/`)}>{f.p.entry.data.title} →</a>
+                </div>
+              </details>
+            ))}
+          </div>
+        </section>
+      ))
+    }
+  </div>
+</Base>
+
+<script>
+  const input = document.getElementById('faq-filter') as HTMLInputElement | null;
+  if (input) {
+    const norm = (s: string) => s.toLowerCase().replace(/ё/g, 'е');
+    input.addEventListener('input', () => {
+      const terms = norm(input.value).split(/\s+/).filter(Boolean);
+      let shown = 0;
+      document.querySelectorAll<HTMLDetailsElement>('.faq-item').forEach((d) => {
+        const hay = norm(d.dataset.q || '');
+        const ok = terms.every((t) => hay.includes(t));
+        d.hidden = !ok;
+        if (ok) shown++;
+        d.open = ok && terms.length > 0 && shown <= 3;
+      });
+      document.querySelectorAll<HTMLElement>('.faq-group').forEach((g) => {
+        g.hidden = !g.querySelector('.faq-item:not([hidden])');
+      });
+      document.getElementById('faq-empty')!.hidden = shown > 0;
+    });
+  }
+</script>
