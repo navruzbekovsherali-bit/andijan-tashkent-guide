@@ -49,6 +49,9 @@ faq:
 
 Доступные типы карт: Visa, Mastercard, UnionPay, HUMO и Uzcard. Лимиты, комиссии и особенности корпоративного счёта уточните у специалиста по адаптации.
 
+<div class="video-reel" data-reel="cards"></div>
+
+
 ## Обмен валюты
 
 ### Где менять

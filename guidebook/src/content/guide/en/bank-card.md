@@ -50,6 +50,9 @@ Ask your onboarding specialist for the branch address.
 
 Available card types: Visa, Mastercard, UnionPay, HUMO and Uzcard. Ask your onboarding specialist about limits, fees and the details of the corporate account.
 
+<div class="video-reel" data-reel="cards"></div>
+
+
 ## Exchanging currency
 
 ### Where to exchange

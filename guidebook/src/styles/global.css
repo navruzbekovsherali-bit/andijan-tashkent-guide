@@ -3517,3 +3517,141 @@ html[data-view='expat'] .q-aud {
 .pd-num {
   font-size: 0.8125rem;
 }
+
+/* ---------- Bank reel: vertical film in a phone ---------- */
+.video-reel {
+  margin-block: 2.2em !important;
+  max-width: none !important;
+}
+.reel {
+  display: grid;
+  gap: 22px;
+  align-items: center;
+  margin: 0;
+  padding: 26px 22px;
+  border-radius: var(--radius);
+  background: radial-gradient(80% 70% at 20% 10%, rgb(26 167 82 / 0.22), transparent 70%), var(--night);
+  color: var(--on-night);
+}
+@media (min-width: 560px) {
+  .reel {
+    grid-template-columns: 230px 1fr;
+    gap: 32px;
+    padding: 30px;
+  }
+}
+.reel-phone {
+  position: relative;
+  width: min(230px, 62vw);
+  aspect-ratio: 9 / 16;
+  margin-inline: auto;
+  padding: 7px;
+  border-radius: 30px;
+  background: #0b0f0e;
+  box-shadow: 0 30px 50px -24px rgb(0 0 0 / 0.7), inset 0 0 0 1.5px rgb(255 255 255 / 0.12);
+}
+.reel-phone video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 24px;
+  background: #0b0f0e;
+}
+.reel-toggle {
+  position: absolute;
+  inset: 7px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 24px;
+  background: transparent;
+  cursor: pointer;
+}
+.reel-play {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.22);
+  backdrop-filter: blur(12px) saturate(1.5);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.4);
+  transition: opacity 300ms var(--ease), transform 400ms var(--ease);
+}
+.reel-play::before {
+  content: '';
+  margin-left: 4px;
+  border-left: 16px solid #fff;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+}
+.reel.is-playing .reel-play {
+  opacity: 0;
+  transform: scale(0.8);
+}
+.reel-sound {
+  position: absolute;
+  right: 16px;
+  bottom: 20px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(10 46 42 / 0.55);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  cursor: pointer;
+}
+.reel-sound::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+}
+.reel-sound .wave {
+  display: none;
+}
+.reel.has-sound .reel-sound .wave {
+  display: block;
+}
+.reel.has-sound .reel-sound .mute {
+  display: none;
+}
+.reel-bar {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: 16px;
+  height: 3px;
+  border-radius: 3px;
+  background: rgb(255 255 255 / 0.3);
+  overflow: hidden;
+  pointer-events: none;
+}
+.reel-bar i {
+  display: block;
+  height: 100%;
+  background: #fff;
+  transform-origin: 0 50%;
+  transform: scaleX(var(--t, 0));
+}
+.reel figcaption {
+  display: grid;
+  gap: 8px;
+}
+.reel figcaption strong {
+  font-size: var(--t-h3);
+  color: #fff;
+}
+.reel figcaption span {
+  color: var(--on-night-2);
+  max-width: 36ch;
+}
+.reel figcaption small {
+  font-size: var(--t-label);
+  color: var(--on-night-2);
+  opacity: 0.8;
+}

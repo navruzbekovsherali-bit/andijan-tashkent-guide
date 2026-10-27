@@ -387,6 +387,7 @@ export function initSite() {
     () => (cleanupProgress = progress()),
     journeyRail,
     phoneDemos,
+    reels,
     followingGuide,
     headerOnScroll,
     heroFold,
@@ -541,6 +542,79 @@ function stopVideo(btn: HTMLButtonElement) {
   btn.remove();
   frame.classList.remove('is-playing', 'is-loaded');
   frame.querySelector<HTMLElement>('[data-play]')?.focus({ preventScroll: true });
+}
+
+/* ---------- Bank reels: a vertical film that plays silently while on screen; sound on request ---------- */
+const REELS: Record<string, { src: string; poster: string; ru: [string, string, string]; en: [string, string, string] }> = {
+  cards: {
+    src: 'video/cards-reel.mp4',
+    poster: 'video/cards-reel-poster.webp',
+    ru: ['Карты Hamkor Bank', 'VISA в сумах, HUMO и кредитная карта — коротко, за 20 секунд.', 'Видео Hamkor Bank'],
+    en: ['Hamkor Bank cards', 'VISA in sums, HUMO and the credit card — in 20 seconds.', 'Video by Hamkor Bank'],
+  },
+};
+
+function reels() {
+  const lang = document.documentElement.lang === 'en' ? 'en' : 'ru';
+  const L = lang === 'en' ? { on: 'Turn sound on', off: 'Turn sound off', play: 'Play', pause: 'Pause' } : { on: 'Включить звук', off: 'Выключить звук', play: 'Смотреть', pause: 'Пауза' };
+  document.querySelectorAll<HTMLElement>('.video-reel:not([data-ready])').forEach((host) => {
+    const r = REELS[host.dataset.reel || ''];
+    if (!r) return;
+    host.dataset.ready = '';
+    const [title, lead, credit] = r[lang];
+    const root = base() || '/';
+    host.innerHTML = `
+      <figure class="reel">
+        <div class="reel-phone">
+          <video src="${root}${r.src}" poster="${root}${r.poster}" muted playsinline loop preload="none" aria-label="${escapeHtml(title)}"></video>
+          <button type="button" class="reel-toggle" aria-label="${L.play}"><span class="reel-play"></span></button>
+          <button type="button" class="reel-sound" aria-pressed="false" aria-label="${L.on}">
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path class="wave" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path class="mute" d="M16 9.5l5 5M21 9.5l-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
+          <span class="reel-bar"><i></i></span>
+        </div>
+        <figcaption><strong>${escapeHtml(title)}</strong><span>${escapeHtml(lead)}</span><small>${escapeHtml(credit)}</small></figcaption>
+      </figure>`;
+    const fig = host.querySelector<HTMLElement>('.reel')!;
+    const video = host.querySelector('video')!;
+    const sound = host.querySelector<HTMLButtonElement>('.reel-sound')!;
+    const toggle = host.querySelector<HTMLButtonElement>('.reel-toggle')!;
+    const bar = host.querySelector<HTMLElement>('.reel-bar i')!;
+    let userPaused = false;
+    const setPlaying = () => {
+      fig.classList.toggle('is-playing', !video.paused);
+      toggle.setAttribute('aria-label', video.paused ? L.play : L.pause);
+    };
+    video.addEventListener('play', setPlaying);
+    video.addEventListener('pause', setPlaying);
+    video.addEventListener('timeupdate', () => bar.style.setProperty('--t', String(video.currentTime / (video.duration || 1))));
+    toggle.addEventListener('click', () => {
+      if (video.paused) {
+        userPaused = false;
+        video.play().catch(() => {});
+      } else {
+        userPaused = true;
+        video.pause();
+      }
+    });
+    sound.addEventListener('click', () => {
+      video.muted = !video.muted;
+      sound.setAttribute('aria-pressed', String(!video.muted));
+      sound.setAttribute('aria-label', video.muted ? L.on : L.off);
+      fig.classList.toggle('has-sound', !video.muted);
+      if (video.paused) video.play().catch(() => {});
+    });
+    // Plays on its own only while you can see it, and never for people who asked for less motion.
+    new IntersectionObserver(
+      (es) => {
+        const e = es[0];
+        if (e.isIntersecting && video.preload === 'none') video.preload = 'auto';
+        if (e.intersectionRatio >= 0.6 && !userPaused && !reduceMotion()) video.play().catch(() => {});
+        else if (e.intersectionRatio < 0.25 && !video.paused) video.pause();
+      },
+      { threshold: [0, 0.25, 0.6] },
+    ).observe(fig);
+  });
 }
 
 /* ---------- Animated phone demos (illustrative screens, marked as examples) ---------- */
@@ -980,6 +1054,7 @@ function decorate() {
   mark('.prose > h2');
   mark('.prose > blockquote');
   mark('.prose > .phone-demo');
+  mark('.prose > .video-reel');
   document.querySelectorAll<HTMLElement>('.table-scroll').forEach((t) =>
     t.querySelectorAll<HTMLElement>('tbody tr').forEach((tr, i) => {
       tr.classList.add('reveal');
