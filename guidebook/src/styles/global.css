@@ -113,7 +113,7 @@
 [data-glaze='emerald'] {
   --field: var(--g-emerald);
   --on-field: #fff;
-  --on-field-2: #d3f1e3;
+  --on-field-2: #e4f8ee;
   --field-ink: var(--g-emerald);
   --field-soft: #e0f3ea;
   --tile-star: var(--g-mint);
@@ -207,8 +207,31 @@ svg {
   margin-inline: auto;
 }
 :focus-visible {
-  outline: 3px solid var(--g-mint);
+  outline: 3px solid var(--g-emerald);
   outline-offset: 3px;
+}
+.mast :focus-visible,
+.home-faq :focus-visible,
+.pager :focus-visible,
+.site-header:not(.is-scrolled) :focus-visible {
+  outline-color: var(--g-mint);
+}
+[data-glaze='mint'] .mast :focus-visible,
+.mast[data-glaze='mint'] :focus-visible {
+  outline-color: var(--ink);
+}
+/* chamfered controls clip outlines, so they draw their focus ring inside, in their own text colour */
+.door:focus-visible,
+.tiles a:focus-visible,
+.btn:focus-visible,
+.dock a:focus-visible,
+.dock button:focus-visible,
+.icon-btn:focus-visible,
+.header-nav a:focus-visible,
+.seg :focus-visible,
+.drawer-faq:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 3px currentColor;
 }
 .visually-hidden {
   position: absolute !important;
@@ -233,8 +256,8 @@ svg {
 .display {
   font-family: var(--f-display);
   font-weight: 750;
-  letter-spacing: -0.01em;
-  line-height: 1.02;
+  letter-spacing: -0.025em;
+  line-height: 0.98;
   hyphens: auto;
   overflow-wrap: break-word;
 }
@@ -358,7 +381,7 @@ svg {
   gap: 2px;
   border: 0;
   background: transparent;
-  color: #c9cee2;
+  color: #b9d3cd;
   text-decoration: none;
   font: inherit;
   font-size: 0.72rem;
@@ -925,7 +948,7 @@ main:has(.home-faq) {
   clip-path: var(--chamfer);
 }
 .btn.ghost {
-  background: var(--field-soft, #e8ecf8);
+  background: var(--field-soft, var(--tint));
   color: var(--ink);
 }
 .btn:hover svg {
@@ -1431,7 +1454,7 @@ article {
   margin-top: 0;
   padding: 28px 0;
   background: var(--ink);
-  color: #c9cee2;
+  color: #b9d3cd;
   font-size: 0.9rem;
 }
 .site-footer .wrap {
@@ -1469,7 +1492,7 @@ main:has(.pager) {
 .sheet-scrim {
   position: absolute;
   inset: 0;
-  background: rgb(14 21 48 / 0.55);
+  background: rgb(11 31 29 / 0.55);
   opacity: 0;
   transition: opacity 260ms var(--ease-out);
 }
@@ -1858,7 +1881,7 @@ main:has(.pager) {
   border: 0;
   background: none;
   cursor: pointer;
-  filter: drop-shadow(0 10px 14px rgb(14 21 48 / 0.35));
+  filter: drop-shadow(0 10px 14px rgb(11 31 29 / 0.35));
 }
 .guide-fab .gf-heart {
   transform-box: fill-box;
@@ -1900,7 +1923,7 @@ main:has(.pager) {
   color: var(--ink);
   line-height: 1.3;
   clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
-  filter: drop-shadow(0 8px 18px rgb(14 21 48 / 0.25));
+  filter: drop-shadow(0 8px 18px rgb(11 31 29 / 0.25));
   opacity: 0;
   transform: translateX(8px) scale(0.96);
   transform-origin: right bottom;
@@ -1975,7 +1998,7 @@ main:has(.pager) {
   padding: 9px;
   border-radius: 30px;
   background: var(--ink);
-  box-shadow: 0 24px 40px -24px rgb(14 21 48 / 0.6);
+  box-shadow: 0 24px 40px -24px rgb(11 31 29 / 0.6);
 }
 .pd-notch {
   position: absolute;

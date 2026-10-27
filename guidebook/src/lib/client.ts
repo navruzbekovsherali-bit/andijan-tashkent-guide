@@ -251,7 +251,7 @@ function callouts() {
 
 function markCurrentNav() {
   const here = location.pathname;
-  document.querySelectorAll<HTMLAnchorElement>('.nav-list a, .bottom-bar a, .header-nav a').forEach((a) => {
+  document.querySelectorAll<HTMLAnchorElement>('.nav-list a, .dock a, .header-nav a').forEach((a) => {
     const href = new URL(a.href).pathname;
     const isHome = href === '/' || /^\/(en|uz)\/$/.test(href);
     const match = isHome ? here === href : here.startsWith(href);
