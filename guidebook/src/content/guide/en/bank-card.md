@@ -45,6 +45,9 @@ Ask your onboarding specialist for the branch address.
 2. Sign up using your card.
 3. Set a **PIN code** and fingerprint login.
 
+<div class="phone-demo" data-demo="bank"></div>
+
+
 Available card types: Visa, Mastercard, UnionPay, HUMO and Uzcard. Ask your onboarding specialist about limits, fees and the details of the corporate account.
 
 ## Exchanging currency

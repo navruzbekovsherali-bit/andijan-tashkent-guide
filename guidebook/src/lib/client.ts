@@ -382,6 +382,7 @@ export function initSite() {
     callouts,
     dialable,
     tables,
+    decorate,
     reveal,
     () => (cleanupProgress = progress()),
     journeyRail,
@@ -389,6 +390,7 @@ export function initSite() {
     followingGuide,
     headerOnScroll,
     heroFold,
+    headFold,
     cityDepth,
     checklists,
     countdown,
@@ -542,23 +544,109 @@ function stopVideo(btn: HTMLButtonElement) {
 }
 
 /* ---------- Animated phone demos (illustrative screens, marked as examples) ---------- */
-type Screen = { kind: 'dial' | 'result'; text: string; lines?: string[]; step: number };
-const DEMOS: Record<string, { title: string; steps: string[]; screens: Screen[] }> = {
-  imei: {
-    title: 'Пример: как проверить IMEI',
-    steps: ['Наберите *#06# — телефон покажет IMEI', 'Перепишите все IMEI (их может быть два)', 'Наберите *1170# — придёт статус регистрации'],
-    screens: [
-      { kind: 'dial', text: '*#06#', step: 0 },
-      { kind: 'result', text: 'IMEI', lines: ['IMEI 1: 35 1234 •••• 4821', 'IMEI 2: 35 1234 •••• 4839'], step: 1 },
-      { kind: 'dial', text: '*1170#', step: 2 },
-      { kind: 'result', text: 'UzIMEI', lines: ['IMEI 35 1234 •••• 4821', 'Статус: зарегистрирован'], step: 2 },
-    ],
+type Screen = {
+  kind: 'dial' | 'result' | 'app';
+  text: string;
+  lines?: string[];
+  step: number;
+  /** App screens: markup for the screen, given what has been typed so far. */
+  view?: (typed: string) => string;
+  /** App screens: type `text` letter by letter. */
+  type?: boolean;
+  ms?: number;
+};
+type Demo = { title: string; steps: string[]; note: string; screens: Screen[] };
+
+const MARK =
+  '<svg viewBox="270 270 1390 1390" aria-hidden="true"><circle cx="965" cy="965" r="616.5" fill="none" stroke="#1aa752" stroke-width="137" stroke-dasharray="1500 300 1500 572" /><polygon points="1215,476 1440,466 1125,1307 902,1307 1007,1023 880,1023 720,1480 495,1465 812,622 1033,622 928,908 1052,908" fill="#1aa752"/></svg>';
+const MAP =
+  '<svg class="pd-streets" viewBox="0 0 200 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><path d="M-10 60 L210 40 M-10 150 L210 170 M-10 240 L210 225 M40 -10 L60 310 M130 -10 L120 310 M175 -10 L190 310" /><path class="pd-park" d="M70 70 h40 v50 h-40z" /></svg>';
+const caret = '<span class="pd-caret"></span>';
+
+const DEMO_TEXT = {
+  ru: {
+    note: 'Экран условный, цифры вымышлены.',
+    imei: { title: 'Пример: как проверить IMEI', steps: ['Наберите *#06# — телефон покажет IMEI', 'Перепишите все IMEI (их может быть два)', 'Наберите *1170# — придёт статус регистрации'], status: 'Статус: зарегистрирован' },
+    taxi: { title: 'Пример: как вызвать такси', steps: ['Откройте Yandex Go и укажите, куда ехать', 'Выберите тариф — цена видна сразу', 'Нажмите «Заказать» и ждите машину'], from: 'Откуда', here: 'Вы здесь', to: 'Куда', dest: 'Работа', eco: 'Эконом', comf: 'Комфорт', order: 'Заказать', coming: 'Машина едет', min: 'мин', car: 'Белый Cobalt · 01 A 123 BC' },
+    bank: { title: 'Пример: как настроить приложение банка', steps: ['Скачайте приложение Hamkorbank', 'Зарегистрируйтесь с помощью карты', 'Установите ПИН-код и вход по отпечатку'], get: 'Установить', open: 'Открыть', card: 'Номер карты', next: 'Далее', pin: 'Придумайте ПИН-код', touch: 'Вход по отпечатку', done: 'Готово', added: 'Карта добавлена' },
+  },
+  en: {
+    note: 'Illustrative screen, made-up numbers.',
+    imei: { title: 'Example: checking your IMEI', steps: ['Dial *#06# — the phone shows its IMEI', 'Write down every IMEI (there may be two)', 'Dial *1170# — you get the registration status'], status: 'Status: registered' },
+    taxi: { title: 'Example: ordering a taxi', steps: ['Open Yandex Go and say where you are going', 'Pick a tariff — the price shows straight away', 'Tap “Order” and wait for the car'], from: 'From', here: 'You are here', to: 'To', dest: 'Work', eco: 'Economy', comf: 'Comfort', order: 'Order', coming: 'Car on the way', min: 'min', car: 'White Cobalt · 01 A 123 BC' },
+    bank: { title: 'Example: setting up the bank app', steps: ['Download the Hamkorbank app', 'Sign up with your card', 'Set a PIN and fingerprint login'], get: 'Get', open: 'Open', card: 'Card number', next: 'Next', pin: 'Choose a PIN', touch: 'Fingerprint login', done: 'Done', added: 'Card added' },
   },
 };
 
+function demoFor(name: string): Demo | undefined {
+  const l = document.documentElement.lang === 'en' ? 'en' : 'ru';
+  const T = DEMO_TEXT[l];
+  if (name === 'imei') {
+    return {
+      ...T.imei,
+      note: T.note,
+      screens: [
+        { kind: 'dial', text: '*#06#', step: 0 },
+        { kind: 'result', text: 'IMEI', lines: ['IMEI 1: 35 1234 •• 4821', 'IMEI 2: 35 1234 •• 4839'], step: 1 },
+        { kind: 'dial', text: '*1170#', step: 2 },
+        { kind: 'result', text: 'UzIMEI', lines: ['35 1234 •• 4821', T.imei.status], step: 2 },
+      ],
+    };
+  }
+  if (name === 'taxi') {
+    const X = T.taxi;
+    const sheet = (inner: string) => `<div class="pd-app pd-map">${MAP}<span class="pd-pin"></span><div class="pd-panel">${inner}</div></div>`;
+    return {
+      ...X,
+      note: T.note,
+      screens: [
+        {
+          kind: 'app', text: X.dest, type: true, step: 0, ms: 2800,
+          view: (t) => sheet(`<div class="pd-field"><small>${X.from}</small>${X.here}</div><div class="pd-field is-focus"><small>${X.to}</small>${escapeHtml(t)}${caret}</div>`),
+        },
+        {
+          kind: 'app', text: '', step: 1, ms: 2600,
+          view: () => sheet(`<div class="pd-tiles"><span class="is-pick"><b>${X.eco}</b>≈ 18 000</span><span><b>${X.comf}</b>≈ 26 000</span></div><span class="pd-btn is-press">${X.order}</span>`),
+        },
+        {
+          kind: 'app', text: '', step: 2, ms: 3200,
+          view: () =>
+            `<div class="pd-app pd-map">${MAP}<svg class="pd-route" viewBox="0 0 200 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><path pathLength="1" d="M40 250 C 60 200, 130 190, 125 140 S 160 70, 170 50" /></svg><span class="pd-car"></span><div class="pd-panel"><p class="pd-eta"><b>${X.coming}</b><span>4 ${X.min}</span></p><small>${X.car}</small></div></div>`,
+        },
+      ],
+    };
+  }
+  if (name === 'bank') {
+    const X = T.bank;
+    return {
+      ...X,
+      note: T.note,
+      screens: [
+        {
+          kind: 'app', text: '', step: 0, ms: 2600,
+          view: () => `<div class="pd-app pd-store"><span class="pd-icon">${MARK}</span><b>Hamkorbank</b><span class="pd-get"><i></i>${X.get}</span></div>`,
+        },
+        {
+          kind: 'app', text: '8600 •••• 9012', type: true, step: 1, ms: 3000,
+          view: (t) => `<div class="pd-app pd-form"><span class="pd-icon is-small">${MARK}</span><div class="pd-field is-focus"><small>${X.card}</small><span class="pd-num">${escapeHtml(t)}${caret}</span></div><span class="pd-btn${t.length > 13 ? ' is-press' : ''}">${X.next}</span></div>`,
+        },
+        {
+          kind: 'app', text: '', step: 2, ms: 2800,
+          view: () => `<div class="pd-app pd-form"><p class="pd-ask">${X.pin}</p><div class="pd-dots"><i></i><i></i><i></i><i></i></div><span class="pd-finger"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a7 7 0 0 0-7 7v2M19 11a7 7 0 0 0-3.5-6M8.5 20c1-2 1.5-4.5 1.5-7a2 2 0 0 1 4 0c0 3-.5 5.5-1.5 7.5M16 18c.6-1.6 1-3.5 1-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span><small>${X.touch}</small></div>`,
+        },
+        {
+          kind: 'app', text: '', step: 2, ms: 2400,
+          view: () => `<div class="pd-app pd-form pd-done"><span class="pd-tick"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" pathLength="1"/></svg></span><b>${X.done}</b><small>${X.added}</small><span class="pd-mini-card">${MARK}<i>•••• 9012</i></span></div>`,
+        },
+      ],
+    };
+  }
+  return undefined;
+}
+
 function phoneDemos() {
   document.querySelectorAll<HTMLElement>('.phone-demo:not([data-ready])').forEach((host) => {
-    const demo = DEMOS[host.dataset.demo || ''];
+    const demo = demoFor(host.dataset.demo || '');
     if (!demo) return;
     host.dataset.ready = '';
     host.innerHTML = `
@@ -568,7 +656,7 @@ function phoneDemos() {
         <figcaption>
           <strong>${escapeHtml(demo.title)}</strong>
           <ol class="pd-steps">${demo.steps.map((s, n) => `<li><button type="button" data-step="${n}">${escapeHtml(s)}</button></li>`).join('')}</ol>
-          <small>Экран условный, цифры вымышлены.</small>
+          <small>${escapeHtml(demo.note)}</small>
         </figcaption>
       </figure>`;
     const screen = host.querySelector<HTMLElement>('.pd-screen')!;
@@ -587,6 +675,8 @@ function phoneDemos() {
         screen.innerHTML = `<div class="pd-dial"><div class="pd-typed">${escapeHtml(typed)}<span class="pd-caret"></span></div>
           <div class="pd-keys">${keys.map((k) => `<span class="${typed.endsWith(k) ? 'is-hit' : ''}">${k}</span>`).join('')}</div>
           <div class="pd-call"></div></div>`;
+      } else if (sc.kind === 'app' && sc.view) {
+        screen.innerHTML = sc.view(typed);
       } else {
         screen.innerHTML = `<div class="pd-result"><div class="pd-sheet"><b>${escapeHtml(sc.text)}</b>${(sc.lines || [])
           .map((l) => `<span>${escapeHtml(l)}</span>`)
@@ -600,19 +690,20 @@ function phoneDemos() {
       if (!visible) return;
       const at = i % demo.screens.length;
       const sc = demo.screens[at];
-      const dur = sc.kind === 'dial' ? 2600 : 2400;
+      const dur = sc.ms ?? (sc.kind === 'dial' ? 2600 : 2400);
       bars.forEach((b, n) => {
         b.className = n < at ? 'is-done' : n === at ? 'is-on' : '';
         b.style.setProperty('--dur', `${dur}ms`);
       });
-      if (sc.kind === 'dial' && !reduce) {
+      if ((sc.kind === 'dial' || sc.type) && !reduce) {
         let n = 0;
         render(sc, '');
+        const pace = sc.kind === 'dial' ? 260 : Math.min(160, 1700 / Math.max(sc.text.length, 1));
         typing = window.setInterval(() => {
           n++;
           render(sc, sc.text.slice(0, n));
           if (n >= sc.text.length) clearInterval(typing);
-        }, 260);
+        }, pace);
       } else render(sc, sc.text);
       timer = window.setTimeout(() => {
         i++;
@@ -860,6 +951,43 @@ function heroFold() {
     if (p >= 1 && hero.style.getPropertyValue('--hp') === '1') return;
     hero.style.setProperty('--hp', p.toFixed(3));
   });
+}
+
+/* ---------- Article heads fold away the same way as you read on ---------- */
+function headFold() {
+  const els = Array.from(document.querySelectorAll<HTMLElement>('.page-head > .wrap, .city-hero'));
+  if (!els.length || reduceMotion()) return;
+  els.forEach((el) => (el.dataset.fold = ''));
+  onScrollFrame(() => {
+    for (const el of els) {
+      const r = el.getBoundingClientRect();
+      // 0 while the head is on screen, 1 once it has gone up under the top bar.
+      const p = clamp01((90 - r.top) / Math.max(r.height, 1));
+      el.style.setProperty('--fp', p.toFixed(3));
+    }
+  });
+}
+
+/** Marks the parts of an article that rise in as you reach them. */
+function decorate() {
+  if (reduceMotion()) return;
+  const mark = (sel: string, stagger = false) =>
+    document.querySelectorAll<HTMLElement>(sel).forEach((el, i) => {
+      el.classList.add('reveal');
+      if (stagger) el.style.setProperty('--i', String(i % 8));
+    });
+  mark('.summary li', true);
+  mark('.prose > h2');
+  mark('.prose > blockquote');
+  mark('.prose > .phone-demo');
+  document.querySelectorAll<HTMLElement>('.table-scroll').forEach((t) =>
+    t.querySelectorAll<HTMLElement>('tbody tr').forEach((tr, i) => {
+      tr.classList.add('reveal');
+      tr.style.setProperty('--i', String(i % 10));
+    }),
+  );
+  mark('.pager a');
+  mark('.faq-group > .section-title');
 }
 
 /* ---------- City strip: photos drift against their cards as the strip moves, names drift the other way ---------- */

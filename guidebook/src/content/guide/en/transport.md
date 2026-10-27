@@ -31,6 +31,9 @@ The most convenient and popular option.
 - **Always order through an app.** It is safer and the price is fairer.
 - **Price:** check the exact fare in the app before you order.
 
+<div class="phone-demo" data-demo="taxi"></div>
+
+
 > **Tip.** Taxi prices go up at rush hour and when it rains. In Tashkent it is easier to take the metro at those times.
 
 ## Metro (Tashkent only)
