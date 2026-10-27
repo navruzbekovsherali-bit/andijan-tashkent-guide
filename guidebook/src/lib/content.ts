@@ -59,6 +59,15 @@ export const PAGE_PHOTO: Record<string, string> = {
   'leisure-andijan': 'andijan',
   uzbekistan: 'samarkand-2',
 };
+/** City videos from the owner's Notion guidebook (YouTube ids), played inline over the head photo. */
+export const PAGE_VIDEO: Record<string, string> = {
+  samarkand: 'w0JULzjgUcs',
+  bukhara: '_ZH1WsIr2Zk',
+  khiva: 'MNx5gJntshQ',
+  tashkent: 'NG5aQFOiOrU',
+  andijan: '1kyocWKc5_w',
+  mountains: 'ZZ5lBkcy6PQ',
+};
 /** Cities strip on the home page, in travel order. */
 export const CITY_CARDS = [
   { slug: 'tashkent', photo: 'tashkent', title: { ru: 'Ташкент', en: 'Tashkent', uz: 'Toshkent' } },

@@ -299,6 +299,16 @@ function bindShell() {
       closeSheets();
       return;
     }
+    const play = t.closest<HTMLButtonElement>('[data-play]');
+    if (play) {
+      playVideo(play);
+      return;
+    }
+    const stop = t.closest<HTMLButtonElement>('[data-stop]');
+    if (stop) {
+      stopVideo(stop);
+      return;
+    }
     const audBtn = t.closest<HTMLButtonElement>('[data-aud]');
     if (audBtn) {
       const aud = audBtn.dataset.aud as Aud;
@@ -436,6 +446,38 @@ function cameFromHere() {
   } catch {
     return false;
   }
+}
+
+/* ---------- City films: the photo is the poster, the film opens in its place ---------- */
+function playVideo(btn: HTMLButtonElement) {
+  const frame = btn.closest<HTMLElement>('.photo-frame');
+  if (!frame || frame.classList.contains('is-playing')) return;
+  const id = btn.dataset.play!;
+  const lang = document.documentElement.lang || 'ru';
+  const iframe = document.createElement('iframe');
+  iframe.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&playsinline=1&rel=0&modestbranding=1&hl=${lang}&cc_lang_pref=${lang}`;
+  iframe.title = btn.getAttribute('aria-label') || 'Video';
+  iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+  iframe.allowFullscreen = true;
+  iframe.addEventListener('load', () => frame.classList.add('is-loaded'), { once: true });
+  const close = document.createElement('button');
+  close.type = 'button';
+  close.className = 'video-close';
+  close.dataset.stop = '';
+  close.setAttribute('aria-label', lang === 'en' ? 'Close the video' : lang === 'uz' ? 'Videoni yopish' : 'Закрыть видео');
+  close.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+  frame.append(iframe, close);
+  frame.classList.add('is-playing');
+  close.focus({ preventScroll: true });
+}
+
+function stopVideo(btn: HTMLButtonElement) {
+  const frame = btn.closest<HTMLElement>('.photo-frame');
+  if (!frame) return;
+  frame.querySelector('iframe')?.remove();
+  btn.remove();
+  frame.classList.remove('is-playing', 'is-loaded');
+  frame.querySelector<HTMLElement>('[data-play]')?.focus({ preventScroll: true });
 }
 
 /* ---------- Animated phone demos (illustrative screens, marked as examples) ---------- */

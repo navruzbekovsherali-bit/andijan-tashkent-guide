@@ -6,7 +6,7 @@ import Illus from '../../components/Illus.astro';
 import Photo from '../../components/Photo.astro';
 import { langPaths } from '../../lib/paths';
 import { articles, t, url, type Lang } from '../../lib/i18n';
-import { getPages, groupBySection, SECTIONS, illusOf, CITY_CARDS } from '../../lib/content';
+import { getPages, groupBySection, SECTIONS, illusOf, CITY_CARDS, PAGE_VIDEO } from '../../lib/content';
 
 export const getStaticPaths = langPaths;
 const { lang } = Astro.props as { lang: Lang };
@@ -82,6 +82,12 @@ const faqPreview = pages.flatMap((p) => p.entry.data.faq.slice(0, 1).map((f) => 
           <li>
             <a class="city" href={url(lang, `/guide/${c.slug}/`)}>
               <Photo id={c.photo} credit={false} sizes="(min-width: 900px) 30vw, 78vw" />
+              {PAGE_VIDEO[c.slug] && (
+                <span class="city-video">
+                  <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path d="M8 5.5v13a.6.6 0 0 0 .9.5l10.4-6.5a.6.6 0 0 0 0-1L8.9 5a.6.6 0 0 0-.9.5Z" fill="currentColor" /></svg>
+                  {tr('video')}
+                </span>
+              )}
               <span class="city-name">{c.title[lang]}</span>
               <span class="round-arrow"><Icon name="arrow" size={16} /></span>
             </a>
