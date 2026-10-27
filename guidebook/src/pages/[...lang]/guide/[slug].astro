@@ -4,8 +4,9 @@ import Base from '../../../layouts/Base.astro';
 import Icon from '../../../components/Icon.astro';
 import Guide from '../../../components/Guide.astro';
 import Illus from '../../../components/Illus.astro';
+import Photo from '../../../components/Photo.astro';
 import { LANGS, DEFAULT_LANG, t, url, type Lang } from '../../../lib/i18n';
-import { getPages, forAudience, readingMinutes, SECTIONS, SECTION_ORDER, illusOf } from '../../../lib/content';
+import { getPages, forAudience, readingMinutes, SECTIONS, SECTION_ORDER, illusOf, PAGE_PHOTO } from '../../../lib/content';
 
 export async function getStaticPaths() {
   const out = [];
@@ -62,7 +63,7 @@ const topicNo = String(SECTION_ORDER.indexOf(data.section) + 1).padStart(2, '0')
           )}
         </div>
       </div>
-      <Illus name={illusOf(data.section, slug)} />
+      {PAGE_PHOTO[slug] ? <Photo id={PAGE_PHOTO[slug]} class="head-photo" eager /> : <Illus name={illusOf(data.section, slug)} />}
     </div>
   </header>
 

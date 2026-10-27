@@ -1,0 +1,41 @@
+---
+/** A licensed photograph with its credit (data in src/data/photos.json, files in public/photos/). */
+interface Props {
+  id: string;
+  class?: string;
+  /** Sizes hint for the browser: how wide the photo shows. */
+  sizes?: string;
+  eager?: boolean;
+  credit?: boolean;
+}
+const { id, class: cls = '', sizes = '(min-width: 900px) 50vw, 100vw', eager = false, credit = true } = Astro.props;
+const all = import.meta.glob<Record<string, any>>('../data/photos.json', { eager: true, import: 'default' });
+const photos = Object.values(all)[0] ?? {};
+const p = photos[id];
+---
+
+{
+  p && (
+    <figure class:list={['photo', cls]}>
+      <img
+        src={`/photos/${id}-1600.webp`}
+        srcset={`/photos/${id}-800.webp 800w, /photos/${id}-1600.webp 1600w`}
+        sizes={sizes}
+        width={p.width}
+        height={p.height}
+        alt={p.alt}
+        loading={eager ? 'eager' : 'lazy'}
+        decoding="async"
+        fetchpriority={eager ? 'high' : undefined}
+      />
+      {credit && (
+        <figcaption>
+          <span>{p.caption}</span>
+          <a href={p.source} rel="noopener" target="_blank">
+            {p.author} · {p.license}
+          </a>
+        </figcaption>
+      )}
+    </figure>
+  )
+}

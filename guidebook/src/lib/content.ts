@@ -47,6 +47,28 @@ const PAGE_ILLUS: Record<string, IllusName> = {
   tashkent: 'map',
   andijan: 'map',
 };
+/** Pages that open with a photograph instead of a drawing (see src/data/photos.json). */
+export const PAGE_PHOTO: Record<string, string> = {
+  samarkand: 'samarkand',
+  bukhara: 'bukhara',
+  khiva: 'khiva',
+  tashkent: 'tashkent',
+  andijan: 'andijan',
+  mountains: 'mountains',
+  'leisure-tashkent': 'tashkent-2',
+  'leisure-andijan': 'andijan',
+  uzbekistan: 'samarkand-2',
+};
+/** Cities strip on the home page, in travel order. */
+export const CITY_CARDS = [
+  { slug: 'tashkent', photo: 'tashkent', title: { ru: 'Ташкент', en: 'Tashkent', uz: 'Toshkent' } },
+  { slug: 'andijan', photo: 'andijan', title: { ru: 'Андижан', en: 'Andijan', uz: 'Andijon' } },
+  { slug: 'samarkand', photo: 'samarkand', title: { ru: 'Самарканд', en: 'Samarkand', uz: 'Samarqand' } },
+  { slug: 'bukhara', photo: 'bukhara', title: { ru: 'Бухара', en: 'Bukhara', uz: 'Buxoro' } },
+  { slug: 'khiva', photo: 'khiva', title: { ru: 'Хива', en: 'Khiva', uz: 'Xiva' } },
+  { slug: 'mountains', photo: 'mountains', title: { ru: 'Горы', en: 'Mountains', uz: 'Togʻlar' } },
+] as const;
+
 export const illusOf = (id: SectionId, slug?: string): IllusName => (slug && PAGE_ILLUS[slug]) || SECTION_ILLUS[id];
 
 export const SECTION_ORDER = Object.keys(SECTIONS) as SectionId[];

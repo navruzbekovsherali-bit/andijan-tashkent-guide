@@ -3,9 +3,10 @@ import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
 import BrandMark from '../../components/BrandMark.astro';
 import Illus from '../../components/Illus.astro';
+import Photo from '../../components/Photo.astro';
 import { langPaths } from '../../lib/paths';
 import { t, url, type Lang } from '../../lib/i18n';
-import { getPages, groupBySection, SECTIONS, illusOf } from '../../lib/content';
+import { getPages, groupBySection, SECTIONS, illusOf, CITY_CARDS } from '../../lib/content';
 
 export const getStaticPaths = langPaths;
 const { lang } = Astro.props as { lang: Lang };
@@ -16,6 +17,8 @@ const groups = groupBySection(pages);
 
 const popularSlugs = ['arrival-72h', 'first-day-week', 'work-time', 'salary-expat', 'bank-card', 'emergency'];
 const popular = popularSlugs.map((s) => bySlug.get(s)).filter((p): p is NonNullable<typeof p> => Boolean(p));
+// The cities strip appears once the licensed photos are in place.
+const hasPhotos = Object.keys(import.meta.glob('../../data/photos.json')).length > 0;
 const faqPreview = pages.flatMap((p) => p.entry.data.faq.slice(0, 1).map((f) => ({ ...f, slug: p.slug }))).slice(0, 6);
 ---
 
@@ -64,6 +67,30 @@ const faqPreview = pages.flatMap((p) => p.entry.data.faq.slice(0, 1).map((f) => 
       </ul>
     </div>
   </section>
+
+  {hasPhotos && (
+  <section class="block">
+    <div class="wrap">
+      <div class="block-head">
+        <h2 class="h2">{tr('cities')}</h2>
+        <p class="block-note">{tr('citiesLead')}</p>
+      </div>
+    </div>
+    <ul class="cities">
+      {
+        CITY_CARDS.map((c) => (
+          <li>
+            <a class="city" href={url(lang, `/guide/${c.slug}/`)}>
+              <Photo id={c.photo} credit={false} sizes="(min-width: 900px) 30vw, 78vw" />
+              <span class="city-name">{c.title[lang]}</span>
+              <span class="round-arrow"><Icon name="arrow" size={16} /></span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+  )}
 
   <section class="block">
     <div class="wrap">

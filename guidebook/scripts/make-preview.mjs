@@ -31,6 +31,8 @@ function rewrite(html, fileRel) {
     if (target === 'index.html') target = 'home.html';
     return `${attr}="${up}${target}${tail}"`;
   });
+  // srcset lists several root-relative urls
+  html = html.replace(/\ssrcset="([^"]*)"/g, (_, list) => ` srcset="${list.replace(/(^|,\s*)\/(?!\/)/g, `$1${up}`)}"`);
   html = html.replace(/_astro\//g, 'assets/');
   return html.replace(/<html([^>]*)>/, `<html$1 data-base="${up}">`);
 }

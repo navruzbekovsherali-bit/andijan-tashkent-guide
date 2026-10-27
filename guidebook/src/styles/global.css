@@ -2188,3 +2188,107 @@ article {
     transition: opacity 1ms;
   }
 }
+
+/* ---------- Photographs ---------- */
+.photo {
+  margin: 0;
+}
+.photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: var(--radius);
+  background: var(--paper-2);
+}
+.photo figcaption {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2px 12px;
+  margin-top: 8px;
+  font-size: var(--t-label);
+  color: var(--ink-3);
+}
+.photo figcaption a {
+  color: inherit;
+}
+.head-grid .head-photo {
+  order: -1;
+  width: 100%;
+}
+@media (min-width: 900px) {
+  .head-grid .head-photo {
+    order: 0;
+  }
+}
+
+/* cities: a horizontal strip of tall photo cards, snapping */
+.cities {
+  list-style: none;
+  margin: 0;
+  padding: 0 16px 6px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: min(78vw, 360px);
+  gap: 10px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 16px;
+  scrollbar-width: none;
+}
+.cities::-webkit-scrollbar {
+  display: none;
+}
+@media (min-width: 1212px) {
+  .cities {
+    padding-inline: calc((100% - 1180px) / 2);
+    scroll-padding-inline: calc((100% - 1180px) / 2);
+  }
+}
+.cities li {
+  scroll-snap-align: start;
+}
+.city {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: #fff;
+  isolation: isolate;
+}
+.city .photo img {
+  aspect-ratio: 4 / 5;
+  border-radius: 0;
+  transition: transform 900ms var(--ease);
+}
+.city:hover .photo img {
+  transform: scale(1.04);
+}
+.city::after {
+  content: '';
+  position: absolute;
+  inset: 45% 0 0 0;
+  background: linear-gradient(to bottom, transparent, rgb(10 46 42 / 0.82));
+  pointer-events: none;
+}
+.city-name {
+  position: absolute;
+  left: 18px;
+  bottom: 16px;
+  z-index: 1;
+  font-size: var(--t-h2);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.city .round-arrow {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  z-index: 1;
+  background: rgb(255 255 255 / 0.9);
+  color: var(--ink);
+}
