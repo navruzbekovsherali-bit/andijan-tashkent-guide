@@ -549,6 +549,15 @@ const REELS: Record<
   string,
   { src: string; poster: string; srcEn?: string; posterEn?: string; silent?: boolean; ru: [string, string, string]; en: [string, string, string] }
 > = {
+  hotel: {
+    src: 'video/hotel-ru.mp4',
+    poster: 'video/hotel-ru-poster.webp',
+    srcEn: 'video/hotel-en.mp4',
+    posterEn: 'video/hotel-en-poster.webp',
+    silent: true,
+    ru: ['Отель и регистрация', 'Из аэропорта в отель, регистрация на ресепшене и талон — за 30 секунд.', 'Анимация гайдбука'],
+    en: ['Hotel and registration', 'From the airport to the hotel, registration at reception and the slip — in 30 seconds.', 'Guidebook animation'],
+  },
   arrival: {
     src: 'video/arrival-ru.mp4',
     poster: 'video/arrival-ru-poster.webp',

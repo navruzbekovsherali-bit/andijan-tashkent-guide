@@ -54,6 +54,8 @@ This is the most important page for your first days. Follow the steps in order. 
 
 ## First 48 hours
 
+<div class="video-reel" data-reel="hotel"></div>
+
 1. **Register at your place of stay.** This is your main legal step.
    - **In a hotel**, registration is done automatically. When you check out, ask for a printout of the registration slip.
    - **In a flat**, register yourself on [emehmon.uz](https://emehmon.uz), or go with the owner to the migration office.

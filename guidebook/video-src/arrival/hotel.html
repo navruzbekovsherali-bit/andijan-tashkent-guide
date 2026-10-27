@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Hotel film</title>
+<!--
+  "Hotel" film: airport → taxi → hotel → reception registers the stay → registration slip.
+  Same rules as arrival.html: render(t) draws any moment; render.cjs films it (node render.cjs ru hotel).
+-->
+<style>
+  @font-face { font-family: 'Onest'; src: url('../../node_modules/@fontsource-variable/onest/files/onest-cyrillic-wght-normal.woff2') format('woff2'); font-weight: 100 900; unicode-range: U+0400-04FF; }
+  @font-face { font-family: 'Onest'; src: url('../../node_modules/@fontsource-variable/onest/files/onest-latin-wght-normal.woff2') format('woff2'); font-weight: 100 900; }
+  @font-face { font-family: 'Manrope'; src: url('../../node_modules/@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2') format('woff2'); font-weight: 200 800; }
+  :root {
+    --paper: #f5f4f0; --paper-2: #ecebe6; --ink: #0e1a18; --ink-2: #4a524f; --ink-3: #6b726f;
+    --night: #0a2e2a; --brand: #1aa752; --brand-ink: #0b4a43; --red: #c8372d; --sky: #eaf1ee;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #000; }
+  .stage {
+    position: relative; width: 1080px; height: 1920px; overflow: hidden;
+    background: linear-gradient(180deg, var(--sky) 0%, #f3f5f1 55%, var(--paper) 62%);
+    font-family: 'Onest', system-ui, sans-serif; color: var(--ink);
+  }
+  .abs { position: absolute; left: 0; top: 0; }
+  svg { overflow: visible; }
+  .line { fill: none; stroke: var(--ink); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+  .fill-paper { fill: #fff; stroke: var(--ink); stroke-width: 6; stroke-linejoin: round; }
+
+  /* header */
+  .head { position: absolute; left: 64px; right: 64px; top: 64px; display: flex; align-items: center; gap: 18px; z-index: 20; }
+  .head svg { width: 54px; height: 54px; }
+  .head b { font-family: 'Manrope', 'Onest'; font-weight: 800; font-size: 34px; letter-spacing: -0.03em; }
+  .head span { margin-left: auto; font-size: 26px; font-weight: 600; color: var(--ink-3); letter-spacing: 0.04em; }
+  .segs { position: absolute; left: 64px; right: 64px; top: 150px; display: flex; gap: 14px; z-index: 20; }
+  .segs i { flex: 1; height: 8px; border-radius: 8px; background: rgb(14 26 24 / 0.12); overflow: hidden; }
+  .segs i b { display: block; height: 100%; background: var(--brand); transform-origin: 0 50%; transform: scaleX(0); border-radius: inherit; }
+
+  /* world */
+  .world { position: absolute; left: 0; top: 0; width: 3400px; height: 1920px; will-change: transform; }
+  .ground { position: absolute; left: 0; top: 1180px; width: 3400px; height: 740px; background: var(--paper); border-top: 6px solid var(--ink); }
+
+  /* captions */
+  .cap {
+    position: absolute; left: 56px; right: 56px; top: 1340px; padding: 52px 56px 58px;
+    border-radius: 48px; background: #fff; box-shadow: 0 30px 60px -30px rgb(10 46 42 / 0.35), inset 0 0 0 2px rgb(14 26 24 / 0.06);
+    z-index: 15;
+  }
+  .cap .k { display: inline-flex; align-items: center; gap: 14px; font-size: 30px; font-weight: 700; color: var(--brand-ink); letter-spacing: 0.02em; }
+  .cap .k i { display: inline-grid; place-items: center; min-width: 52px; height: 52px; padding: 0 12px; border-radius: 26px; background: var(--brand); color: #fff; font-style: normal; font-size: 28px; }
+  .cap h2 { margin: 22px 0 0; font-size: 76px; line-height: 1.04; font-weight: 700; letter-spacing: -0.035em; }
+  .cap p { margin: 20px 0 0; font-size: 38px; line-height: 1.4; color: var(--ink-2); }
+  .cap.red .k i { background: var(--red); }
+  .cap.red .k { color: var(--red); }
+
+  /* overlay cards */
+  .card {
+    position: absolute; left: 110px; width: 860px; top: 300px; padding: 56px 60px 170px;
+    border-radius: 44px; background: #fff; z-index: 18;
+    box-shadow: 0 60px 120px -40px rgb(10 46 42 / 0.55), inset 0 0 0 2px rgb(14 26 24 / 0.06);
+  }
+  .card small { display: block; font-size: 28px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+  .card h3 { margin: 12px 0 36px; font-size: 58px; letter-spacing: -0.03em; }
+  .row { display: grid; gap: 8px; padding: 26px 0; border-top: 3px solid var(--paper-2); }
+  .row label { font-size: 28px; color: var(--ink-3); font-weight: 600; }
+  .row div { font-size: 44px; font-weight: 650; min-height: 56px; white-space: nowrap; }
+  .row .tick { display: inline-block; width: 44px; height: 44px; margin-right: 14px; border-radius: 12px; border: 4px solid var(--ink); vertical-align: -6px; position: relative; }
+  .row .tick.on { background: var(--red); border-color: var(--red); }
+  .row .tick.on::after { content: ''; position: absolute; left: 11px; top: 3px; width: 12px; height: 22px; border: solid #fff; border-width: 0 6px 6px 0; transform: rotate(45deg); }
+  .caret { display: inline-block; width: 4px; height: 46px; margin-left: 4px; background: var(--ink); vertical-align: -6px; }
+  .stamp {
+    position: absolute; right: 54px; bottom: 44px; padding: 18px 30px; border: 8px solid var(--red); border-radius: 20px;
+    color: var(--red); font-weight: 800; font-size: 44px; letter-spacing: 0.06em; transform-origin: center;
+    background: rgb(255 255 255 / 0.6);
+  }
+
+  .phone {
+    position: absolute; left: 280px; top: 270px; width: 520px; height: 1020px; padding: 22px;
+    border-radius: 86px; background: #0b0f0e; z-index: 18;
+    box-shadow: 0 60px 120px -40px rgb(0 0 0 / 0.6), inset 0 0 0 3px rgb(255 255 255 / 0.12);
+  }
+  .phone .scr { position: relative; width: 100%; height: 100%; border-radius: 66px; background: #f6f7f9; overflow: hidden; }
+  .phone .island { position: absolute; left: 50%; top: 26px; width: 150px; height: 44px; margin-left: -75px; border-radius: 22px; background: #0b0f0e; z-index: 3; }
+  .phone .status { position: absolute; left: 48px; right: 48px; top: 30px; display: flex; justify-content: space-between; font-size: 30px; font-weight: 700; }
+  .bars { display: flex; align-items: flex-end; gap: 6px; height: 30px; }
+  .bars i { width: 9px; border-radius: 3px; background: #cfd3d8; }
+  .bars i:nth-child(1) { height: 30%; } .bars i:nth-child(2) { height: 55%; } .bars i:nth-child(3) { height: 78%; } .bars i:nth-child(4) { height: 100%; }
+  .bars i.on { background: #111418; }
+  .net { position: absolute; left: 0; right: 0; top: 260px; text-align: center; }
+  .net .big { font-size: 46px; font-weight: 750; letter-spacing: -0.02em; }
+  .net .sub { margin-top: 10px; font-size: 30px; color: #6b7280; }
+  .net .ok { display: inline-grid; place-items: center; width: 150px; height: 150px; margin-bottom: 30px; border-radius: 50%; background: var(--brand); color: #fff; }
+  .net .ok svg { width: 80px; }
+  .sms { position: absolute; left: 34px; right: 34px; top: 640px; padding: 26px 30px; border-radius: 30px; background: #fff; box-shadow: 0 16px 40px -18px rgb(0 0 0 / 0.35); font-size: 28px; line-height: 1.35; }
+  .sms b { display: block; font-size: 26px; color: #6b7280; margin-bottom: 6px; }
+  .tray { position: absolute; right: -10px; top: 330px; width: 22px; height: 150px; border-radius: 8px; background: #2a2f2e; z-index: 4; }
+  .simbig { position: absolute; width: 130px; height: 170px; border-radius: 16px 46px 16px 16px; background: #fff; box-shadow: 0 10px 30px -8px rgb(0 0 0 / 0.4), inset 0 0 0 4px var(--ink); z-index: 19; }
+  .simbig::after { content: ''; position: absolute; left: 30px; top: 50px; width: 70px; height: 70px; border-radius: 12px; background: linear-gradient(135deg, #e6c86a, #c9a43b); box-shadow: inset 0 0 0 3px rgb(0 0 0 / 0.25); }
+
+  /* final */
+  .final { position: absolute; inset: 0; z-index: 30; background: radial-gradient(70% 45% at 85% 5%, rgb(26 167 82 / 0.4), transparent 70%), var(--night); color: #f2f5f3; padding: 260px 80px 0; }
+  .final h2 { margin: 0 0 70px; font-size: 92px; line-height: 1.02; letter-spacing: -0.04em; font-weight: 750; }
+  .done { display: flex; align-items: flex-start; gap: 34px; margin-bottom: 54px; font-size: 50px; font-weight: 650; line-height: 1.2; }
+  .done .c { flex: none; display: grid; place-items: center; width: 84px; height: 84px; border-radius: 50%; background: var(--brand); }
+  .done .c svg { width: 46px; }
+  .done.next .c { background: transparent; box-shadow: inset 0 0 0 5px rgb(242 245 243 / 0.5); }
+  .done small { display: block; margin-top: 10px; font-size: 34px; font-weight: 500; color: #a9c2bc; }
+  .brand { position: absolute; left: 80px; right: 80px; bottom: 150px; display: flex; align-items: center; gap: 30px; }
+  .brand svg { width: 120px; height: 120px; }
+  .brand b { font-family: 'Manrope', 'Onest'; font-size: 78px; font-weight: 800; letter-spacing: -0.05em; color: #fff; line-height: 1; }
+  .brand span { display: block; margin-top: 10px; font-size: 34px; color: #a9c2bc; }
+</style>
+</head>
+<body>
+<style>
+  .interior { position: absolute; inset: 0; z-index: 5; background: linear-gradient(180deg, #f1ece3 0%, #efe9df 61%, var(--paper) 61%); }
+  .interior .floor { position: absolute; left: 0; right: 0; top: 1180px; height: 740px; background: var(--paper); border-top: 6px solid var(--ink); }
+  .bubble { position: absolute; z-index: 16; max-width: 560px; padding: 28px 34px; border-radius: 36px; background: #fff; box-shadow: 0 20px 50px -24px rgb(10 46 42 / 0.45), inset 0 0 0 3px var(--ink); font-size: 40px; font-weight: 650; line-height: 1.25; }
+  .bubble.me { border-bottom-left-radius: 8px; }
+  .bubble.them { border-bottom-right-radius: 8px; background: var(--night); color: #fff; box-shadow: 0 20px 50px -24px rgb(10 46 42 / 0.6); }
+  .screen { position: absolute; left: 90px; width: 900px; top: 300px; border-radius: 40px; overflow: hidden; background: #fff; z-index: 18;
+    box-shadow: 0 60px 120px -40px rgb(10 46 42 / 0.55), inset 0 0 0 2px rgb(14 26 24 / 0.06); }
+  .screen .bar { display: flex; align-items: center; gap: 16px; padding: 30px 44px; background: #1b4f8f; color: #fff; font-size: 34px; font-weight: 750; }
+  .screen .bar i { width: 18px; height: 18px; border-radius: 50%; background: rgb(255 255 255 / 0.5); }
+  .screen .body { padding: 40px 50px 56px; }
+  .screen h4 { margin: 0 0 28px; font-size: 44px; letter-spacing: -0.02em; }
+  .screen .prog { height: 18px; margin-top: 30px; border-radius: 9px; background: #e8ecf1; overflow: hidden; }
+  .screen .prog b { display: block; height: 100%; background: var(--brand); transform-origin: 0 50%; }
+  .screen .okline { display: flex; align-items: center; gap: 22px; margin-top: 34px; font-size: 46px; font-weight: 750; color: var(--brand-ink); }
+  .screen .okline span { display: grid; place-items: center; width: 80px; height: 80px; border-radius: 50%; background: var(--brand); }
+  .slip { position: absolute; left: 150px; width: 780px; top: 300px; padding: 60px 64px 160px; border-radius: 14px; z-index: 18;
+    background: #fffdf8; box-shadow: 0 60px 120px -40px rgb(10 46 42 / 0.55), inset 0 0 0 2px rgb(14 26 24 / 0.08); }
+  .slip small { display: block; font-size: 26px; font-weight: 700; letter-spacing: 0.1em; color: var(--ink-3); text-transform: uppercase; }
+  .slip h3 { margin: 10px 0 34px; font-size: 56px; letter-spacing: -0.03em; }
+  .slip .ln { display: flex; justify-content: space-between; gap: 30px; padding: 20px 0; border-top: 3px dashed #e4dfd3; font-size: 36px; }
+  .slip .ln span { color: var(--ink-3); }
+  .slip .ln b { font-weight: 650; }
+  .gstamp { position: absolute; right: 60px; bottom: 50px; padding: 16px 28px; border: 8px solid var(--brand); border-radius: 20px; color: var(--brand); font-weight: 800; font-size: 42px; letter-spacing: 0.06em; background: rgb(255 255 255 / 0.65); }
+</style>
+<div class="stage" id="stage">
+  <div class="head" id="head">
+    <svg viewBox="270 270 1390 1390"><circle cx="965" cy="965" r="616.5" fill="none" stroke="#1aa752" stroke-width="137" stroke-dasharray="1500 300 1500 572"/><polygon points="1215,476 1440,466 1125,1307 902,1307 1007,1023 880,1023 720,1480 495,1465 812,622 1033,622 928,908 1052,908" fill="#1aa752"/></svg>
+    <b>Hamkor Bank</b><span id="tag"></span>
+  </div>
+  <div class="segs" id="segs"><i><b></b></i><i><b></b></i><i><b></b></i></div>
+
+  <!-- outside: airport → city → hotel -->
+  <div class="world" id="world" style="width:3400px">
+    <div class="ground"></div>
+    <svg class="abs" id="cloud1" width="260" height="110" style="left:160px;top:360px"><path class="line" d="M30 90 h190 a40 40 0 0 0-20-70 a60 60 0 0 0-110-10 a45 45 0 0 0-60 80z" style="fill:#fff"/></svg>
+    <svg class="abs" id="cloud2" width="200" height="90" style="left:1500px;top:300px"><path class="line" d="M24 74 h150 a32 32 0 0 0-16-56 a48 48 0 0 0-88-8 a36 36 0 0 0-46 64z" style="fill:#fff"/></svg>
+    <svg class="abs" id="sun" width="160" height="160" style="left:2600px;top:330px"><circle cx="80" cy="80" r="52" fill="#ffe7a3" stroke="#0e1a18" stroke-width="6"/></svg>
+    <!-- road -->
+    <svg class="abs" width="3400" height="40" style="left:0;top:1236px"><path d="M0 14 H3400" stroke="#0e1a18" stroke-width="8" stroke-dasharray="80 60" stroke-linecap="round" opacity=".22"/></svg>
+    <!-- terminal with sliding doors -->
+    <svg class="abs" width="460" height="440" style="left:20px;top:746px">
+      <path class="fill-paper" d="M10 434 V140 Q10 110 40 110 H420 Q450 110 450 140 V434" />
+      <path class="line" d="M10 200 H450" />
+      <path d="M40 220 H420 V310 H40z" fill="#dfe9e4" stroke="#0e1a18" stroke-width="6"/>
+      <rect x="160" y="330" width="140" height="104" fill="#cfe0d8" stroke="#0e1a18" stroke-width="6"/>
+      <rect id="doorL" x="160" y="330" width="70" height="104" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <rect id="doorR" x="230" y="330" width="70" height="104" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <rect x="90" y="40" width="280" height="62" rx="14" fill="#0a2e2a"/>
+      <text x="230" y="82" text-anchor="middle" fill="#fff" font-size="30" font-weight="700" font-family="Onest" id="aSign">АЭРОПОРТ</text>
+    </svg>
+    <!-- city -->
+    <svg class="abs" width="1300" height="520" style="left:1020px;top:666px" opacity=".9">
+      <g fill="#e6ece8" stroke="#0e1a18" stroke-width="5" stroke-linejoin="round">
+        <rect x="40" y="200" width="180" height="314"/><rect x="250" y="80" width="150" height="434"/><rect x="430" y="240" width="200" height="274"/>
+        <rect x="680" y="140" width="160" height="374"/><rect x="880" y="260" width="190" height="254"/><rect x="1100" y="180" width="150" height="334"/>
+      </g>
+      <g fill="#fff" stroke="#0e1a18" stroke-width="4">
+        <rect x="80" y="240" width="40" height="40"/><rect x="140" y="240" width="40" height="40"/><rect x="80" y="310" width="40" height="40"/><rect x="140" y="310" width="40" height="40"/>
+        <rect x="285" y="120" width="34" height="44"/><rect x="335" y="120" width="34" height="44"/><rect x="285" y="190" width="34" height="44"/><rect x="335" y="190" width="34" height="44"/><rect x="285" y="260" width="34" height="44"/><rect x="335" y="260" width="34" height="44"/>
+        <rect x="470" y="280" width="50" height="40"/><rect x="550" y="280" width="50" height="40"/>
+        <rect x="715" y="180" width="36" height="44"/><rect x="770" y="180" width="36" height="44"/><rect x="715" y="250" width="36" height="44"/><rect x="770" y="250" width="36" height="44"/>
+        <rect x="920" y="300" width="44" height="40"/><rect x="990" y="300" width="44" height="40"/><rect x="1135" y="220" width="34" height="44"/><rect x="1185" y="220" width="34" height="44"/>
+      </g>
+    </svg>
+    <svg class="abs" width="1400" height="200" style="left:980px;top:990px">
+      <g><path class="line" d="M100 190 V120"/><circle cx="100" cy="90" r="46" fill="#bfe3c9" stroke="#0e1a18" stroke-width="6"/></g>
+      <g><path class="line" d="M520 190 V120"/><circle cx="520" cy="86" r="52" fill="#bfe3c9" stroke="#0e1a18" stroke-width="6"/></g>
+      <g><path class="line" d="M940 190 V120"/><circle cx="940" cy="90" r="46" fill="#bfe3c9" stroke="#0e1a18" stroke-width="6"/></g>
+      <g><path class="line" d="M1300 190 V120"/><circle cx="1300" cy="86" r="50" fill="#bfe3c9" stroke="#0e1a18" stroke-width="6"/></g>
+    </svg>
+    <!-- hotel -->
+    <svg class="abs" width="560" height="760" style="left:2560px;top:426px">
+      <rect x="20" y="80" width="520" height="674" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <rect x="120" y="10" width="320" height="80" rx="16" fill="#0a2e2a"/>
+      <text x="280" y="64" text-anchor="middle" fill="#fff" font-size="44" font-weight="800" font-family="Onest" letter-spacing="6">HOTEL</text>
+      <g fill="#dfe9e4" stroke="#0e1a18" stroke-width="5">
+        <rect x="70" y="130" width="90" height="80"/><rect x="235" y="130" width="90" height="80"/><rect x="400" y="130" width="90" height="80"/>
+        <rect x="70" y="250" width="90" height="80"/><rect x="235" y="250" width="90" height="80"/><rect x="400" y="250" width="90" height="80"/>
+        <rect x="70" y="370" width="90" height="80"/><rect x="235" y="370" width="90" height="80"/><rect x="400" y="370" width="90" height="80"/>
+      </g>
+      <path d="M150 520 H410" stroke="#1aa752" stroke-width="12" stroke-linecap="round"/>
+      <rect x="200" y="560" width="160" height="194" fill="#cfe0d8" stroke="#0e1a18" stroke-width="6"/>
+      <path class="line" d="M280 560 V754"/>
+    </svg>
+    <!-- taxi -->
+    <svg class="abs" id="taxi" width="420" height="200" viewBox="0 0 420 200">
+      <path d="M20 150 V110 Q20 96 34 92 L110 82 L160 34 Q170 26 184 26 H290 Q306 26 316 38 L356 84 L392 92 Q406 96 406 112 V150 Z" fill="#fff" stroke="#0e1a18" stroke-width="6" stroke-linejoin="round"/>
+      <path d="M128 84 L172 42 H234 V84 Z M250 42 H300 L338 84 H250 Z" fill="#dfe9e4" stroke="#0e1a18" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M26 122 H400" stroke="#1aa752" stroke-width="10"/>
+      <rect x="196" y="8" width="56" height="20" rx="6" fill="#ffd34d" stroke="#0e1a18" stroke-width="4"/>
+      <circle cx="100" cy="156" r="30" fill="#0e1a18"/><circle cx="100" cy="156" r="11" fill="#fff"/>
+      <circle cx="326" cy="156" r="30" fill="#0e1a18"/><circle cx="326" cy="156" r="11" fill="#fff"/>
+      <g id="face" opacity="0"><circle cx="270" cy="62" r="18" fill="#fff" stroke="#0e1a18" stroke-width="4"/></g>
+    </svg>
+    <svg class="abs" id="phoneHint" width="200" height="200"><path class="fill-paper" d="M40 20 H160 Q184 20 184 44 V120 Q184 144 160 144 H96 L70 176 L72 144 H40 Q16 144 16 120 V44 Q16 20 40 20z"/><rect x="74" y="36" width="52" height="92" rx="12" fill="#fff" stroke="#0e1a18" stroke-width="6"/><rect x="84" y="62" width="32" height="20" rx="5" fill="#ffd34d" stroke="#0e1a18" stroke-width="3"/></svg>
+  </div>
+
+  <!-- inside: reception -->
+  <div class="interior" id="interior">
+    <div class="floor"></div>
+    <svg class="abs" width="420" height="120" style="left:560px;top:430px">
+      <rect x="10" y="10" width="400" height="100" rx="20" fill="#0a2e2a"/>
+      <text x="210" y="74" text-anchor="middle" fill="#fff" font-size="44" font-weight="800" font-family="Onest" id="recSign">РЕСЕПШЕН</text>
+    </svg>
+    <svg class="abs" width="220" height="380" style="left:40px;top:806px">
+      <rect x="50" y="250" width="120" height="124" rx="10" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <path class="line" d="M110 250 V150"/>
+      <ellipse cx="80" cy="150" rx="38" ry="22" fill="#bfe3c9" stroke="#0e1a18" stroke-width="5" transform="rotate(-30 80 150)"/>
+      <ellipse cx="140" cy="120" rx="38" ry="22" fill="#bfe3c9" stroke="#0e1a18" stroke-width="5" transform="rotate(30 140 120)"/>
+      <ellipse cx="104" cy="80" rx="22" ry="40" fill="#bfe3c9" stroke="#0e1a18" stroke-width="5"/>
+    </svg>
+    <svg class="abs" width="200" height="200" style="left:150px;top:420px">
+      <circle cx="100" cy="100" r="80" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <path id="hourH" class="line" d="M100 100 V58" style="transform-origin:100px 100px"/>
+      <path id="minH" class="line" d="M100 100 V36" style="stroke-width:4;transform-origin:100px 100px"/>
+      <circle cx="100" cy="100" r="7" fill="#1aa752"/>
+    </svg>
+    <!-- receptionist + desk -->
+    <svg class="abs" width="520" height="520" style="left:500px;top:666px">
+      <g id="rec">
+        <circle cx="300" cy="150" r="46" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+        <path d="M252 140 Q260 92 300 94 Q346 94 350 142 Q330 118 300 118 Q272 118 252 140z" fill="#0e1a18"/>
+        <circle cx="284" cy="154" r="5" fill="#0e1a18"/>
+        <path class="line" d="M276 176 Q284 182 294 176" style="stroke-width:4"/>
+        <path d="M218 300 Q218 212 300 212 Q382 212 382 300" fill="#0b4a43" stroke="#0e1a18" stroke-width="6"/>
+        <path d="M290 218 L300 240 L310 218" fill="#fff" stroke="#0e1a18" stroke-width="4"/>
+      </g>
+      <rect x="380" y="200" width="120" height="96" rx="10" fill="#fff" stroke="#0e1a18" stroke-width="6" transform="rotate(-4 440 248)"/>
+      <path class="line" d="M440 296 V316"/>
+      <rect x="10" y="300" width="510" height="214" rx="18" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <rect x="10" y="300" width="510" height="40" rx="16" fill="#0a2e2a"/>
+      <path d="M70 296 a26 22 0 0 1 52 0z" fill="#ffd34d" stroke="#0e1a18" stroke-width="4"/>
+      <path d="M50 420 H480" stroke="#1aa752" stroke-width="10" stroke-linecap="round"/>
+    </svg>
+    <svg class="abs" id="passport" width="70" height="90"><rect x="4" y="4" width="62" height="82" rx="8" fill="#0a2e2a" stroke="#0e1a18" stroke-width="4"/><circle cx="35" cy="38" r="12" fill="none" stroke="#e6c86a" stroke-width="4"/></svg>
+    <svg class="abs" id="keycard" width="110" height="80"><rect x="4" y="4" width="100" height="68" rx="10" fill="#1aa752" stroke="#0e1a18" stroke-width="4"/><path d="M20 24 H60" stroke="#fff" stroke-width="6" stroke-linecap="round"/></svg>
+    <svg class="abs" id="paper" width="80" height="100"><path d="M6 6 H56 L74 24 V94 H6z" fill="#fffdf8" stroke="#0e1a18" stroke-width="4" stroke-linejoin="round"/><path d="M18 42 H62 M18 58 H62 M18 74 H46" stroke="#0e1a18" stroke-width="4" stroke-linecap="round"/></svg>
+  </div>
+
+  <!-- the traveller (moved between the outside world and the lobby) -->
+  <svg class="abs" id="person" width="240" height="330" viewBox="0 0 240 330" style="z-index:6">
+    <g id="bag">
+      <rect x="10" y="150" width="78" height="118" rx="14" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <path class="line" d="M30 150 V112 H68 V150"/>
+      <path d="M24 186 H74 M24 214 H74" stroke="#1aa752" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="28" cy="278" r="9" fill="#0e1a18"/><circle cx="70" cy="278" r="9" fill="#0e1a18"/>
+    </g>
+    <g>
+      <path id="legL" class="line" d="M150 230 L150 318" style="stroke-width:12;transform-origin:150px 230px"/>
+      <path id="legR" class="line" d="M166 230 L166 318" style="stroke-width:12;transform-origin:166px 230px"/>
+      <path d="M118 236 Q118 134 158 134 Q198 134 198 236 Z" fill="#0b4a43" stroke="#0e1a18" stroke-width="6" stroke-linejoin="round"/>
+      <path id="arm" class="line" d="M178 160 L206 196" style="stroke-width:12;transform-origin:178px 160px"/>
+      <circle cx="158" cy="92" r="38" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <path d="M122 84 Q130 46 162 50 Q194 52 196 86 Q178 70 150 74 Z" fill="#0e1a18"/>
+      <circle cx="172" cy="96" r="5" fill="#0e1a18"/>
+      <path class="line" d="M166 112 Q174 116 182 110" style="stroke-width:4"/>
+    </g>
+  </svg>
+
+  <div class="bubble me" id="b1"></div>
+  <div class="bubble them" id="b2"></div>
+
+  <div class="screen" id="screen">
+    <div class="bar"><i></i><span>E-mehmon</span></div>
+    <div class="body">
+      <h4 id="sH"></h4>
+      <div class="row"><label id="sL1"></label><div id="sV1"></div></div>
+      <div class="row"><label id="sL2"></label><div id="sV2"></div></div>
+      <div class="row"><label id="sL3"></label><div id="sV3"></div></div>
+      <div class="prog"><b id="prog"></b></div>
+      <div class="okline" id="okline"><span><svg viewBox="0 0 24 24" width="46"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b id="sOk"></b></div>
+    </div>
+  </div>
+
+  <div class="slip" id="slip">
+    <small id="tK"></small>
+    <h3 id="tH"></h3>
+    <div class="ln"><span id="tL1"></span><b id="tV1"></b></div>
+    <div class="ln"><span id="tL2"></span><b id="tV2"></b></div>
+    <div class="ln"><span id="tL3"></span><b id="tV3"></b></div>
+    <div class="gstamp" id="gstamp"></div>
+  </div>
+
+  <div class="cap" id="cap"><span class="k" id="capK"></span><h2 id="capH"></h2><p id="capP"></p></div>
+
+  <div class="final" id="final">
+    <h2 id="fH"></h2>
+    <div class="done" id="f1"><span class="c"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span id="f1t"></span></div>
+    <div class="done" id="f2"><span class="c"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span id="f2t"></span></div>
+    <div class="done next" id="f3"><span class="c"><svg viewBox="0 0 24 24"><path d="M6 12h12M13 7l5 5-5 5" fill="none" stroke="#f2f5f3" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span id="f3t"></span></div>
+    <div class="brand" id="fBrand">
+      <svg viewBox="270 270 1390 1390"><circle cx="965" cy="965" r="616.5" fill="none" stroke="#1aa752" stroke-width="137" stroke-dasharray="1500 300 1500 572"/><polygon points="1215,476 1440,466 1125,1307 902,1307 1007,1023 880,1023 720,1480 495,1465 812,622 1033,622 928,908 1052,908" fill="#1aa752"/></svg>
+      <div><b>Hamkor Bank</b><span id="fTag"></span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const TEXT = {
+  ru: {
+    tag: 'ГАЙДБУК', air: 'АЭРОПОРТ', rec: 'РЕСЕПШЕН',
+    c0: ['Шаг 1 · Дорога', 'Из аэропорта — в отель', 'Такси заказывайте через приложение: так безопаснее и цена видна сразу.'],
+    c1: ['Шаг 2 · Регистрация', 'Регистрация в отеле', 'Отель оформляет её за вас — в течение 3 дней после прибытия. Дайте загранпаспорт и уточните, что всё сделано.'],
+    c2: ['Шаг 3 · Талон', 'Сохраните талон', 'Попросите распечатку регистрационного талона — при выезде или переезде он понадобится.'],
+    b1: 'Сделайте, пожалуйста, регистрацию по месту пребывания', b2: 'Конечно! Оформим прямо сейчас',
+    sH: 'Регистрация иностранного гостя', sL1: 'Гость', sV1: 'SMITH JOHN', sL2: 'Паспорт', sV2: '•••• 4567', sL3: 'Проживание', sV3: '28.10 — 30.11', sOk: 'Регистрация оформлена',
+    tK: 'Регистрационный талон', tH: 'Место пребывания', tL1: 'Гость', tV1: 'SMITH JOHN', tL2: 'Адрес', tV2: 'Отель, Ташкент', tL3: 'Срок', tV3: '28.10 — 30.11', stamp: 'ОФОРМЛЕНО',
+    fH: 'Готово. Вы зарегистрированы', f1: 'Заселились в отель', f2: 'Регистрация оформлена, талон у вас', f3: ['Дальше: регистрация IMEI', 'На uzimei.uz, если пользуетесь местной SIM-картой'], fTag: 'Гайдбук сотрудника',
+  },
+  en: {
+    tag: 'GUIDEBOOK', air: 'AIRPORT', rec: 'RECEPTION',
+    c0: ['Step 1 · The ride', 'From the airport to the hotel', 'Order a taxi in the app: it is safer, and you see the price straight away.'],
+    c1: ['Step 2 · Registration', 'Registration at the hotel', 'The hotel registers you — within 3 days of arrival. Hand over your passport and check it is done.'],
+    c2: ['Step 3 · The slip', 'Keep the registration slip', 'Ask for a printout of the registration slip — you will need it when you check out or move.'],
+    b1: 'Could you please register my stay?', b2: 'Of course! Doing it right now',
+    sH: 'Foreign guest registration', sL1: 'Guest', sV1: 'SMITH JOHN', sL2: 'Passport', sV2: '•••• 4567', sL3: 'Stay', sV3: '28.10 — 30.11', sOk: 'Registration done',
+    tK: 'Registration slip', tH: 'Place of stay', tL1: 'Guest', tV1: 'SMITH JOHN', tL2: 'Address', tV2: 'Hotel, Tashkent', tL3: 'Period', tV3: '28.10 — 30.11', stamp: 'REGISTERED',
+    fH: 'Done. Your stay is registered', f1: 'Checked in at the hotel', f2: 'Registration done, slip in hand', f3: ['Next: register your IMEI', 'On uzimei.uz, if you use a local SIM card'], fTag: 'Employee guidebook',
+  },
+};
+const lang = new URLSearchParams(location.search).get('lang') === 'en' ? 'en' : 'ru';
+const T = TEXT[lang];
+document.documentElement.lang = lang;
+const $ = (id) => document.getElementById(id);
+$('tag').textContent = T.tag; $('aSign').textContent = T.air; $('recSign').textContent = T.rec;
+for (const k of ['sH', 'sL1', 'sL2', 'sL3', 'sOk', 'tK', 'tH', 'tL1', 'tV1', 'tL2', 'tV2', 'tL3', 'tV3', 'fH', 'fTag']) $(k).textContent = T[k];
+$('gstamp').textContent = T.stamp; $('f1t').textContent = T.f1; $('f2t').textContent = T.f2;
+$('f3t').innerHTML = `${T.f3[0]}<small>${T.f3[1]}</small>`;
+
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const easeOut = (x) => 1 - Math.pow(1 - x, 3);
+const easeInOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const back = (x) => { const c = 1.6; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+const p = (t, t0, t1, e = easeInOut) => e(clamp((t - t0) / (t1 - t0)));
+function key(t, keys, e = easeInOut) {
+  if (t <= keys[0][0]) return keys[0][1];
+  for (let i = 1; i < keys.length; i++) {
+    const [t1, v1] = keys[i]; const [t0, v0] = keys[i - 1];
+    if (t <= t1) return v0 + (v1 - v0) * e((t - t0) / (t1 - t0 || 1));
+  }
+  return keys[keys.length - 1][1];
+}
+const fade = (t, a, b, c, d) => Math.min(p(t, a, b, easeOut), 1 - p(t, c, d, easeInOut));
+const set = (el, css) => Object.assign((typeof el === 'string' ? $(el) : el).style, css);
+const typ = (t, s, a, b) => s.slice(0, Math.round(clamp((t - a) / (b - a)) * s.length));
+const caretIf = (t, a, b) => (t > a && t < b + 0.1 ? '<i class="caret"></i>' : '');
+
+const DUR = 33;
+const INSIDE = 9.4; // cut from the street to the lobby
+// Outside: the traveller, then the taxi.
+const PX_OUT = [[0, 250], [0.9, 250], [2.4, 560], [8.0, 560], [8.0, 2620], [9.2, 2840]];
+const TX = [[0, 1500], [2.1, 690], [3.0, 690], [7.4, 2430], [9.4, 2430]];
+// Inside: walks in from the left to the desk.
+const PX_IN = [[INSIDE, -160], [11.2, 330], [33, 330]];
+
+function render(t) {
+  const inside = t >= INSIDE;
+  // ---- taxi & camera (outside) ----
+  const tx = key(t, TX, (k) => easeInOut(k));
+  const moving = Math.abs(key(t + 0.05, TX) - key(t - 0.05, TX)) > 0.5;
+  set('taxi', { transform: `translate(${tx}px, ${1180 - 186 + (moving ? Math.sin(t * 40) * 1.5 : 0)}px)` });
+  set('face', { opacity: t > 2.8 && t < 7.6 ? 1 : 0 });
+  const cam = clamp(tx - 360, 0, 3400 - 1080) * p(t, 2.6, 3.6);
+  set('world', { transform: `translateX(${-cam}px)` });
+  set('cloud1', { transform: `translateX(${-t * 12}px)` });
+  set('cloud2', { transform: `translateX(${-t * 8}px)` });
+  const doorO = Math.max(p(t, 0.2, 0.7) - p(t, 1.6, 2.1), 0);
+  $('doorL').setAttribute('x', 160 - doorO * 62); $('doorR').setAttribute('x', 230 + doorO * 62);
+  const hint = fade(t, 1.0, 1.4, 2.4, 2.8);
+  set('phoneHint', { transform: `translate(${560 - 40}px, ${700 - hint * 30}px) scale(${0.7 + hint * 0.3})`, opacity: hint, transformOrigin: '70px 176px' });
+
+  // ---- traveller ----
+  const outX = key(t, PX_OUT);
+  const inX = key(t, PX_IN, easeOut);
+  const x = inside ? inX : outX;
+  const dx = inside ? key(t + 0.05, PX_IN, easeOut) - key(t - 0.05, PX_IN, easeOut) : key(t + 0.05, PX_OUT) - key(t - 0.05, PX_OUT);
+  const walking = Math.abs(dx) > 0.5 && !(t > 7.95 && t < 8.05);
+  const sw = walking ? Math.sin(t * 13) : 0;
+  const screenX = inside ? x : x - cam;
+  const inCar = t > 2.6 && t < 8.0;
+  const visible = inside ? p(t, INSIDE, INSIDE + 0.3) : (t < 2.6 ? p(t, 0.5, 0.9) : t >= 8.0 ? p(t, 8.0, 8.3) * (1 - p(t, 9.0, 9.3)) : 0);
+  set('person', { transform: `translate(${screenX - 150}px, ${1180 - 322 + (walking ? -Math.abs(sw) * 7 : 0)}px)`, opacity: inCar ? 0 : visible });
+  set('legL', { transform: `rotate(${sw * 20}deg)` });
+  set('legR', { transform: `rotate(${-sw * 20}deg)` });
+  const giving = Math.max(p(t, 11.6, 12.0) - p(t, 12.6, 13.0), 0);
+  set('arm', { transform: `rotate(${walking ? sw * 10 : -giving * 60}deg)` });
+  set('bag', { transform: `rotate(${walking ? -6 : 0}deg)`, transformOrigin: '50px 278px' });
+
+  set('minH', { transform: `rotate(${t * 40}deg)` });
+  set('hourH', { transform: `rotate(${120 + t * 3.3}deg)` });
+  // ---- cut to the lobby ----
+  const cut = p(t, INSIDE - 0.4, INSIDE + 0.3);
+  set('interior', { opacity: cut, clipPath: `circle(${cut * 150}% at 82% 60%)` });
+
+  // ---- passport to the desk, key and slip back ----
+  const pp = p(t, 11.8, 12.6);
+  set('passport', { transform: `translate(${380 + pp * 230}px, ${1000 - Math.sin(pp * Math.PI) * 90 - pp * 40}px)`, opacity: t > 11.7 && t < 12.8 ? 1 : 0 });
+  const kp = p(t, 21.4, 22.2);
+  set('keycard', { transform: `translate(${640 - kp * 230}px, ${960 - Math.sin(kp * Math.PI) * 90}px) rotate(${-kp * 12}deg)`, opacity: t > 21.3 && t < 22.4 ? 1 : 0 });
+  set('paper', { transform: `translate(${660 - kp * 250}px, ${940 - Math.sin(kp * Math.PI) * 120}px) rotate(${kp * 10}deg)`, opacity: t > 21.4 && t < 22.5 ? 1 : 0 });
+
+  // ---- dialogue ----
+  const b1 = fade(t, 12.8, 13.2, 15.0, 15.4);
+  $('b1').innerHTML = typ(t, T.b1, 13.0, 14.3);
+  set('b1', { left: '120px', top: '620px', opacity: b1, transform: `translateY(${(1 - b1) * 20}px) scale(${0.92 + b1 * 0.08})`, transformOrigin: '0 100%' });
+  const b2 = fade(t, 14.6, 15.0, 16.0, 16.4);
+  $('b2').textContent = T.b2;
+  set('b2', { right: '90px', left: 'auto', top: '560px', opacity: b2, transform: `translateY(${(1 - b2) * 20}px) scale(${0.92 + b2 * 0.08})`, transformOrigin: '100% 100%' });
+
+  // ---- the hotel's screen: e-mehmon ----
+  const sIn = p(t, 16.3, 17.1, back); const sOut = p(t, 21.0, 21.5);
+  set('screen', { transform: `translateY(${(1 - sIn) * 1300 + sOut * -1400}px)`, opacity: t < 16.3 || t > 21.5 ? 0 : 1 });
+  $('sV1').innerHTML = typ(t, T.sV1, 17.2, 17.9) + caretIf(t, 17.2, 17.9);
+  $('sV2').innerHTML = typ(t, T.sV2, 18.0, 18.5) + caretIf(t, 18.0, 18.5);
+  $('sV3').innerHTML = typ(t, T.sV3, 18.6, 19.2) + caretIf(t, 18.6, 19.2);
+  set('prog', { transform: `scaleX(${p(t, 19.3, 20.1)})` });
+  const ok = p(t, 20.1, 20.5, back);
+  set('okline', { opacity: t < 20.1 ? 0 : 1, transform: `scale(${0.85 + ok * 0.15})`, transformOrigin: '0 50%' });
+
+  // ---- the registration slip ----
+  const slIn = p(t, 22.4, 23.2, back); const slOut = p(t, 26.6, 27.1);
+  set('slip', { transform: `translateY(${(1 - slIn) * 1300 + slOut * -1400}px) rotate(${(1 - slIn) * 6 - 1.5}deg)`, opacity: t < 22.4 || t > 27.1 ? 0 : 1 });
+  const st = p(t, 24.0, 24.35, easeOut);
+  set('gstamp', { opacity: t < 24.0 ? 0 : 1, transform: `rotate(-8deg) scale(${1.9 - st * 0.9})` });
+  set('stage', { transform: t > 24.3 && t < 24.5 ? `translateY(${Math.sin((t - 24.3) * 90) * 6}px)` : 'none' });
+
+  // ---- captions ----
+  const caps = [[T.c0, 0.3, 9.2, ''], [T.c1, 9.6, 21.4, ''], [T.c2, 21.8, 27.2, '']];
+  let shown = null;
+  for (const c of caps) if (t >= c[1] - 0.4 && t <= c[2] + 0.4) shown = c;
+  if (shown) {
+    const [c, a, b, cls] = shown;
+    const n = caps.indexOf(shown) + 1;
+    $('capK').innerHTML = `<i>${n}</i>${c[0].replace(/^[^·]*·\s*/, '')}`;
+    $('capH').textContent = c[1]; $('capP').textContent = c[2];
+    $('cap').className = `cap ${cls}`;
+    const v = fade(t, a - 0.4, a + 0.2, b - 0.2, b + 0.4);
+    set('cap', { opacity: v, transform: `translateY(${(1 - v) * 60}px)` });
+  } else set('cap', { opacity: 0 });
+
+  const segs = [[0, 9.4], [9.4, 21.6], [21.6, 27.2]];
+  [...$('segs').children].forEach((s, i) => (s.firstElementChild.style.transform = `scaleX(${clamp((t - segs[i][0]) / (segs[i][1] - segs[i][0]))})`));
+
+  // ---- final ----
+  const fin = p(t, 27.2, 28.0);
+  set('final', { transform: `translateY(${(1 - fin) * 100}%)`, borderRadius: `${(1 - fin) * 80}px ${(1 - fin) * 80}px 0 0` });
+  const item = (id, a) => { const v = p(t, a, a + 0.5, easeOut); set(id, { opacity: v, transform: `translateX(${(1 - v) * -40}px)` }); set($(id).querySelector('.c'), { transform: `scale(${back(clamp((t - a - 0.1) / 0.45))})` }); };
+  set('fH', { opacity: p(t, 27.8, 28.3, easeOut), transform: `translateY(${(1 - p(t, 27.8, 28.3, easeOut)) * 30}px)` });
+  item('f1', 28.4); item('f2', 29.0); item('f3', 29.7);
+  const br = p(t, 30.6, 31.3, easeOut);
+  set('fBrand', { opacity: br, transform: `translateY(${(1 - br) * 40}px)` });
+}
+window.render = render;
+window.DUR = DUR;
+render(0);
+if (new URLSearchParams(location.search).has('play')) {
+  const t0 = performance.now();
+  const loop = () => { render(((performance.now() - t0) / 1000) % DUR); requestAnimationFrame(loop); };
+  loop();
+}
+</script>
+</body>
+</html>
