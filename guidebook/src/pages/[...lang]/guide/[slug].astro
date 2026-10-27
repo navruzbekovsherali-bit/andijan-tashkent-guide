@@ -5,7 +5,7 @@ import Icon from '../../../components/Icon.astro';
 import Guide from '../../../components/Guide.astro';
 import Illus from '../../../components/Illus.astro';
 import Photo from '../../../components/Photo.astro';
-import { LANGS, DEFAULT_LANG, t, url, type Lang } from '../../../lib/i18n';
+import { articles, LANGS, DEFAULT_LANG, t, url, type Lang } from '../../../lib/i18n';
 import { getPages, forAudience, readingMinutes, SECTIONS, SECTION_ORDER, illusOf, PAGE_PHOTO } from '../../../lib/content';
 
 export async function getStaticPaths() {
@@ -128,7 +128,7 @@ const topicNo = String(SECTION_ORDER.indexOf(data.section) + 1).padStart(2, '0')
         <nav class="pager" aria-label={`${tr('prev')} / ${tr('next')}`}>
           {prev ? (
             <a class="prev" href={url(lang, `/guide/${prev.slug}/`)}>
-              <span class="dir"><Icon name="back" size={14} />{tr('prev')}</span>
+              <span class="dir"><Icon name="back" size={14} />{tr('prevArticle')}</span>
               <strong>{prev.entry.data.title}</strong>
             </a>
           ) : (
@@ -139,7 +139,7 @@ const topicNo = String(SECTION_ORDER.indexOf(data.section) + 1).padStart(2, '0')
           )}
           {next && (
             <a class="next" href={url(lang, `/guide/${next.slug}/`)}>
-              <span class="dir">{tr('next')}<Icon name="arrow" size={14} /></span>
+              <span class="dir">{tr('nextArticle')}<Icon name="arrow" size={14} /></span>
               <strong>{next.entry.data.title}</strong>
             </a>
           )}

@@ -26,7 +26,7 @@ const ru: Dict = {
   searchEmpty: 'Ничего не нашлось. Попробуйте другое слово.',
   searchHint: 'Ищем по всем страницам и частым вопросам',
   home: 'Главная',
-  local: 'Я локальный кандидат',
+  local: 'Я местный сотрудник',
   localShort: 'Локальным',
   localLead: 'Первый день, график, зарплата, доступы и кто вам поможет.',
   expat: 'Я экспат',
@@ -50,6 +50,11 @@ const ru: Dict = {
   forWhom: 'Для кого',
   both: 'Для всех',
   audienceSwitch: 'Ваш раздел',
+  all: 'Всем',
+  prevArticle: 'Предыдущая статья',
+  nextArticle: 'Следующая статья',
+  prevTopic: 'Предыдущая тема',
+  nextTopic: 'Следующая тема',
   guideName: 'Гид',
   topics: 'Темы',
   cities: 'Города',
@@ -83,7 +88,7 @@ const en: Dict = {
   searchEmpty: 'Nothing found. Try another word.',
   searchHint: 'Searching all pages and FAQs',
   home: 'Home',
-  local: 'I am a local candidate',
+  local: 'I am a local hire',
   localShort: 'Local',
   localLead: 'First day, schedule, salary, access and who will help you.',
   expat: 'I am an expat',
@@ -107,6 +112,11 @@ const en: Dict = {
   forWhom: 'For',
   both: 'Everyone',
   audienceSwitch: 'Your section',
+  all: 'All',
+  prevArticle: 'Previous article',
+  nextArticle: 'Next article',
+  prevTopic: 'Previous topic',
+  nextTopic: 'Next topic',
   guideName: 'Guide',
   topics: 'Topics',
   cities: 'Cities',
@@ -140,7 +150,7 @@ const uz: Dict = {
   searchEmpty: 'Hech narsa topilmadi. Boshqa soʻz bilan urinib koʻring.',
   searchHint: 'Barcha sahifalar va savollar boʻyicha qidiramiz',
   home: 'Bosh sahifa',
-  local: 'Men mahalliy nomzodman',
+  local: 'Men mahalliy xodimman',
   localShort: 'Mahalliy',
   localLead: 'Birinchi kun, ish tartibi, maosh, kirish huquqlari va kim yordam beradi.',
   expat: 'Men ekspatman',
@@ -161,6 +171,18 @@ const uz: Dict = {
   prev: 'Orqaga',
   both: 'Hamma uchun',
   audienceSwitch: 'Boʻlimingiz',
+  all: 'Hammasi',
+  prevArticle: 'Oldingi maqola',
+  nextArticle: 'Keyingi maqola',
+  prevTopic: 'Oldingi mavzu',
+  nextTopic: 'Keyingi mavzu',
+  back: 'Orqaga',
+  topics: 'Mavzular',
+  topicsLead: 'Dastlabki kunlar va oylar uchun hamma narsa mavzular boʻyicha.',
+  cities: 'Shaharlar',
+  citiesLead: 'Qayerda yashaysiz va dam olish kunlari qayerga borish mumkin.',
+  minutes: 'daqiqa oʻqish',
+  bankGuide: 'Xodim qoʻllanmasi',
   guideName: 'Yoʻlboshchi',
   translationSoon: 'Oʻzbek tilidagi tarjima tayyorlanmoqda. Hozircha rus tilidagi versiya koʻrsatilmoqda.',
   style: 'Uslub',
@@ -172,6 +194,16 @@ const uz: Dict = {
 };
 
 const DICTS: Record<Lang, Dict> = { ru, en, uz };
+
+/** "3 статьи", "5 статей", "1 article". */
+export function articles(lang: Lang, n: number): string {
+  if (lang === 'en') return `${n} ${n === 1 ? 'article' : 'articles'}`;
+  if (lang === 'uz') return `${n} ta maqola`;
+  const m10 = n % 10;
+  const m100 = n % 100;
+  const w = m10 === 1 && m100 !== 11 ? 'статья' : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? 'статьи' : 'статей';
+  return `${n}\u00a0${w}`;
+}
 
 export function t(lang: Lang) {
   return (key: string) => DICTS[lang][key] ?? ru[key] ?? key;

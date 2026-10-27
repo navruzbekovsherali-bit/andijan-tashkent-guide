@@ -63,6 +63,12 @@ html {
   scroll-padding-top: 96px;
   background: var(--paper);
 }
+/* Keyboard focus never lands under the phone dock. */
+@media (max-width: 959.98px) {
+  html {
+    scroll-padding-bottom: calc(var(--dock-h) + 24px + env(safe-area-inset-bottom));
+  }
+}
 body {
   margin: 0;
   min-height: 100dvh;
@@ -122,6 +128,7 @@ svg {
   border-radius: 6px;
 }
 .on-dark :focus-visible,
+.glass.is-dark :focus-visible,
 .dock :focus-visible,
 .site-footer :focus-visible {
   outline-color: var(--on-night);
@@ -137,7 +144,8 @@ svg {
 .skip {
   position: fixed;
   left: 12px;
-  top: -60px;
+  top: 12px;
+  transform: translateY(calc(-100% - 24px));
   z-index: 100;
   padding: 12px 16px;
   border-radius: 999px;
@@ -145,7 +153,7 @@ svg {
   color: #fff;
 }
 .skip:focus {
-  top: 12px;
+  transform: none;
 }
 /* small caps label, e.g. ( 01 ) or a topic name */
 .label {
@@ -204,7 +212,8 @@ a:hover .topic-meta .round-arrow {
   color: #fff;
 }
 .pill-mint {
-  background: var(--brand);
+  /* the brand green deepened just enough for white text (4.8:1) */
+  background: #13843f;
   color: #fff;
 }
 .pill-mint .pill-arrow {
@@ -254,7 +263,7 @@ a:hover .topic-meta .round-arrow {
   align-items: center;
   gap: 4px;
   max-width: 1180px;
-  height: var(--bar-h);
+  min-height: var(--bar-h);
   margin: 0 auto;
   padding: 0 6px 0 8px;
   border-radius: 999px;
@@ -268,10 +277,10 @@ a:hover .topic-meta .round-arrow {
   transform: translateY(calc(-100% - 16px));
 }
 .tb-back {
-  display: inline-flex;
+  display: none;
   align-items: center;
   gap: 6px;
-  height: 42px;
+  min-height: var(--tap);
   padding: 0 14px 0 10px;
   border-radius: 999px;
   background: var(--ink);
@@ -279,6 +288,12 @@ a:hover .topic-meta .round-arrow {
   font-weight: 650;
   font-size: var(--t-small);
   text-decoration: none;
+}
+/* on phones "Назад" lives in the dock, one per screen */
+@media (min-width: 960px) {
+  .tb-back {
+    display: inline-flex;
+  }
 }
 .tb-back:hover {
   background: var(--brand-ink);
@@ -352,8 +367,8 @@ a:hover .topic-meta .round-arrow {
   bottom: calc(10px + env(safe-area-inset-bottom));
   z-index: 45;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  height: var(--dock-h);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  min-height: var(--dock-h);
   padding: 6px;
   border-radius: 999px;
   background: rgb(10 46 42 / 0.92);
@@ -454,6 +469,10 @@ a:hover .topic-meta .round-arrow {
   gap: 10px;
   margin-top: 30px;
 }
+/* phones: the first screen sits in the optical centre, not at the bottom */
+.hero {
+  align-items: center;
+}
 @media (min-width: 720px) {
   .hero {
     align-items: center;
@@ -546,12 +565,12 @@ a:hover .topic-meta .round-arrow {
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 @media (min-width: 900px) {
   .topic-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 16px;
   }
 }
@@ -790,7 +809,7 @@ a:hover .topic-meta .round-arrow {
 }
 .head-grid .illus-frame {
   order: -1;
-  width: min(72%, 300px);
+  width: min(50%, 190px);
 }
 @media (min-width: 900px) {
   .head-grid {
@@ -1058,9 +1077,12 @@ article {
 .prose blockquote.is-tip {
   background: rgb(26 167 82 / 0.1);
 }
-.prose table {
-  display: block;
+.table-scroll {
   overflow-x: auto;
+  margin-block: 1.6em;
+  overscroll-behavior-x: contain;
+}
+.prose table {
   width: 100%;
   border-collapse: collapse;
   font-size: var(--t-small);
@@ -1073,6 +1095,10 @@ article {
   padding: 12px 14px 12px 0;
   border-bottom: 1px solid var(--line);
 }
+.prose td:first-child {
+  min-width: 9ch;
+  font-weight: 600;
+}
 .prose th {
   font-size: var(--t-label);
   font-weight: 650;
@@ -1081,6 +1107,7 @@ article {
   color: var(--ink-3);
 }
 .prose code {
+  font-family: inherit;
   padding: 1px 6px;
   border-radius: 6px;
   background: var(--paper-2);
@@ -1196,7 +1223,7 @@ article {
 /* pager: two equal buttons, back and forward */
 .pager {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   max-width: var(--measure);
   margin-top: 56px;
@@ -1305,12 +1332,25 @@ article {
   gap: 10px;
   pointer-events: none;
   opacity: 0;
+  visibility: hidden;
   transform: translateY(16px);
-  transition: opacity 300ms var(--ease), transform 400ms var(--ease);
+  transition: opacity 300ms var(--ease), transform 400ms var(--ease), visibility 0s 400ms;
 }
 .guide-fab.is-visible {
   opacity: 1;
+  visibility: visible;
   transform: none;
+  transition-delay: 0s;
+}
+/* phones: the guide steps aside while you read down */
+@media (max-width: 959.98px) {
+  .guide-fab.is-visible.is-tucked:not(.is-open) {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  .guide-fab.is-tucked:not(.is-open) .guide-fab-btn {
+    pointer-events: none;
+  }
 }
 .guide-fab-btn {
   order: 1;
@@ -1562,7 +1602,7 @@ article {
 }
 .seg {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 4px;
   padding: 4px;
   margin: 0 0 24px;
@@ -1590,7 +1630,7 @@ article {
   color: #fff;
 }
 .seg.three {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 .nav-group {
   margin-bottom: 22px;
@@ -1724,15 +1764,22 @@ article {
 }
 .is-covering .curtain {
   visibility: visible;
-  animation: curtain-up 480ms var(--ease-io) forwards;
+  animation: curtain-up 220ms var(--ease-io) forwards;
 }
 .is-covered .curtain {
   visibility: visible;
   transform: none;
+  /* failsafe: if the page's script never lifts it, the curtain leaves on its own */
+  animation: curtain-failsafe 1ms 1.6s forwards;
+}
+@keyframes curtain-failsafe {
+  to {
+    visibility: hidden;
+  }
 }
 .is-lifting .curtain {
   visibility: visible;
-  animation: curtain-away 560ms var(--ease-io) forwards;
+  animation: curtain-away 420ms var(--ease-io) forwards;
 }
 .is-covering .curtain-mark,
 .is-covered .curtain-mark {
@@ -1817,7 +1864,7 @@ article {
 }
 .pd-phone {
   position: relative;
-  width: 200px;
+  width: clamp(148px, 40vw, 200px);
   aspect-ratio: 9 / 18.5;
   margin-inline: auto;
   padding: 9px;
@@ -1873,7 +1920,7 @@ article {
 }
 .pd-keys {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
   justify-items: center;
 }
@@ -1945,7 +1992,7 @@ article {
   padding-left: 1.3em;
 }
 .pd-steps li {
-  color: var(--ink-3);
+  color: var(--ink-2);
   transition: color 250ms;
 }
 .pd-steps li.is-on {
@@ -2114,6 +2161,13 @@ article {
 .topbar-in.is-dark .tb-icon:hover,
 .topbar-in.is-dark .tb-nav a:hover {
   background: rgb(255 255 255 / 0.12);
+}
+
+/* dock: denser frost over text, so labels never compete with the words underneath */
+.dock.glass:not(.is-dark),
+.topbar-in.glass:not(.is-dark) {
+  background: linear-gradient(180deg, rgb(252 252 250 / 0.84), rgb(245 244 240 / 0.74));
+  backdrop-filter: blur(30px) saturate(1.8) brightness(1.04);
 }
 
 /* dock */
@@ -2291,4 +2345,18 @@ article {
   z-index: 1;
   background: rgb(255 255 255 / 0.9);
   color: var(--ink);
+}
+
+/* tap-to-call numbers inside articles */
+a.tel {
+  white-space: nowrap;
+  font-weight: 650;
+}
+/* the FAQ text filter and the audience switch combine */
+.faq-item[data-miss] {
+  display: none;
+}
+.faq-aud {
+  max-width: 420px;
+  margin-top: 14px;
 }

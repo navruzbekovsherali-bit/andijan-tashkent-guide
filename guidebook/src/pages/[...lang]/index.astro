@@ -5,7 +5,7 @@ import BrandMark from '../../components/BrandMark.astro';
 import Illus from '../../components/Illus.astro';
 import Photo from '../../components/Photo.astro';
 import { langPaths } from '../../lib/paths';
-import { t, url, type Lang } from '../../lib/i18n';
+import { articles, t, url, type Lang } from '../../lib/i18n';
 import { getPages, groupBySection, SECTIONS, illusOf, CITY_CARDS } from '../../lib/content';
 
 export const getStaticPaths = langPaths;
@@ -57,7 +57,7 @@ const faqPreview = pages.flatMap((p) => p.entry.data.faq.slice(0, 1).map((f) => 
                 <Illus name={illusOf(g.id)} />
                 <span class="topic-title">{SECTIONS[g.id].title[lang]}</span>
                 <span class="topic-meta">
-                  {g.pages.length} {tr('pagesWord')}
+                  {articles(lang, g.pages.length)}
                   <span class="round-arrow"><Icon name="arrow" size={16} /></span>
                 </span>
               </a>

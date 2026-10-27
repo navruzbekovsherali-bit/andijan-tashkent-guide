@@ -17,7 +17,32 @@ Rebuilt 27.10.2026 after the owner rejected ornament ("no Samarkand pattern; a b
 Rule: one accent. No colour per section; topics are told apart by their illustration, not by colour.
 
 ## Type
-Manrope Variable for everything. Display 750–800, letter-spacing −0.045…−0.055em, line-height 0.92–0.98. Body 17px (18px desktop) / 1.6, weight 450. Labels: 12px, 650, uppercase, +0.08em (`( 01 )`, topic names).
+One family: **Onest Variable** for all text and UI. Manrope appears only in the "Hamkor Bank" wordmark.
+
+Scale (CSS tokens in `global.css`):
+- label 13px;
+- small 15px;
+- UI 16px;
+- body 18px / 1.7, weight 400;
+- list item 19px;
+- lead 20px;
+- h3 21px;
+- h2 28–34px;
+- h1 40–64px.
+
+Headings are 600–650 with slight negative tracking. Paragraphs are capped at 62ch, and h2 in articles gets 2.6em of air above it. Labels such as `( 01 )` use sentence case, not caps.
+
+## Glass
+The top bar and the phone dock are liquid glass (`.glass`):
+- backdrop blur and saturate, with a light gradient rim drawn by a masked `::before`;
+- they turn dark over the dark first screen (`.is-dark`, toggled from JS);
+- the dock has a glass lens that springs under the current tab and flows to the one you press;
+- without `backdrop-filter`, an opaque fallback is used.
+
+## Photos
+Licensed city photos (Wikimedia Commons, credited in `docs/photo-credits.md`), served as 800/1600 webp:
+- a horizontal city strip on home;
+- the head image of city articles.
 
 ## Shape
 Pills (999px) for every button, with a round arrow; cards 20px radius; no shadows on content, thin `--line` rules instead; floating frosted top bar and dock.

@@ -151,7 +151,8 @@ const here = Astro.url.pathname;
           <button class="tb-icon" type="button" data-close aria-label={tr('close')}><Icon name="close" /></button>
         </div>
         <div class="sheet-body">
-          <div class="seg" role="group" aria-label={tr('audienceSwitch')}>
+          <div class="seg three" role="group" aria-label={tr('audienceSwitch')}>
+            <button type="button" data-aud="all">{tr('all')}</button>
             <button type="button" data-aud="local">{tr('localShort')}</button>
             <button type="button" data-aud="expat">{tr('expatShort')}</button>
           </div>

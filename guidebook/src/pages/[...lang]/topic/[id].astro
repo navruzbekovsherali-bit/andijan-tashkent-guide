@@ -2,7 +2,7 @@
 import Base from '../../../layouts/Base.astro';
 import Icon from '../../../components/Icon.astro';
 import Illus from '../../../components/Illus.astro';
-import { LANGS, DEFAULT_LANG, t, url, type Lang } from '../../../lib/i18n';
+import { articles, LANGS, DEFAULT_LANG, t, url, type Lang } from '../../../lib/i18n';
 import { getPages, groupBySection, SECTIONS, SECTION_ORDER, illusOf, type SectionId } from '../../../lib/content';
 
 export function getStaticPaths() {
@@ -32,7 +32,7 @@ const next = index >= 0 && index < groups.length - 1 ? groups[index + 1] : undef
       <div>
         <p class="label"><a href={url(lang, '/#topics')}>{tr('topics')}</a> · ( {String(index + 1).padStart(2, '0')} )</p>
         <h1>{title}</h1>
-        <p class="lead">{pages.length} {tr('pagesWord')}</p>
+        <p class="lead">{articles(lang, pages.length)}</p>
       </div>
       <Illus name={illusOf(id)} />
     </div>
@@ -59,7 +59,7 @@ const next = index >= 0 && index < groups.length - 1 ? groups[index + 1] : undef
       {
         prev ? (
           <a class="prev" href={url(lang, `/topic/${prev.id}/`)}>
-            <span class="dir"><Icon name="back" size={14} />{tr('prev')}</span>
+            <span class="dir"><Icon name="back" size={14} />{tr('prevTopic')}</span>
             <strong>{SECTIONS[prev.id].title[lang]}</strong>
           </a>
         ) : (
@@ -72,7 +72,7 @@ const next = index >= 0 && index < groups.length - 1 ? groups[index + 1] : undef
       {
         next && (
           <a class="next" href={url(lang, `/topic/${next.id}/`)}>
-            <span class="dir">{tr('next')}<Icon name="arrow" size={14} /></span>
+            <span class="dir">{tr('nextTopic')}<Icon name="arrow" size={14} /></span>
             <strong>{SECTIONS[next.id].title[lang]}</strong>
           </a>
         )

@@ -40,41 +40,56 @@ function openSheet(id: string) {
   closeSheets();
   lastFocus = document.activeElement as HTMLElement;
   sheet.setAttribute('data-open', '');
+  setInert(true);
   document.body.style.overflow = 'hidden';
   if (id === 'search') {
     loadIndex();
     setTimeout(() => (document.getElementById('search-input') as HTMLInputElement | null)?.focus(), 60);
   } else {
-    (sheet.querySelector('[aria-current="page"]') as HTMLElement | null)?.scrollIntoView({ block: 'center' });
-    (sheet.querySelector('[data-close].icon-btn') as HTMLElement | null)?.focus({ preventScroll: true });
+    const body = sheet.querySelector<HTMLElement>('.sheet-body');
+    if (body) body.scrollTop = 0;
+    (sheet.querySelector('.sheet-head [data-close]') as HTMLElement | null)?.focus({ preventScroll: true });
   }
 }
 
+/** While a sheet is open everything behind it is out of reach for Tab and screen readers. */
+function setInert(on: boolean) {
+  document.querySelectorAll<HTMLElement>('body > :not(.sheet):not(script):not(template)').forEach((el) => (el.inert = on));
+}
+
 function closeSheets() {
+  const wasOpen = document.querySelector('.sheet[data-open]');
   document.querySelectorAll('.sheet[data-open]').forEach((s) => s.removeAttribute('data-open'));
+  setInert(false);
   document.body.style.overflow = '';
-  lastFocus?.focus?.({ preventScroll: true });
+  if (wasOpen) lastFocus?.focus?.({ preventScroll: true });
   lastFocus = null;
 }
 
 /* ---------- Audience ---------- */
-function currentAudience(): 'local' | 'expat' {
+type Aud = 'local' | 'expat' | 'all';
+
+/** A first-time visitor hasn't said who they are yet: show everything until they choose. */
+function currentAudience(): Aud {
   const fromPage = document.documentElement.dataset.audience;
   if (fromPage === 'local' || fromPage === 'expat') return fromPage;
-  return (store.get('gb-audience') as 'local' | 'expat') || 'expat';
+  const saved = store.get('gb-audience');
+  return saved === 'local' || saved === 'expat' ? saved : 'all';
 }
 
-function applyAudience(aud: 'local' | 'expat') {
+function applyAudience(aud: Aud) {
+  document.documentElement.dataset.view = aud;
   document.querySelectorAll<HTMLButtonElement>('[data-aud]').forEach((b) => {
     b.setAttribute('aria-pressed', String(b.dataset.aud === aud));
   });
   document.querySelectorAll<HTMLElement>('[data-aud-list]').forEach((li) => {
-    li.hidden = !li.dataset.audList!.split(' ').includes(aud);
+    li.hidden = aud !== 'all' && !li.dataset.audList!.split(' ').includes(aud);
   });
   document.querySelectorAll('.nav-group').forEach((g) => {
     const visible = g.querySelectorAll('li:not([hidden])').length > 0;
     (g as HTMLElement).hidden = !visible;
   });
+  document.dispatchEvent(new Event('gb:audience'));
 }
 
 /* ---------- Search ---------- */
@@ -95,6 +110,14 @@ function href(path: string) {
 
 function norm(s: string) {
   return s.toLowerCase().replace(/ё/g, 'е').replace(/[ʻʼ‘’']/g, '');
+}
+
+/** Rough stem: "карту", "карты", "картой" all search as "карт". */
+export function stems(q: string) {
+  return norm(q)
+    .split(/[^\p{L}\p{N}*#]+/u)
+    .filter((t) => t.length > 1)
+    .map((t) => (t.length >= 5 ? t.slice(0, Math.max(4, t.length - 2)) : t));
 }
 
 function loadIndex() {
@@ -137,7 +160,7 @@ function search(q: string) {
   const out = document.getElementById('search-results');
   const hint = document.getElementById('search-hint');
   if (!out || !hint) return;
-  const terms = norm(q).split(/\s+/).filter((t) => t.length > 1);
+  const terms = stems(q);
   if (!terms.length || !index) {
     out.innerHTML = '';
     hint.textContent = hint.dataset.hint || '';
@@ -157,7 +180,7 @@ function search(q: string) {
         if (!s) return { d, score: 0 };
         score += s;
       }
-      if (d.audience.includes(aud)) score += 0.5;
+      if (aud !== 'all' && d.audience.includes(aud)) score += 0.5;
       return { d, score };
     })
     .filter((r) => r.score > 0)
@@ -278,8 +301,9 @@ function bindShell() {
     }
     const audBtn = t.closest<HTMLButtonElement>('[data-aud]');
     if (audBtn) {
-      const aud = audBtn.dataset.aud as 'local' | 'expat';
-      store.set('gb-audience', aud);
+      const aud = audBtn.dataset.aud as Aud;
+      if (aud === 'all') store.set('gb-audience', '');
+      else store.set('gb-audience', aud);
       applyAudience(aud);
       return;
     }
@@ -306,6 +330,14 @@ function bindShell() {
 
   const input = document.getElementById('search-input') as HTMLInputElement | null;
   let timer = 0;
+  // Enter opens the best match.
+  input?.addEventListener('keydown', async (e) => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    await loadIndex();
+    search(input.value);
+    document.querySelector<HTMLAnchorElement>('#search-results a')?.click();
+  });
   input?.addEventListener('input', () => {
     clearTimeout(timer);
     timer = window.setTimeout(async () => {
@@ -317,21 +349,85 @@ function bindShell() {
 }
 
 export function initSite() {
-  bindShell();
+  // The curtain goes first: whatever fails below, the page must never stay covered.
+  liftCover();
   const aud = document.documentElement.dataset.audience;
   if (aud === 'local' || aud === 'expat') store.set('gb-audience', aud);
-  applyAudience(currentAudience());
-  markCurrentNav();
-  callouts();
-  reveal();
-  cleanupProgress = progress();
-  journeyRail();
-  phoneDemos();
-  followingGuide();
-  headerOnScroll();
-  dockLens();
-  illustrationsOnScroll();
-  liftCover();
+  const steps = [
+    bindShell,
+    () => applyAudience(currentAudience()),
+    markCurrentNav,
+    callouts,
+    dialable,
+    tables,
+    reveal,
+    () => (cleanupProgress = progress()),
+    journeyRail,
+    phoneDemos,
+    followingGuide,
+    headerOnScroll,
+    dockLens,
+    illustrationsOnScroll,
+  ];
+  for (const step of steps) {
+    try {
+      step();
+    } catch (err) {
+      console.error(err);
+    }
+  }
+}
+
+/** Phone numbers in articles become tap-to-call links (1050, 102, +998 71 200-00-00…). */
+function dialable() {
+  const roots = document.querySelectorAll('.prose, .summary, .faq-a');
+  const re = /(\+998[\s\d()-]{9,16}\d|\b(?:101|102|103|104|112|1050|1144|1170)\b)/g;
+  roots.forEach((root) => {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => (n.parentElement?.closest('a, code, pre, h1, h2, h3, script') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+    });
+    const nodes: Text[] = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode as Text);
+    for (const node of nodes) {
+      const text = node.data;
+      re.lastIndex = 0;
+      if (!re.test(text)) continue;
+      re.lastIndex = 0;
+      const frag = document.createDocumentFragment();
+      let at = 0;
+      for (const m of text.matchAll(re)) {
+        const i = m.index ?? 0;
+        // A short code is only a number to dial when it stands alone, not inside "102 000 сум".
+        const short = !m[0].startsWith('+');
+        if (short && /\d\s?$/.test(text.slice(0, i))) continue;
+        if (short && /^\s?\d/.test(text.slice(i + m[0].length))) continue;
+        frag.append(text.slice(at, i));
+        const a = document.createElement('a');
+        a.href = `tel:${m[0].replace(/[^\d+]/g, '')}`;
+        a.className = 'tel';
+        a.textContent = m[0];
+        frag.append(a);
+        at = i + m[0].length;
+      }
+      if (!at) continue;
+      frag.append(text.slice(at));
+      node.replaceWith(frag);
+    }
+  });
+}
+
+/** Wide tables scroll inside their own frame instead of squeezing the words. */
+function tables() {
+  document.querySelectorAll<HTMLTableElement>('.prose table').forEach((t) => {
+    if (t.parentElement?.classList.contains('table-scroll')) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'table-scroll';
+    wrap.tabIndex = 0;
+    wrap.setAttribute('role', 'region');
+    wrap.setAttribute('aria-label', t.querySelector('th')?.textContent || 'Таблица');
+    t.replaceWith(wrap);
+    wrap.append(t);
+  });
 }
 
 function cameFromHere() {
@@ -639,7 +735,6 @@ function followingGuide() {
         if (!e.isIntersecting || seen.has(e.target) || !fab.classList.contains('is-visible')) continue;
         seen.add(e.target);
         hop('is-alert');
-        if (mode === 'closed' || mode === 'note') say('note', 3500);
       }
     },
     { rootMargin: '-35% 0px -35% 0px' },
@@ -647,7 +742,6 @@ function followingGuide() {
   article.querySelectorAll('.prose blockquote.is-warn').forEach((q) => warnIo.observe(q));
 
   const pager = next.closest('.pager') as HTMLElement;
-  let nudged = false;
   let lastY = window.scrollY;
   let lookTimer = 0;
   onScrollFrame(() => {
@@ -677,15 +771,13 @@ function followingGuide() {
       lookTimer = window.setTimeout(() => fab.style.setProperty('--look', '0px'), 450);
     }
 
-    if (!nudged && read > 0.6 && !pagerInView) {
-      nudged = true;
-      say('next', 6000);
-    }
+    // On a phone the guide steps aside while you read on, and comes back when you pause or scroll up.
+    fab.classList.toggle('is-tucked', dy > 0 && window.scrollY > 200);
   });
 }
 
 /* ---------- Page change: the bank's curtain rises over the page, the next page lifts it away ---------- */
-const CURTAIN_IN = 480;
+const CURTAIN_IN = 220;
 
 function coverAndGo(e: MouseEvent, link: HTMLAnchorElement) {
   if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
@@ -703,6 +795,8 @@ function coverAndGo(e: MouseEvent, link: HTMLAnchorElement) {
   }
   document.documentElement.classList.add('is-covering');
   window.setTimeout(() => (location.href = link.href), CURTAIN_IN);
+  // The navigation may not happen (offline, a download): never leave the page covered.
+  window.setTimeout(() => document.documentElement.classList.remove('is-covering'), CURTAIN_IN + 4000);
 }
 
 /** On arrival behind the curtain (set by the head script), lift it away. */

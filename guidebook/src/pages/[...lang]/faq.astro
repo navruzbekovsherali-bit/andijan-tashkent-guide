@@ -26,6 +26,11 @@ const groups = groupBySection(await getPages(lang))
       <Icon name="search" />
       <input type="search" id="faq-filter" placeholder={tr('faqSearch')} autocomplete="off" />
     </label>
+    <div class="seg three faq-aud" role="group" aria-label={tr('audienceSwitch')}>
+      <button type="button" data-aud="all">{tr('all')}</button>
+      <button type="button" data-aud="local">{tr('localShort')}</button>
+      <button type="button" data-aud="expat">{tr('expatShort')}</button>
+    </div>
     <p class="search-hint" id="faq-empty" hidden>{tr('searchEmpty')}</p>
 
     {
@@ -55,23 +60,26 @@ const groups = groupBySection(await getPages(lang))
 </Base>
 
 <script>
+  import { stems } from '../../lib/client';
   const input = document.getElementById('faq-filter') as HTMLInputElement | null;
-  if (input) {
-    const norm = (s: string) => s.toLowerCase().replace(/ё/g, 'е');
-    input.addEventListener('input', () => {
-      const terms = norm(input.value).split(/\s+/).filter(Boolean);
-      let shown = 0;
-      document.querySelectorAll<HTMLDetailsElement>('.faq-item').forEach((d) => {
-        const hay = norm(d.dataset.q || '');
-        const ok = terms.every((t) => hay.includes(t));
-        d.hidden = !ok;
-        if (ok) shown++;
-        d.open = ok && terms.length > 0 && shown <= 3;
-      });
-      document.querySelectorAll<HTMLElement>('.faq-group').forEach((g) => {
-        g.hidden = !g.querySelector('.faq-item:not([hidden])');
-      });
-      document.getElementById('faq-empty')!.hidden = shown > 0;
+  // Text matches are marked separately from the audience filter (which uses [hidden]) so the two combine.
+  const filter = () => {
+    const terms = stems(input?.value || '');
+    let shown = 0;
+    document.querySelectorAll<HTMLDetailsElement>('.faq-item').forEach((d) => {
+      const hay = (d.dataset.q || '').replace(/ё/g, 'е');
+      const ok = terms.every((t) => hay.includes(t));
+      d.toggleAttribute('data-miss', !ok);
+      const visible = ok && !d.hidden;
+      if (visible) shown++;
+      d.open = visible && terms.length > 0 && shown <= 3;
     });
-  }
+    document.querySelectorAll<HTMLElement>('.faq-group').forEach((g) => {
+      g.hidden = !g.querySelector('.faq-item:not([hidden]):not([data-miss])');
+    });
+    document.getElementById('faq-empty')!.hidden = shown > 0;
+  };
+  input?.addEventListener('input', filter);
+  document.addEventListener('gb:audience', filter);
+  filter();
 </script>
