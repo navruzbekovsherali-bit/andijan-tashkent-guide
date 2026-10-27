@@ -53,7 +53,7 @@ const hello: Record<Audience, Record<Lang, string>> = {
             {g.pages.map((p) => (
               <li>
                 <a href={url(lang, `/guide/${p.slug}/`)}>
-                  <strong style={`view-transition-name: t-${p.slug}`}>{p.entry.data.title}</strong>
+                  <strong data-vt={`t-${p.slug}`}>{p.entry.data.title}</strong>
                   <span>{p.entry.data.description}</span>
                 </a>
               </li>

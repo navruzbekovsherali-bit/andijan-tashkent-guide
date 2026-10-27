@@ -24,14 +24,19 @@ const last = words.pop();
     <div class="wrap">
       <h1>{words.join(' ')} <span class="mark">{last}</span></h1>
       <p class="hero-lead">{tr('heroLead')}</p>
-      <svg class="hero-art draw" viewBox="0 0 360 260" fill="none" aria-hidden="true">
-        <path d="M20 220 C 90 220, 80 120, 160 120 S 250 40, 330 40" stroke="var(--line-2)" stroke-width="6" stroke-linecap="round"></path>
-        <path d="M20 240 C 120 240, 140 180, 220 180 S 300 150, 340 110" stroke="var(--line-1)" stroke-width="6" stroke-linecap="round"></path>
-        <circle cx="20" cy="220" r="9" fill="var(--paper)" stroke="var(--line-2)" stroke-width="5"></circle>
-        <circle cx="160" cy="120" r="9" fill="var(--paper)" stroke="var(--line-2)" stroke-width="5"></circle>
-        <circle cx="330" cy="40" r="11" fill="var(--line-2)"></circle>
-        <circle cx="220" cy="180" r="9" fill="var(--paper)" stroke="var(--line-1)" stroke-width="5"></circle>
-        <circle cx="340" cy="110" r="11" fill="var(--line-1)"></circle>
+      <!-- Two lines (local, expat) that draw with the scroll; a rider marks how far you are -->
+      <svg class="hero-art" data-scrub viewBox="0 0 360 260" fill="none" aria-hidden="true">
+        <path d="M20 220 C 90 220, 80 120, 160 120 S 250 40, 330 40" stroke="var(--line-2)" stroke-width="6" stroke-linecap="round" class="track-ghost"></path>
+        <path d="M20 240 C 120 240, 140 180, 220 180 S 300 150, 340 110" stroke="var(--line-1)" stroke-width="6" stroke-linecap="round" class="track-ghost"></path>
+        <path d="M20 220 C 90 220, 80 120, 160 120 S 250 40, 330 40" stroke="var(--line-2)" stroke-width="6" stroke-linecap="round" data-track="a"></path>
+        <path d="M20 240 C 120 240, 140 180, 220 180 S 300 150, 340 110" stroke="var(--line-1)" stroke-width="6" stroke-linecap="round" data-track="b"></path>
+        <circle class="stop is-reached" cx="20" cy="220" r="9" fill="var(--paper)" stroke="var(--line-2)" stroke-width="5"></circle>
+        <circle class="stop" data-at="0.5" cx="160" cy="120" r="9" fill="var(--paper)" stroke="var(--line-2)" stroke-width="5"></circle>
+        <circle class="stop end" data-at="0.99" cx="330" cy="40" r="11" fill="var(--line-2)"></circle>
+        <circle class="stop" data-at="0.6" cx="220" cy="180" r="9" fill="var(--paper)" stroke="var(--line-1)" stroke-width="5"></circle>
+        <circle class="stop end" data-at="0.99" cx="340" cy="110" r="11" fill="var(--line-1)"></circle>
+        <circle class="rider" data-rider="a" r="6" fill="var(--ink)"></circle>
+        <circle class="rider" data-rider="b" r="6" fill="var(--ink)"></circle>
       </svg>
       <Guide name={tr('guideName')}>
         <p>{tr('guideHello')}</p>
@@ -42,14 +47,14 @@ const last = words.pop();
   <div class="wrap">
     <h2 class="visually-hidden">{tr('chooseTitle')}</h2>
     <div class="choose">
-      <a class="door reveal" href={url(lang, '/local/')} data-choose="local">
+      <a class="door reveal" data-spot href={url(lang, '/local/')} data-choose="local">
         <div>
           <h2 style="view-transition-name: aud-local">{tr('local')}</h2>
           <p>{tr('localLead')}</p>
         </div>
         <span class="go"><Icon name="arrow" /></span>
       </a>
-      <a class="door reveal" href={url(lang, '/expat/')} data-choose="expat">
+      <a class="door reveal" data-spot href={url(lang, '/expat/')} data-choose="expat">
         <div>
           <h2 style="view-transition-name: aud-expat">{tr('expat')}</h2>
           <p>{tr('expatLead')}</p>
@@ -57,6 +62,8 @@ const last = words.pop();
         <span class="go"><Icon name="arrow" /></span>
       </a>
     </div>
+
+    <p class="statement" data-words>{tr('manifest')}</p>
 
     <h2 class="block-title">{tr('popular')}</h2>
     <ul class="quick">

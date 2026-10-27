@@ -312,8 +312,22 @@ function bindShell() {
       applyTheme(themeBtn.dataset.themeSet!);
       return;
     }
+    // Only the tapped list item gets a transition name, so one title morphs instead of forty.
+    const named = t.closest('a')?.querySelector<HTMLElement>('[data-vt]');
+    if (named) {
+      document.querySelectorAll<HTMLElement>('[data-vt]').forEach((el) => (el.style.viewTransitionName = ''));
+      named.style.viewTransitionName = named.dataset.vt!;
+    }
     const door = t.closest<HTMLAnchorElement>('[data-choose]');
     if (door) store.set('gb-audience', door.dataset.choose!);
+    // Going back up the route: the next page wipes in from the top instead of the bottom.
+    if (t.closest('.pager .prev, .crumbs a')) {
+      try {
+        sessionStorage.setItem('gb-dir', 'back');
+      } catch {
+        /* the wipe just keeps its default direction */
+      }
+    }
   });
 
   document.addEventListener('keydown', (e) => {
@@ -350,6 +364,10 @@ export function initSite() {
   journeyRail();
   phoneDemos();
   followingGuide();
+  headerOnScroll();
+  scrubArt();
+  wordsReveal();
+  spotlight();
 }
 
 /* ---------- Animated phone demos (illustrative screens, marked as examples) ---------- */
@@ -374,15 +392,17 @@ function phoneDemos() {
     host.dataset.ready = '';
     host.innerHTML = `
       <figure class="pd">
-        <div class="pd-phone" aria-hidden="true"><div class="pd-notch"></div><div class="pd-screen"></div></div>
+        <div class="pd-phone" aria-hidden="true"><div class="pd-notch"></div><div class="pd-screen"></div>
+          <div class="pd-bar">${demo.screens.map(() => '<span></span>').join('')}</div></div>
         <figcaption>
           <strong>${escapeHtml(demo.title)}</strong>
-          <ol class="pd-steps">${demo.steps.map((s) => `<li>${escapeHtml(s)}</li>`).join('')}</ol>
+          <ol class="pd-steps">${demo.steps.map((s, n) => `<li><button type="button" data-step="${n}">${escapeHtml(s)}</button></li>`).join('')}</ol>
           <small>Экран условный, цифры вымышлены.</small>
         </figcaption>
       </figure>`;
     const screen = host.querySelector<HTMLElement>('.pd-screen')!;
     const steps = Array.from(host.querySelectorAll<HTMLElement>('.pd-steps li'));
+    const bars = Array.from(host.querySelectorAll<HTMLElement>('.pd-bar span'));
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     let i = 0;
     let timer = 0;
@@ -407,7 +427,13 @@ function phoneDemos() {
       clearTimeout(timer);
       clearInterval(typing);
       if (!visible) return;
-      const sc = demo.screens[i % demo.screens.length];
+      const at = i % demo.screens.length;
+      const sc = demo.screens[at];
+      const dur = sc.kind === 'dial' ? 2600 : 2400;
+      bars.forEach((b, n) => {
+        b.className = n < at ? 'is-done' : n === at ? 'is-on' : '';
+        b.style.setProperty('--dur', `${dur}ms`);
+      });
       if (sc.kind === 'dial' && !reduce) {
         let n = 0;
         render(sc, '');
@@ -420,8 +446,19 @@ function phoneDemos() {
       timer = window.setTimeout(() => {
         i++;
         play();
-      }, sc.kind === 'dial' ? 2600 : 2400);
+      }, dur);
     };
+
+    // A step can be tapped: the phone jumps to its first screen and carries on from there.
+    host.querySelector('.pd-steps')!.addEventListener('click', (e) => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-step]');
+      if (!b) return;
+      i = demo.screens.findIndex((sc) => sc.step === Number(b.dataset.step));
+      if (reduce || !visible) {
+        const sc = demo.screens[i];
+        render(sc, sc.text);
+      } else play();
+    });
 
     render(demo.screens[0], reduce ? demo.screens[0].text : '');
     new IntersectionObserver((es) => {
@@ -489,36 +526,230 @@ function journeyRail() {
   return () => window.removeEventListener('scroll', onScroll);
 }
 
-/* ---------- Guide that follows the reader and points to the next step ---------- */
+/* ---------- Shared helpers for scroll-linked effects ---------- */
+const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
+
+/** Runs fn at most once per frame while the page scrolls, and on resize. */
+function onScrollFrame(fn: () => void) {
+  let ticking = false;
+  const run = () => {
+    ticking = false;
+    fn();
+  };
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(run);
+      }
+    },
+    { passive: true },
+  );
+  window.addEventListener('resize', fn);
+  fn();
+}
+
+/* ---------- Header: steps aside while reading down, returns on the way up ---------- */
+function headerOnScroll() {
+  const header = document.querySelector<HTMLElement>('.site-header');
+  if (!header) return;
+  let lastY = window.scrollY;
+  onScrollFrame(() => {
+    const y = window.scrollY;
+    header.classList.toggle('is-scrolled', y > 24);
+    if (Math.abs(y - lastY) < 8) return;
+    const busy = document.querySelector('.sheet[data-open]') || header.matches(':focus-within');
+    header.classList.toggle('is-hidden', !busy && y > lastY && y > 160);
+    lastY = y;
+  });
+}
+
+/* ---------- Home: the two lines draw with the scroll, riders show how far you are ---------- */
+function scrubArt() {
+  document.querySelectorAll<SVGSVGElement>('[data-scrub]').forEach((svg) => {
+    const tracks = Array.from(svg.querySelectorAll<SVGPathElement>('[data-track]')).map((path) => ({
+      path,
+      len: path.getTotalLength(),
+      rider: svg.querySelector<SVGCircleElement>(`[data-rider="${path.dataset.track}"]`),
+    }));
+    const stops = Array.from(svg.querySelectorAll<SVGElement>('[data-at]'));
+    tracks.forEach((t) => (t.path.style.strokeDasharray = String(t.len)));
+
+    const FLOOR = 0.3; // share of the line drawn on arrival; scrolling draws the rest
+    let intro = reduceMotion() ? 1 : 0;
+    const draw = () => {
+      const top = svg.getBoundingClientRect().top + window.scrollY;
+      const travel = Math.max(window.innerHeight * 0.5, top - window.innerHeight * 0.12);
+      const p = reduceMotion() ? 1 : clamp01(FLOOR * intro + (1 - FLOOR) * clamp01(window.scrollY / travel));
+      for (const t of tracks) {
+        t.path.style.strokeDashoffset = String(t.len * (1 - p));
+        const pt = t.path.getPointAtLength(t.len * p);
+        t.rider?.setAttribute('cx', pt.x.toFixed(1));
+        t.rider?.setAttribute('cy', pt.y.toFixed(1));
+      }
+      stops.forEach((s) => s.classList.toggle('is-reached', p >= Number(s.dataset.at)));
+      svg.classList.toggle('is-done', p >= 0.99);
+    };
+    if (!reduceMotion()) {
+      const start = performance.now();
+      const step = (now: number) => {
+        const k = clamp01((now - start) / 1100);
+        intro = k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2;
+        draw();
+        if (k < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+    onScrollFrame(draw);
+  });
+}
+
+/* ---------- Statement that "reads itself": words light up as it crosses the screen ---------- */
+function wordsReveal() {
+  const els = Array.from(document.querySelectorAll<HTMLElement>('[data-words]:not([data-split])'));
+  if (!els.length) return;
+  for (const el of els) {
+    el.dataset.split = '';
+    const words = (el.textContent || '').trim().split(/\s+/);
+    el.style.setProperty('--n', String(words.length));
+    el.innerHTML = words.map((w, i) => `<span class="w" style="--i:${i}">${escapeHtml(w)}</span>`).join(' ');
+  }
+  onScrollFrame(() => {
+    const vh = window.innerHeight;
+    for (const el of els) {
+      const top = el.getBoundingClientRect().top;
+      el.style.setProperty('--p', clamp01((vh * 0.9 - top) / (vh * 0.55)).toFixed(3));
+    }
+  });
+}
+
+/* ---------- Doors: a soft light follows the pointer (desktop only) ---------- */
+function spotlight() {
+  if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  document.querySelectorAll<HTMLElement>('[data-spot]').forEach((el) => {
+    el.addEventListener('pointermove', (e) => {
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', `${e.clientX - r.left}px`);
+      el.style.setProperty('--my', `${e.clientY - r.top}px`);
+    });
+  });
+}
+
+/* ---------- Guide that follows the reader ----------
+   Shows reading progress as a ring, knows which section you are in, looks the way you
+   scroll, nudges you at "Важно" notes and offers the next step near the end. */
+const GUIDE_TEXT = {
+  ru: { name: 'Гид', next: 'Следующий шаг', now: 'Сейчас', of: 'из', important: 'Здесь важное — прочитайте внимательно.', open: 'Подсказка гида' },
+  en: { name: 'Guide', next: 'Next step', now: 'Now', of: 'of', important: 'Something important here — read it carefully.', open: 'Guide tip' },
+  uz: { name: 'Yoʻlboshchi', next: 'Keyingi qadam', now: 'Hozir', of: '/', important: 'Bu yerda muhim maʼlumot bor.', open: 'Yoʻlboshchi' },
+};
+
+const GUIDE_FACE = `<svg class="face" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="20" cy="15" r="6.5"/><path d="M9 33c1.5-6 6-9 11-9s9.5 3 11 9"/><g class="look"><path class="eyes" d="M17.5 15.5h.01M22.5 15.5h.01"/></g><path d="M17.8 18.4c1.3 1 3.1 1 4.4 0"/></svg>`;
+
 function followingGuide() {
   const next = document.querySelector<HTMLAnchorElement>('.pager .next');
   const article = document.querySelector<HTMLElement>('article');
   if (!next || !article || document.querySelector('.guide-fab')) return;
+  const lang = (document.documentElement.lang as keyof typeof GUIDE_TEXT) in GUIDE_TEXT ? (document.documentElement.lang as keyof typeof GUIDE_TEXT) : 'ru';
+  const tx = GUIDE_TEXT[lang];
   const title = next.querySelector('strong')?.textContent || '';
-  const label = document.documentElement.lang === 'en' ? 'Next step' : document.documentElement.lang === 'uz' ? 'Keyingi qadam' : 'Следующий шаг';
+  const heads = Array.from(article.querySelectorAll<HTMLElement>('.prose > h2'));
+
   const fab = document.createElement('div');
   fab.className = 'guide-fab';
   fab.innerHTML = `
-    <a class="guide-fab-bubble" href="${next.getAttribute('href')}"><small>${label}</small>${escapeHtml(title)}</a>
-    <button type="button" class="guide-fab-btn" aria-label="${label}: ${escapeHtml(title)}">
-      <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="20" cy="15" r="6.5"/><path d="M9 33c1.5-6 6-9 11-9s9.5 3 11 9"/><path d="M17.5 15.5h.01M22.5 15.5h.01"/><path d="M17.8 18.4c1.3 1 3.1 1 4.4 0"/></svg>
+    <div class="guide-fab-bubble" id="guide-fab-bubble">
+      <small data-k="label"></small>
+      <span data-k="text"></span>
+      <a data-k="next" href="${next.getAttribute('href')}"><small>${tx.next}</small>${escapeHtml(title)}</a>
+    </div>
+    <button type="button" class="guide-fab-btn" aria-expanded="false" aria-controls="guide-fab-bubble" aria-label="${tx.open}">
+      <svg class="ring" viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="28"/><circle class="ring-fill" cx="30" cy="30" r="28" pathLength="1"/></svg>
+      ${GUIDE_FACE}
     </button>`;
   document.body.append(fab);
-  fab.querySelector('button')!.addEventListener('click', () => fab.classList.toggle('is-open'));
-  let shown = false;
-  const pager = next.closest('.pager') as HTMLElement;
-  const check = () => {
-    const r = article.getBoundingClientRect();
-    const read = (window.innerHeight - r.top) / r.height;
-    // The pager itself takes over once it is on screen.
-    const pagerInView = pager.getBoundingClientRect().top < window.innerHeight - 40;
-    fab.classList.toggle('is-visible', read > 0.25 && !pagerInView);
-    if (!shown && read > 0.6) {
-      shown = true;
-      fab.classList.add('is-open');
-      setTimeout(() => fab.classList.remove('is-open'), 6000);
-    }
+  const btn = fab.querySelector<HTMLButtonElement>('.guide-fab-btn')!;
+  const label = fab.querySelector<HTMLElement>('[data-k="label"]')!;
+  const text = fab.querySelector<HTMLElement>('[data-k="text"]')!;
+
+  let mode: 'closed' | 'section' | 'note' | 'next' = 'closed';
+  let closeTimer = 0;
+  let active = -1;
+  const sectionLine = () =>
+    active >= 0 ? [`${tx.now} · ${active + 1} ${tx.of} ${heads.length}`, heads[active].textContent || ''] : [tx.next, ''];
+
+  /** Opens the bubble in a mode; timed bubbles close themselves. */
+  const say = (m: typeof mode, ms = 0) => {
+    clearTimeout(closeTimer);
+    mode = m;
+    const [l, t] = m === 'note' ? [tx.name, tx.important] : sectionLine();
+    label.textContent = m === 'next' ? '' : l;
+    text.textContent = m === 'next' ? '' : t;
+    fab.dataset.mode = m;
+    fab.classList.toggle('is-open', m !== 'closed');
+    btn.setAttribute('aria-expanded', String(m !== 'closed'));
+    if (ms) closeTimer = window.setTimeout(() => say('closed'), ms);
   };
-  window.addEventListener('scroll', check, { passive: true });
-  check();
+  const hop = (cls: string) => {
+    if (reduceMotion()) return;
+    btn.classList.remove(cls);
+    void btn.offsetWidth;
+    btn.classList.add(cls);
+  };
+
+  btn.addEventListener('click', () => say(mode === 'closed' ? 'section' : 'closed'));
+
+  // Notes marked "Важно": the guide points at them once.
+  const seen = new WeakSet<Element>();
+  const warnIo = new IntersectionObserver(
+    (es) => {
+      for (const e of es) {
+        if (!e.isIntersecting || seen.has(e.target) || !fab.classList.contains('is-visible')) continue;
+        seen.add(e.target);
+        hop('is-alert');
+        if (mode === 'closed' || mode === 'note') say('note', 3500);
+      }
+    },
+    { rootMargin: '-35% 0px -35% 0px' },
+  );
+  article.querySelectorAll('.prose blockquote.is-warn').forEach((q) => warnIo.observe(q));
+
+  const pager = next.closest('.pager') as HTMLElement;
+  let nudged = false;
+  let lastY = window.scrollY;
+  let lookTimer = 0;
+  onScrollFrame(() => {
+    const vh = window.innerHeight;
+    const r = article.getBoundingClientRect();
+    const read = clamp01((vh - r.top) / r.height);
+    fab.style.setProperty('--read', read.toFixed(3));
+    // The pager itself takes over once it is on screen.
+    const pagerInView = pager.getBoundingClientRect().top < vh - 40;
+    fab.classList.toggle('is-visible', read > 0.12 && !pagerInView);
+    if (pagerInView && mode !== 'closed') say('closed');
+
+    let now = -1;
+    heads.forEach((h, n) => {
+      if (h.getBoundingClientRect().top < vh * 0.35) now = n;
+    });
+    if (now > active && active >= 0) hop('is-hop');
+    active = now;
+    if (mode === 'section') say('section');
+
+    // Eyes follow the direction of reading, then settle.
+    const dy = window.scrollY - lastY;
+    lastY = window.scrollY;
+    if (Math.abs(dy) > 2) {
+      fab.style.setProperty('--look', dy > 0 ? '1.3px' : '-1.3px');
+      clearTimeout(lookTimer);
+      lookTimer = window.setTimeout(() => fab.style.setProperty('--look', '0px'), 450);
+    }
+
+    if (!nudged && read > 0.6 && !pagerInView) {
+      nudged = true;
+      say('next', 6000);
+    }
+  });
 }

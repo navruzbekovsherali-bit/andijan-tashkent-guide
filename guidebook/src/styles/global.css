@@ -1769,11 +1769,19 @@ p {
 @view-transition {
   navigation: auto;
 }
+/* The new page rises over the old one behind an arched edge (going back, it drops from the top);
+   the old page recedes a little. Header, bottom bar and linked titles stay put or morph on their own. */
 ::view-transition-old(root) {
-  animation: 180ms var(--ease-out) both vt-out;
+  animation: 680ms var(--ease-in-out) both vt-recede;
 }
 ::view-transition-new(root) {
-  animation: 420ms var(--ease-out) both vt-in;
+  animation: 680ms var(--ease-in-out) both vt-rise;
+}
+html:active-view-transition-type(back)::view-transition-new(root) {
+  animation-name: vt-drop;
+}
+html:active-view-transition-type(back)::view-transition-old(root) {
+  animation-name: vt-recede-down;
 }
 .site-header {
   view-transition-name: header;
@@ -1781,16 +1789,32 @@ p {
 .bottom-bar {
   view-transition-name: bottombar;
 }
-@keyframes vt-out {
+@keyframes vt-recede {
   to {
-    opacity: 0;
-    transform: translateY(-6px);
+    transform: translateY(-3%) scale(0.97);
+    filter: brightness(0.9);
   }
 }
-@keyframes vt-in {
+@keyframes vt-recede-down {
+  to {
+    transform: translateY(3%) scale(0.97);
+    filter: brightness(0.9);
+  }
+}
+@keyframes vt-rise {
   from {
-    opacity: 0;
-    transform: translateY(12px);
+    clip-path: ellipse(140% 0% at 50% 100%);
+  }
+  to {
+    clip-path: ellipse(140% 150% at 50% 100%);
+  }
+}
+@keyframes vt-drop {
+  from {
+    clip-path: ellipse(140% 0% at 50% 0%);
+  }
+  to {
+    clip-path: ellipse(140% 150% at 50% 0%);
   }
 }
 
@@ -2131,6 +2155,312 @@ p {
     transition: none;
   }
   .pd-caret {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+   Round 2 — ideas from the design references (docs/design-references.md)
+   ========================================================================== */
+
+/* --- Header steps aside while you read down, comes back on the way up (eezy, vantra) --- */
+.site-header {
+  transition: transform 320ms var(--ease-out), background-color 250ms, border-color 250ms;
+}
+.read-progress {
+  transition: top 320ms var(--ease-out);
+}
+@media (max-width: 959px) {
+  .site-header.is-hidden {
+    transform: translateY(-100%);
+  }
+  .site-header.is-hidden ~ main .read-progress {
+    top: 0;
+  }
+}
+/* On a wide screen the bar turns into a floating pill once the page moves */
+@media (min-width: 960px) {
+  .site-header .wrap {
+    transition: background-color 250ms, box-shadow 250ms, padding 250ms, border-radius 250ms;
+  }
+  .site-header.is-scrolled {
+    background: transparent;
+    border-color: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .site-header.is-scrolled .wrap {
+    margin-top: 6px;
+    height: calc(100% - 8px);
+    padding-inline: 10px 6px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--paper) 90%, transparent);
+    backdrop-filter: saturate(1.4) blur(12px);
+    -webkit-backdrop-filter: saturate(1.4) blur(12px);
+    box-shadow: var(--shadow), 0 0 0 1px var(--rule);
+  }
+  [data-theme='document'] .site-header.is-scrolled .wrap {
+    border-radius: 6px;
+  }
+}
+
+/* --- Home: lines draw with the scroll, a rider marks the way (gianlucaboccia, mosaic) --- */
+.hero-art .track-ghost {
+  opacity: 0.16;
+}
+.hero-art .stop {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 450ms var(--ease-out), opacity 300ms;
+}
+.js .hero-art .stop:not(.is-reached) {
+  opacity: 0.45;
+  transform: scale(0.7);
+}
+.hero-art .stop.end.is-reached {
+  animation: stop-pop 600ms var(--ease-out);
+}
+.hero-art .rider {
+  stroke: var(--paper);
+  stroke-width: 3;
+  transition: opacity 300ms;
+}
+.hero-art.is-done .rider {
+  opacity: 0;
+}
+html:not(.js) .hero-art .rider {
+  display: none;
+}
+@keyframes stop-pop {
+  40% {
+    transform: scale(1.35);
+  }
+}
+
+/* --- A statement that reads itself as it crosses the screen (eezy, sebg, anfalova) --- */
+.statement {
+  max-width: 30ch;
+  margin: 0 0 var(--space-7);
+  font-family: var(--font-head);
+  font-weight: var(--head-weight);
+  letter-spacing: var(--head-track);
+  font-size: var(--step-2);
+  line-height: 1.25;
+  color: var(--ink);
+}
+@media (min-width: 720px) {
+  .statement {
+    font-size: var(--step-3);
+    max-width: 26ch;
+  }
+}
+.statement .w {
+  opacity: clamp(0.2, calc(var(--p, 1) * (var(--n) + 4) - var(--i)), 1);
+  transition: opacity 120ms linear;
+}
+[data-theme='notebook'] .statement {
+  font-family: var(--font-note);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+[data-theme='document'] .statement {
+  font-family: var(--font-body);
+  font-weight: 400;
+}
+
+/* --- Doors: a soft light follows the pointer (vantra, anfalova) --- */
+[data-spot]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle 240px at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--line) 16%, transparent), transparent 70%);
+  transition: opacity 300ms var(--ease-out);
+}
+[data-spot]:hover::after {
+  opacity: 1;
+}
+
+/* --- Guide: reading ring, blink, looks the way you scroll, hops at each new section (sebg) --- */
+.guide-avatar .eyes,
+.guide-fab .eyes {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: blink 5.2s infinite;
+}
+.guide-fab .look {
+  transform: translateY(var(--look, 0px));
+  transition: transform 260ms var(--ease-out);
+}
+@keyframes blink {
+  0%,
+  95%,
+  100% {
+    transform: scaleY(1);
+  }
+  97% {
+    transform: scaleY(0.1);
+  }
+}
+.guide-fab-btn {
+  position: relative;
+}
+.guide-fab-btn .face {
+  width: 38px;
+  height: 38px;
+}
+.guide-fab-btn .ring {
+  position: absolute;
+  inset: -5px;
+  width: calc(100% + 10px);
+  height: calc(100% + 10px);
+  transform: rotate(-90deg);
+  fill: none;
+  stroke-width: 3;
+  pointer-events: none;
+}
+.guide-fab-btn .ring circle {
+  stroke: color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.guide-fab-btn .ring .ring-fill {
+  stroke: var(--accent);
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - var(--read, 0));
+}
+[data-theme='document'] .guide-fab-btn .ring {
+  display: none;
+}
+[data-theme='document'] .guide-fab-btn {
+  box-shadow:
+    inset 0 -4px 0 color-mix(in srgb, var(--accent-ink) 30%, transparent),
+    0 12px 26px -10px rgb(0 0 0 / 0.45);
+}
+.guide-fab-btn.is-hop {
+  animation: guide-hop 520ms var(--ease-out);
+}
+.guide-fab-btn.is-alert {
+  animation: guide-alert 700ms var(--ease-out);
+}
+@keyframes guide-hop {
+  35% {
+    transform: translateY(-9px);
+  }
+  65% {
+    transform: translateY(1px) scaleY(0.95);
+  }
+}
+@keyframes guide-alert {
+  20%,
+  60% {
+    transform: rotate(-9deg);
+  }
+  40%,
+  80% {
+    transform: rotate(9deg);
+  }
+}
+.guide-fab-bubble {
+  display: grid;
+  gap: 2px;
+}
+.guide-fab-bubble [data-k='text'] {
+  font-weight: 700;
+}
+.guide-fab-bubble [data-k='label']:empty,
+.guide-fab-bubble [data-k='text']:empty {
+  display: none;
+}
+.guide-fab-bubble [data-k='next'] {
+  display: none;
+  color: inherit;
+  text-decoration: none;
+  font-weight: 700;
+}
+.guide-fab[data-mode='section'] [data-k='next'],
+.guide-fab[data-mode='next'] [data-k='next'] {
+  display: block;
+}
+.guide-fab[data-mode='section'] [data-k='next'] {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--rule);
+}
+.guide-fab[data-mode='note'] .guide-fab-bubble {
+  background: var(--warn-soft);
+}
+
+/* --- Phone: stories-style progress, steps you can tap (potadot, mosaic) --- */
+/* sits on the bezel, under the screen */
+.pd-bar {
+  position: absolute;
+  left: 30px;
+  right: 30px;
+  bottom: 3px;
+  display: flex;
+  gap: 4px;
+}
+.pd-bar span {
+  flex: 1;
+  height: 3px;
+  border-radius: 3px;
+  background: rgb(255 255 255 / 0.22);
+  overflow: hidden;
+}
+.pd-bar span::after {
+  content: '';
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+}
+.pd-bar .is-done::after {
+  transform: none;
+}
+.pd-bar .is-on::after {
+  animation: pd-fill var(--dur, 2500ms) linear forwards;
+}
+@keyframes pd-fill {
+  to {
+    transform: none;
+  }
+}
+.pd-steps button {
+  all: unset;
+  cursor: pointer;
+  display: block;
+  padding: 2px 0;
+  border-radius: 4px;
+}
+.pd-steps button:hover {
+  color: var(--ink);
+}
+.pd-steps button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+  .site-header,
+  .read-progress,
+  .statement .w,
+  .guide-fab .look {
+    transition: none;
+  }
+  .statement .w {
+    opacity: 1;
+  }
+  .guide-avatar .eyes,
+  .guide-fab .eyes,
+  .pd-bar .is-on::after {
     animation: none;
   }
 }

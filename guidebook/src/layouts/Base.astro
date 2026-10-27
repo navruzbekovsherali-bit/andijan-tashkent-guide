@@ -47,6 +47,30 @@ const here = Astro.url.pathname;
           var au = localStorage.getItem('gb-audience');
           if (au && d.dataset.audience === 'both') d.dataset.pref = au;
         } catch (e) {}
+        // Page transition direction: back (history or "previous") wipes down, forward wipes up.
+        window.addEventListener('pagereveal', function (e) {
+          if (!e.viewTransition || !e.viewTransition.types) return;
+          var back = false;
+          try {
+            var a = window.navigation && navigation.activation;
+            if (a && a.navigationType === 'traverse' && a.from && a.entry) back = a.entry.index < a.from.index;
+            if (sessionStorage.getItem('gb-dir') === 'back') back = true;
+            sessionStorage.removeItem('gb-dir');
+          } catch (err) {}
+          e.viewTransition.types.add(back ? 'back' : 'forward');
+          // Back on a list: only the item you came from carries its title home.
+          var from = a && a.from && a.from.url;
+          if (!from) return;
+          var path = new URL(from).pathname;
+          document.querySelectorAll('[data-vt]').forEach(function (el) {
+            var link = el.closest('a');
+            if (!link || link.pathname !== path) return;
+            el.style.viewTransitionName = el.dataset.vt;
+            e.viewTransition.finished.then(function () {
+              el.style.viewTransitionName = '';
+            });
+          });
+        });
       })();
     </script>
   </head>
