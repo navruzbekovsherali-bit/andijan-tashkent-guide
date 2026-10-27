@@ -329,6 +329,7 @@ export function initSite() {
   phoneDemos();
   followingGuide();
   headerOnScroll();
+  dockLens();
   illustrationsOnScroll();
   liftCover();
 }
@@ -528,6 +529,8 @@ function headerOnScroll() {
   if (!bar) return;
   const hero = document.querySelector<HTMLElement>('.hero');
   const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+  const glassTop = bar.querySelector<HTMLElement>('.glass');
+  const dock = document.querySelector<HTMLElement>('.dock');
   let lastY = window.scrollY;
   onScrollFrame(() => {
     const y = window.scrollY;
@@ -536,6 +539,10 @@ function headerOnScroll() {
       bar.classList.toggle('is-scrolled', past);
       if (hero) meta?.setAttribute('content', past ? '#f5f4f0' : '#0b1f1d');
     }
+    // Glass takes the tone of what is under it: dark over the first screen, light over paper.
+    const heroBottom = hero ? hero.offsetTop + hero.offsetHeight - y : -1;
+    glassTop?.classList.toggle('is-dark', heroBottom > 40);
+    dock?.classList.toggle('is-dark', heroBottom > window.innerHeight - 40);
     if (Math.abs(y - lastY) < 8) return;
     const busy = document.querySelector('.sheet[data-open]') || bar.matches(':focus-within');
     bar.classList.toggle('is-hidden', !busy && y > lastY && y > 200);
@@ -718,3 +725,42 @@ window.addEventListener('pageshow', (e) => {
   if (!e.persisted) return;
   document.documentElement.classList.remove('is-covering', 'is-covered', 'is-lifting');
 });
+
+/* ---------- Dock lens: a drop of glass under the current tab that flows to the one you press ---------- */
+function dockLens() {
+  const dock = document.querySelector<HTMLElement>('.dock');
+  const lens = dock?.querySelector<HTMLElement>('.dock-lens');
+  if (!dock || !lens) return;
+  const items = Array.from(dock.querySelectorAll<HTMLElement>(':scope > a, :scope > button'));
+  const moveTo = (el: HTMLElement | undefined) => {
+    items.forEach((i) => i.classList.toggle('is-lensed', i === el));
+    if (!el) {
+      dock.classList.remove('has-lens');
+      return;
+    }
+    dock.style.setProperty('--lx', `${el.offsetLeft}px`);
+    dock.style.setProperty('--lw', `${el.offsetWidth}px`);
+    lens.style.setProperty('--lx', `${el.offsetLeft}px`);
+    lens.style.setProperty('--lw', `${el.offsetWidth}px`);
+    dock.classList.add('has-lens');
+  };
+  const current = () => items.find((i) => i.getAttribute('aria-current') === 'page');
+  moveTo(current());
+  dock.addEventListener('pointerdown', (e) => {
+    const el = (e.target as HTMLElement).closest<HTMLElement>('a, button');
+    if (!el || !items.includes(el)) return;
+    dock.classList.add('is-pressing');
+    moveTo(el);
+  });
+  const settle = () => dock.classList.remove('is-pressing');
+  dock.addEventListener('pointerup', settle);
+  dock.addEventListener('pointercancel', () => {
+    settle();
+    moveTo(current());
+  });
+  // Sheets opened from the dock hand the lens back when they close.
+  new MutationObserver(() => {
+    if (!document.querySelector('.sheet[data-open]')) moveTo(current());
+  }).observe(document.body, { subtree: true, attributes: true, attributeFilter: ['data-open'] });
+  window.addEventListener('resize', () => moveTo(dock.querySelector<HTMLElement>('.is-lensed') ?? current()));
+}

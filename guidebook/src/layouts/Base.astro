@@ -77,7 +77,7 @@ const here = Astro.url.pathname;
     <a class="skip" href="#main">{tr('skip')}</a>
 
     <header class="topbar">
-      <div class="topbar-in">
+      <div class="topbar-in glass">
         {
           back && (
             <a class="tb-back" href={back} data-back aria-label={tr('back')}>
@@ -121,7 +121,8 @@ const here = Astro.url.pathname;
     </footer>
 
     <!-- Phone dock: back first, then home, search, menu -->
-    <nav class="dock" aria-label={tr('menu')}>
+    <nav class="dock glass" aria-label={tr('menu')}>
+      <span class="dock-lens" aria-hidden="true"></span>
       {
         back ? (
           <a href={back} data-back>
