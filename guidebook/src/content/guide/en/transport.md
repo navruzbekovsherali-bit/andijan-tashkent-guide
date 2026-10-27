@@ -38,6 +38,8 @@ The most convenient and popular option.
 
 ## Metro (Tashkent only)
 
+<div class="video-reel" data-reel="metro"></div>
+
 The Tashkent metro is not just transport but a real underground museum.
 
 - **Fare (from 01.10.2026):** 2500 soums by card or app, 3000 soums in cash.

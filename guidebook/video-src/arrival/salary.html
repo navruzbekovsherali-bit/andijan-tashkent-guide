@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Salary film</title>
+<!-- "Salary" film: when pay arrives — expats once a month (usually by the 10th), local hires three times a month. -->
+<link rel="stylesheet" href="film.css" />
+<style>
+  .bg { position: absolute; inset: 0; background: radial-gradient(70% 40% at 50% 38%, #e3efe7, transparent 70%), linear-gradient(180deg, var(--sky) 0%, #f3f5f1 100%); }
+  .cal { position: absolute; left: 70px; width: 940px; top: 270px; padding: 44px 44px 36px; border-radius: 44px; background: #fff; z-index: 12; box-shadow: 0 60px 120px -40px rgb(10 46 42 / 0.5), inset 0 0 0 2px rgb(14 26 24 / 0.06); }
+  .cal header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 22px; }
+  .cal header b { font-size: 52px; letter-spacing: -0.03em; }
+  .cal header span { font-size: 30px; font-weight: 700; color: var(--brand-ink); padding: 8px 18px; border-radius: 999px; background: #eef6f1; }
+  .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+  .grid .wd { text-align: center; font-size: 24px; font-weight: 700; color: var(--ink-3); padding-bottom: 6px; }
+  .grid .d { position: relative; height: 104px; border-radius: 18px; display: grid; place-items: center; font-size: 36px; font-weight: 650; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+  .grid .d.band { background: rgb(26 167 82 / 0.1); }
+  .grid .d.pay { background: var(--brand); color: #fff; font-weight: 800; }
+  .grid .d.pay2 { background: #1b4f8f; color: #fff; font-weight: 800; }
+  .grid .d i { position: absolute; left: 50%; bottom: -14px; transform: translateX(-50%); padding: 4px 10px; border-radius: 999px; background: var(--night); color: #fff; font-style: normal; font-size: 20px; font-weight: 750; white-space: nowrap; }
+  .push { position: absolute; left: 110px; right: 110px; top: 1110px; display: flex; align-items: center; gap: 22px; padding: 26px 30px; border-radius: 30px; background: rgb(255 255 255 / 0.92); z-index: 14; box-shadow: 0 30px 60px -24px rgb(10 46 42 / 0.5), inset 0 0 0 2px rgb(14 26 24 / 0.06); }
+  .push .ic { flex: none; width: 74px; height: 74px; border-radius: 20px; background: var(--night); display: grid; place-items: center; }
+  .push .ic svg { width: 52px; }
+  .push b { display: block; font-size: 34px; }
+  .push span { font-size: 30px; color: var(--ink-2); }
+  .tax { position: absolute; right: 90px; top: 300px; z-index: 13; padding: 14px 26px; border-radius: 999px; background: var(--night); color: #fff; font-size: 36px; font-weight: 800; }
+  .coin { position: absolute; z-index: 13; width: 84px; height: 84px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff2b8, #e6c86a 60%, #c9a43b); box-shadow: inset 0 0 0 4px rgb(0 0 0 / 0.15); display: grid; place-items: center; font-weight: 800; font-size: 30px; color: #7a5a14; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="bg"></div>
+  <div class="cal" id="cal">
+    <header><b id="mon"></b><span id="who"></span></header>
+    <div class="grid" id="grid"></div>
+  </div>
+  <div class="tax" id="tax"></div>
+  <div class="coin" id="coin1">₮</div><div class="coin" id="coin2">₮</div><div class="coin" id="coin3">₮</div>
+  <div class="push" id="push"><span class="ic"><svg viewBox="270 270 1390 1390"><circle cx="965" cy="965" r="616.5" fill="none" stroke="#1aa752" stroke-width="137" stroke-dasharray="1500 300 1500 572"/><polygon points="1215,476 1440,466 1125,1307 902,1307 1007,1023 880,1023 720,1480 495,1465 812,622 1033,622 928,908 1052,908" fill="#1aa752"/></svg></span><div><b id="pushB"></b><span id="pushS"></span></div></div>
+</div>
+<script src="film.js"></script>
+<script>
+const { p, key, fade, $, set, card, init, captions, progress, final, play, easeOut, back, easeInOut } = Film;
+const T = init({
+  ru: {
+    c: [['Зарплата', 'Когда приходят деньги', 'Выплаты — в сумах на карту. Налог на доходы — 12%.'],
+        ['Экспатам', '1 раз в месяц', 'Как правило, до 10-го числа. Если оффер в net — налог 12% покрывает банк.'],
+        ['Местным', '3 раза в месяц', 'До 12-го — аванс, до 25-го — KPI, 31-го — заработная плата.']],
+    mon: 'Октябрь 2026', wd: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'], expat: 'Экспатам', local: 'Местным',
+    l10: 'до 10-го', l12: 'аванс', l25: 'KPI', l31: 'зарплата', tax: 'НДФЛ 12%',
+    push1: 'Зачисление зарплаты', push1s: 'на вашу карту · в сумах', push2: 'Аванс зачислен', push3: 'Премия по KPI', push4: 'Заработная плата',
+    final: { title: 'Зарплата по расписанию', items: [{ text: 'Экспатам — до 10-го' }, { text: 'Местным — 12, 25 и 31' }, { text: 'НДФЛ — 12%' }, { text: 'Оклад и премии — по офферу', small: 'Вопросы по выплатам задавайте HR', next: true }] },
+  },
+  en: {
+    c: [['Salary', 'When pay arrives', 'Paid in sums to your card. Income tax is 12%.'],
+        ['Expats', 'Once a month', 'Usually by the 10th. If your offer is net, the bank covers the 12% tax.'],
+        ['Local hires', 'Three times a month', 'Advance by the 12th, KPI by the 25th, salary on the 31st.']],
+    mon: 'October 2026', wd: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'], expat: 'Expats', local: 'Local hires',
+    l10: 'by 10th', l12: 'advance', l25: 'KPI', l31: 'salary', tax: 'Tax 12%',
+    push1: 'Salary credited', push1s: 'to your card · in sums', push2: 'Advance credited', push3: 'KPI bonus', push4: 'Salary',
+    final: { title: 'Pay on schedule', items: [{ text: 'Expats — by the 10th' }, { text: 'Local hires — 12, 25 and 31' }, { text: 'Income tax — 12%' }, { text: 'Salary and bonuses — as in your offer', small: 'Ask HR about payments', next: true }] },
+  },
+});
+$('mon').textContent = T.mon; $('tax').textContent = T.tax;
+// October 2026 starts on a Thursday.
+$('grid').innerHTML = T.wd.map((w) => `<div class="wd">${w}</div>`).join('') + '<div></div>'.repeat(3) + Array.from({ length: 31 }, (_, i) => `<div class="d" id="d${i + 1}">${i + 1}</div>`).join('');
+const cell = (n) => $(`d${n}`);
+const label = (n, s, on) => { const c = cell(n); let i = c.querySelector('i'); if (on) { if (!i) { i = document.createElement('i'); c.append(i); } i.textContent = s; } else if (i) i.remove(); };
+const coinTo = (id, n, a) => {
+  const c = cell(n); const r = c.getBoundingClientRect();
+  const v = p(t0, a, a + 0.7, easeInOut);
+  set(id, { left: `${r.left + r.width / 2 - 35}px`, top: `${r.top - 300 + v * 300 + 16}px`, opacity: t0 < a ? 0 : 1 - p(t0, a + 0.6, a + 0.8), transform: `scale(${1 - v * 0.3}) rotate(${v * 180}deg)` });
+};
+let t0 = 0;
+
+function render(t) {
+  t0 = t;
+  const ci = p(t, 0.3, 1.1, back);
+  set('cal', { transform: `translateY(${(1 - ci) * 1300}px)`, opacity: t < 0.3 ? 0 : 1 });
+  set('tax', { opacity: fade(t, 1.6, 2.0, 3.4, 3.8), transform: `scale(${0.8 + p(t, 1.6, 2.0, back) * 0.2})` });
+  const expat = t < 12.2;
+  $('who').textContent = expat ? T.expat : T.local;
+  for (let n = 1; n <= 31; n++) {
+    const c = cell(n); c.className = 'd';
+    if (expat) {
+      if (n <= 10 && t > 4.0 + n * 0.12) c.classList.add('band');
+      if (n === 10 && t > 6.4) c.classList.add('pay');
+    } else {
+      if (n === 12 && t > 13.8) c.classList.add('pay');
+      if (n === 25 && t > 16.0) c.classList.add('pay');
+      if (n === 31 && t > 18.2) c.classList.add('pay2');
+    }
+  }
+  if (!expat) { label(10, '', false); label(12, T.l12, t > 13.8); label(25, T.l25, t > 16.0); label(31, T.l31, t > 18.2); }
+  else { label(10, T.l10, t > 6.4); label(12, '', false); label(25, '', false); label(31, '', false); }
+  const swap = fade(t, 11.8, 12.2, 12.2, 12.6);
+  set('cal', { filter: `blur(${(1 - Math.min(1, Math.abs(t - 12.2) / 0.4)) * 6}px)` });
+  coinTo('coin1', expat ? 10 : 12, expat ? 5.8 : 13.2);
+  if (!expat) { coinTo('coin2', 25, 15.4); coinTo('coin3', 31, 17.6); } else { set('coin2', { opacity: 0 }); set('coin3', { opacity: 0 }); }
+  // push notifications
+  const pushes = [[6.5, 9.0, T.push1], [13.9, 15.3, T.push2], [16.1, 17.5, T.push3], [18.3, 21.0, T.push4]];
+  const cur = pushes.find(([a, b]) => t >= a - 0.1 && t <= b + 0.4);
+  if (cur) { const v = fade(t, cur[0], cur[0] + 0.4, cur[1], cur[1] + 0.4); $('pushB').textContent = cur[2]; $('pushS').textContent = T.push1s; set('push', { opacity: v, transform: `translateY(${(1 - v) * -40}px)` }); }
+  else set('push', { opacity: 0 });
+  set('cal', { transform: `translateY(${(1 - ci) * 1300 + p(t, 21.2, 21.7) * -1400}px)` });
+
+  captions(t, [[T.c[0], 0.3, 3.8], [T.c[1], 4.0, 11.8], [T.c[2], 12.2, 21.6]]);
+  progress(t, [[0, 3.9], [3.9, 12], [12, 21.7]]);
+  final(t, 21.8);
+}
+play(render, 28.5);
+</script>
+</body>
+</html>

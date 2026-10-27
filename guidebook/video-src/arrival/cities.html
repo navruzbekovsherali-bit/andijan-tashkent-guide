@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Cities film</title>
+<!-- "Cities" film: a train across a stylised map — Samarkand, Bukhara, Khiva, then Andijan over the Kamchik pass. -->
+<link rel="stylesheet" href="film.css" />
+<style>
+  .bg { position: absolute; inset: 0; background: radial-gradient(80% 40% at 50% 30%, #e5efe6, transparent 70%), linear-gradient(180deg, #eef2ec 0%, #f2f3ee 100%); }
+  .map { position: absolute; left: 0; top: 230px; width: 1080px; height: 720px; }
+  .dot { fill: #fff; stroke: var(--ink); stroke-width: 6; }
+  .dot.on { fill: var(--brand); }
+  .city-l { font-family: Onest; font-size: 34px; font-weight: 750; fill: var(--ink); paint-order: stroke; stroke: #fff; stroke-width: 12px; stroke-linejoin: round; }
+  .city-card { position: absolute; left: 56px; right: 56px; top: 930px; height: 370px; display: grid; grid-template-columns: 420px 1fr; gap: 34px; align-items: center; padding: 24px; border-radius: 40px; background: #fff; z-index: 14; box-shadow: 0 40px 90px -36px rgb(10 46 42 / 0.5), inset 0 0 0 2px rgb(14 26 24 / 0.06); }
+  .city-card img { position: absolute; inset: 0; width: 420px; height: 322px; object-fit: cover; border-radius: 26px; display: block; }
+  .city-card b { display: block; font-size: 64px; letter-spacing: -0.035em; line-height: 1; }
+  .city-card span { display: block; margin-top: 14px; font-size: 32px; color: var(--ink-2); line-height: 1.3; }
+  .city-card em { display: inline-flex; align-items: center; gap: 12px; margin-top: 22px; padding: 12px 22px; border-radius: 999px; background: var(--night); color: #fff; font-style: normal; font-size: 32px; font-weight: 750; }
+  .cap { top: 1340px; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="bg"></div>
+  <svg class="map" viewBox="0 0 1080 720">
+    <path id="land" pathLength="1" d="M60 250 Q150 190 250 215 Q330 235 380 300 Q450 330 520 340 Q590 330 640 280 Q690 220 760 190 Q830 175 870 230 Q920 270 1000 285 Q1050 300 1040 360 Q1025 420 950 430 Q880 430 830 420 Q790 470 760 520 Q700 600 620 640 Q540 670 470 640 Q400 600 330 540 Q260 470 180 450 Q110 430 70 370 Q40 310 60 250z" fill="#fff" stroke="#0e1a18" stroke-width="6" stroke-dasharray="1" stroke-linejoin="round"/>
+    <g id="mount" opacity="0"><path d="M836 292 L870 238 L904 292 Z M880 292 L906 252 L932 292 Z" fill="#dfe9e4" stroke="#0e1a18" stroke-width="5" stroke-linejoin="round"/></g>
+    <path id="route1" pathLength="1" d="M740 270 C 700 380, 640 470, 570 540 C 520 560, 460 540, 410 500 C 330 450, 230 380, 160 340" fill="none" stroke="#1aa752" stroke-width="10" stroke-linecap="round" stroke-dasharray="1"/>
+    <path id="route2" pathLength="1" d="M740 270 C 790 250, 830 250, 880 300 C 905 330, 925 360, 940 380" fill="none" stroke="#1b4f8f" stroke-width="10" stroke-linecap="round" stroke-dasharray="1"/>
+    <g id="dots"></g>
+    <g id="train"><rect x="-34" y="-20" width="68" height="40" rx="14" fill="#fff" stroke="#0e1a18" stroke-width="5"/><rect x="-22" y="-10" width="18" height="14" rx="3" fill="#dfeef5" stroke="#0e1a18" stroke-width="3"/><rect x="4" y="-10" width="18" height="14" rx="3" fill="#dfeef5" stroke="#0e1a18" stroke-width="3"/><path d="M-30 12 H30" stroke="#1aa752" stroke-width="5"/></g>
+  </svg>
+  <div class="city-card" id="ccard"><div id="cimgs" style="position:relative;width:420px;height:322px"></div><div><b id="cname"></b><span id="cdesc"></span><em id="ctime"></em></div></div>
+</div>
+<script src="film.js"></script>
+<script>
+const { p, key, fade, $, set, init, captions, progress, final, play, easeOut, back, easeInOut, clamp } = Film;
+const CITIES = { tashkent: [740, 270], samarkand: [570, 540], bukhara: [410, 500], khiva: [160, 340], andijan: [940, 380] };
+const LABEL = { tashkent: [-70, -30], samarkand: [0, 62], bukhara: [-40, -34], khiva: [0, -34], andijan: [0, 62] };
+const T = init({
+  ru: {
+    names: { tashkent: 'Ташкент', samarkand: 'Самарканд', bukhara: 'Бухара', khiva: 'Хива', andijan: 'Андижан' },
+    c: [['Самарканд', 'Регистан и Шахи-Зинда', 'Из Ташкента — на скоростном «Афросиабе».'],
+        ['Бухара', 'Пои-Калян и старый город', 'Из Ташкента ≈ 4 ч 10 мин, из Самарканда ≈ 1,5 ч.'],
+        ['Хива', 'Город-музей за стенами', 'С 05.05.2026 ходит скоростной поезд — около 7,5 ч. Или самолётом до Ургенча.'],
+        ['Андижан', 'Через перевал Камчик', 'Поездом через тоннель на перевале — или самолётом.']],
+    cards: {
+      samarkand: ['Самарканд', 'Регистан, Шахи-Зинда и самаркандский плов', '≈ 2 ч 10 – 2 ч 30'],
+      bukhara: ['Бухара', 'Ансамбль Пои-Калян и ремёсла', '≈ 4 ч 10'],
+      khiva: ['Хива', 'Ичан-Кала — город внутри стен', '≈ 7,5 ч'],
+      andijan: ['Андижан', 'Ферганская долина и наш второй дом', 'Камчик'],
+    },
+    final: { title: 'Куда поехать на выходные', items: [{ text: 'Самарканд — ≈ 2 ч' }, { text: 'Бухара — ≈ 4 ч' }, { text: 'Хива — ≈ 7,5 ч' }, { text: 'Билеты — на eticket.railway.uz', small: 'Покупайте заранее: их быстро раскупают', next: true }] },
+  },
+  en: {
+    names: { tashkent: 'Tashkent', samarkand: 'Samarkand', bukhara: 'Bukhara', khiva: 'Khiva', andijan: 'Andijan' },
+    c: [['Samarkand', 'Registan and Shah-i-Zinda', 'From Tashkent on the high-speed Afrosiyob.'],
+        ['Bukhara', 'Po-i-Kalyan and the old town', 'About 4 h 10 from Tashkent, 1.5 h from Samarkand.'],
+        ['Khiva', 'A museum city inside walls', 'Since 05.05.2026 a high-speed train takes about 7.5 h. Or fly to Urgench.'],
+        ['Andijan', 'Over the Kamchik pass', 'By train through the tunnel on the pass — or fly.']],
+    cards: {
+      samarkand: ['Samarkand', 'Registan, Shah-i-Zinda and Samarkand plov', '≈ 2 h 10 – 2 h 30'],
+      bukhara: ['Bukhara', 'Po-i-Kalyan and crafts', '≈ 4 h 10'],
+      khiva: ['Khiva', 'Itchan Kala — a city inside walls', '≈ 7.5 h'],
+      andijan: ['Andijan', 'The Fergana Valley, our second home', 'Kamchik'],
+    },
+    final: { title: 'Where to go at the weekend', items: [{ text: 'Samarkand — ≈ 2 h' }, { text: 'Bukhara — ≈ 4 h' }, { text: 'Khiva — ≈ 7.5 h' }, { text: 'Tickets on eticket.railway.uz', small: 'Buy early — they sell out fast', next: true }] },
+  },
+}, { segs: 4 });
+$('dots').innerHTML = Object.entries(CITIES).map(([k, [x, y]]) => `<g id="c-${k}"><circle class="dot" cx="${x}" cy="${y}" r="18"/><text class="city-l" x="${x + LABEL[k][0]}" y="${y + LABEL[k][1]}" text-anchor="middle">${T.names[k]}</text></g>`).join('');
+$('cimgs').innerHTML = ['samarkand', 'bukhara', 'khiva', 'andijan'].map((k) => `<img id="img-${k}" src="../../public/photos/${k}-800.webp" alt="" />`).join('');
+window.ready = false;
+const route1 = $('route1'), route2 = $('route2');
+const L1 = route1.getTotalLength(), L2 = route2.getTotalLength();
+// Fractions of route1 where each stop sits.
+const stopAt = (path, L, [cx, cy]) => { let best = 0, bd = 1e9; for (let i = 0; i <= 200; i++) { const pt = path.getPointAtLength((L * i) / 200); const d = (pt.x - cx) ** 2 + (pt.y - cy) ** 2; if (d < bd) { bd = d; best = i / 200; } } return best; };
+const fS = stopAt(route1, L1, CITIES.samarkand), fB = stopAt(route1, L1, CITIES.bukhara);
+const SEG = [['samarkand', 2.0, 6.6], ['bukhara', 6.6, 10.6], ['khiva', 10.6, 14.6], ['andijan', 14.6, 19.6]];
+
+function render(t) {
+  $('land').setAttribute('stroke-dashoffset', String(1 - p(t, 0.2, 1.8)));
+  set('land', { fillOpacity: p(t, 1.0, 1.8) });
+  Object.keys(CITIES).forEach((k, i) => set(`c-${k}`, { opacity: p(t, 1.2 + i * 0.12, 1.6 + i * 0.12, easeOut) }));
+  // train along route1 with stops, then route2
+  const f1 = key(t, [[2.0, 0], [3.8, fS], [6.6, fS], [7.8, fB], [10.6, fB], [12.6, 1], [30, 1]]);
+  const f2 = key(t, [[14.6, 0], [16.6, 1]]);
+  const onR2 = t >= 14.4;
+  const path = onR2 ? route2 : route1, L = onR2 ? L2 : L1, f = onR2 ? f2 : f1;
+  const pt = path.getPointAtLength(L * f), pt2 = path.getPointAtLength(Math.min(L, L * f + 2));
+  const ang = Math.atan2(pt2.y - pt.y, pt2.x - pt.x) * 180 / Math.PI;
+  const flip = Math.abs(ang) > 90;
+  $('train').setAttribute('transform', `translate(${pt.x} ${pt.y}) rotate(${flip ? ang + 180 : ang})`);
+  set('train', { opacity: t < 1.8 ? 0 : 1 - p(t, 19.4, 19.8) });
+  route1.setAttribute('stroke-dashoffset', String(1 - f1));
+  route2.setAttribute('stroke-dashoffset', String(1 - f2));
+  set('mount', { opacity: p(t, 14.4, 15.0) });
+  // the stop the train is at
+  const at = SEG.find(([, a, b]) => t >= a && t < b);
+  ['samarkand', 'bukhara', 'khiva', 'andijan'].forEach((k) => $(`c-${k}`).querySelector('circle').classList.toggle('on', t > { samarkand: 3.8, bukhara: 7.8, khiva: 12.6, andijan: 16.6 }[k]));
+  if (at) {
+    const [k, a, b] = at;
+    const arrive = { samarkand: 3.8, bukhara: 7.8, khiva: 12.6, andijan: 16.6 }[k];
+    const v = fade(t, arrive, arrive + 0.5, b - 0.3, b);
+    const c = T.cards[k];
+    ['samarkand', 'bukhara', 'khiva', 'andijan'].forEach((n) => set(`img-${n}`, { opacity: n === k ? 1 : 0 }));
+    $('cname').textContent = c[0]; $('cdesc').textContent = c[1]; $('ctime').textContent = c[2];
+    set('ccard', { opacity: v, transform: `translateY(${(1 - v) * 60}px) scale(${0.96 + v * 0.04})` });
+    const pulse = t > arrive ? Math.max(0, 1 - (t - arrive) / 0.8) : 0;
+    $(`c-${k}`).querySelector('circle').setAttribute('r', String(18 + pulse * 10));
+  } else set('ccard', { opacity: 0 });
+
+  captions(t, SEG.map(([k, a, b], i) => [T.c[i], a + 0.2, b - 0.2]));
+  progress(t, SEG.map(([, a, b]) => [a, b]));
+  final(t, 19.8);
+}
+// Photos must be decoded before frames are taken.
+Promise.all([...document.querySelectorAll('#cimgs img')].map((i) => i.decode().catch(() => {}))).then(() => (window.ready = true));
+play(render, 26.5);
+</script>
+</body>
+</html>

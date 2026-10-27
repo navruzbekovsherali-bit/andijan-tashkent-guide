@@ -3655,3 +3655,6 @@ html[data-view='expat'] .q-aud {
   color: var(--on-night-2);
   opacity: 0.8;
 }
+.home-reel .video-reel {
+  margin-top: 28px !important;
+}

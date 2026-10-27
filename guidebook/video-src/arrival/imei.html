@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>IMEI film</title>
+<!-- "IMEI" film: why, *#06#, application on uzimei.uz with the customs declaration, *1170# status. -->
+<link rel="stylesheet" href="film.css" />
+<style>
+  .bg { position: absolute; inset: 0; background: radial-gradient(70% 40% at 50% 38%, #e3efe7, transparent 70%), linear-gradient(180deg, var(--sky) 0%, #f3f5f1 100%); }
+  .phone { left: 250px; top: 270px; width: 580px; height: 1040px; }
+  .warn { position: absolute; left: 34px; right: 34px; top: 140px; padding: 26px 30px; border-radius: 30px; background: #fff3f1; box-shadow: inset 0 0 0 3px rgb(200 55 45 / 0.35); font-size: 30px; line-height: 1.3; color: #8a2119; font-weight: 650; }
+  .warn b { display: block; font-size: 26px; color: var(--red); letter-spacing: 0.06em; margin-bottom: 6px; }
+  .dial { position: absolute; inset: 0; padding-top: 170px; text-align: center; }
+  .typed { height: 90px; font-size: 76px; font-weight: 600; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
+  .keys { display: grid; grid-template-columns: repeat(3, 110px); gap: 26px 34px; justify-content: center; margin-top: 50px; }
+  .keys span { display: grid; place-items: center; width: 110px; height: 110px; border-radius: 50%; background: #e9ecef; font-size: 46px; font-weight: 600; }
+  .keys span.hit { background: #c9cfd6; }
+  .call { width: 110px; height: 110px; margin: 34px auto 0; border-radius: 50%; background: var(--brand); display: grid; place-items: center; }
+  .call svg { width: 52px; }
+  .sheet { position: absolute; left: 34px; right: 34px; top: 300px; padding: 36px 36px 26px; border-radius: 34px; background: #fff; box-shadow: 0 30px 60px -20px rgb(0 0 0 / 0.45); }
+  .sheet h5 { margin: 0 0 18px; font-size: 38px; }
+  .sheet p { margin: 10px 0; font-size: 34px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .sheet .ok { color: var(--brand-ink); font-weight: 750; white-space: normal; font-size: 32px; }
+  .sheet em { display: block; margin-top: 18px; padding-top: 18px; border-top: 2px solid #e4e7ec; text-align: right; font-style: normal; font-weight: 750; color: var(--brand-ink); font-size: 32px; }
+  .dim { position: absolute; inset: 0; background: rgb(17 20 24 / 0.5); }
+  .file { display: inline-flex; align-items: center; gap: 16px; padding: 14px 22px; border-radius: 16px; background: #eef6f1; font-size: 34px; font-weight: 650; box-shadow: inset 0 0 0 2px rgb(26 167 82 / 0.4); }
+  .file i { width: 34px; height: 42px; border-radius: 6px; background: #fff; box-shadow: inset 0 0 0 3px var(--ink); }
+  .send { margin-top: 28px; padding: 22px; border-radius: 20px; background: #1b4f8f; color: #fff; font-size: 36px; font-weight: 750; text-align: center; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="bg"></div>
+
+  <div class="phone" id="phone">
+    <div class="scr" id="scr">
+      <div class="island"></div>
+      <div class="status"><span>UZ</span><span class="bars"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></div>
+      <div class="warn" id="warn"><b id="wK"></b><span id="wT"></span></div>
+      <div class="dial" id="dial">
+        <div class="typed" id="typed"></div>
+        <div class="keys" id="keys"></div>
+        <div class="call"><svg viewBox="0 0 24 24"><path d="M6.5 3.5h3l1.5 4.5-2 1.5a11 11 0 005.5 5.5l1.5-2 4.5 1.5v3A2 2 0 0118.5 20 15 15 0 014 5.5a2 2 0 012.5-2z" fill="#fff"/></svg></div>
+      </div>
+      <div class="dim" id="dim"></div>
+      <div class="sheet" id="sheet"></div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen">
+    <div class="bar"><i></i><span>uzimei.uz</span></div>
+    <div class="body">
+      <h4 id="sH"></h4>
+      <div class="row"><label>IMEI 1</label><div id="i1"></div></div>
+      <div class="row"><label>IMEI 2</label><div id="i2"></div></div>
+      <div class="row"><label id="sL3"></label><div><span class="file" id="file"><i></i><span id="fileT"></span></span></div></div>
+      <div class="send" id="send"></div>
+      <div class="prog"><b id="prog"></b></div>
+      <div class="okline" id="okline"><span><svg viewBox="0 0 24 24" width="46"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b id="sOk"></b></div>
+    </div>
+  </div>
+</div>
+<script src="film.js"></script>
+<script>
+const { p, key, fade, $, set, typ, caret, card, init, captions, progress, final, play, easeOut, back, clamp } = Film;
+const T = init({
+  ru: {
+    c: [['Зачем', 'Регистрация IMEI', 'С местной SIM-картой телефон нужно зарегистрировать — иначе его заблокируют в сети.'],
+        ['Шаг 1', 'Узнайте IMEI', 'Наберите *#06#. Если в телефоне две SIM или eSIM — IMEI тоже два.'],
+        ['Шаг 2', 'Заявка на uzimei.uz', 'Укажите все IMEI и приложите таможенную декларацию.'],
+        ['Шаг 3', 'Проверьте статус', 'Наберите *1170# — или посмотрите на uzimei.uz и my.gov.uz.']],
+    wK: 'НАПОМИНАНИЕ', wT: 'Зарегистрируйте телефон, чтобы он работал с местной SIM-картой',
+    sH: 'Регистрация устройства', sL3: 'Декларация', fileT: 'declaration.pdf', send: 'Зарегистрировать', sOk: 'Заявка принята',
+    st: 'Статус: зарегистрирован',
+    final: { title: 'Телефон зарегистрирован', items: [{ text: 'IMEI найден' }, { text: 'Заявка подана' }, { text: 'Статус проверен' }, { text: 'Не откладывайте', small: 'Срок — 30 или 60 дней: точный уточните на uzimei.uz', next: true }] },
+  },
+  en: {
+    c: [['Why', 'IMEI registration', 'With a local SIM card, your phone must be registered — or it gets blocked on the network.'],
+        ['Step 1', 'Find your IMEI', 'Dial *#06#. Two SIMs or a SIM and an eSIM mean two IMEI numbers.'],
+        ['Step 2', 'Apply on uzimei.uz', 'Enter every IMEI and attach your customs declaration.'],
+        ['Step 3', 'Check the status', 'Dial *1170# — or look it up on uzimei.uz or my.gov.uz.']],
+    wK: 'REMINDER', wT: 'Register your phone so it keeps working with a local SIM card',
+    sH: 'Device registration', sL3: 'Declaration', fileT: 'declaration.pdf', send: 'Register', sOk: 'Application accepted',
+    st: 'Status: registered',
+    final: { title: 'Your phone is registered', items: [{ text: 'IMEI found' }, { text: 'Application sent' }, { text: 'Status checked' }, { text: 'Do not wait', small: '30 or 60 days: check the exact deadline on uzimei.uz', next: true }] },
+  },
+}, { segs: 4 });
+for (const k of ['wK', 'wT', 'sH', 'sL3', 'fileT', 'sOk']) $(k).textContent = T[k];
+$('send').textContent = T.send;
+const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'];
+$('keys').innerHTML = KEYS.map((k) => `<span data-k="${k}">${k}</span>`).join('');
+
+function dialer(t, code, a, b) {
+  const s = typ(t, code, a, b);
+  $('typed').textContent = s;
+  const last = s.slice(-1);
+  const hitOn = t > a && t < b + 0.2 && Math.abs(((t - a) / ((b - a) / code.length)) % 1) < 0.5;
+  $('keys').querySelectorAll('span').forEach((el) => el.classList.toggle('hit', hitOn && el.dataset.k === last));
+}
+
+function render(t) {
+  // the phone: a reminder, then two dialling scenes
+  const ph = p(t, 0.2, 1.0, back); const phOut = p(t, 11.4, 11.9) - p(t, 20.6, 21.2);
+  set('phone', { transform: `translateY(${(1 - ph) * 1300 + phOut * -1400}px)` });
+  const w = fade(t, 1.0, 1.5, 5.6, 6.0);
+  set('warn', { opacity: w, transform: `translateY(${(1 - w) * -40}px)` });
+  set('dial', { opacity: p(t, 5.8, 6.2) });
+  if (t < 15) dialer(t, '*#06#', 6.6, 8.0); else dialer(t, '*1170#', 21.8, 23.2);
+  const s1 = fade(t, 8.4, 8.8, 11.2, 11.5); const s2 = p(t, 23.6, 24.0);
+  const sheet = t < 15 ? s1 : s2;
+  set('dim', { opacity: sheet });
+  set('sheet', { opacity: sheet, transform: `translateY(${(1 - sheet) * 40}px) scale(${0.94 + sheet * 0.06})` });
+  $('sheet').innerHTML = t < 15
+    ? `<h5>IMEI</h5><p>IMEI 1: 35 1234 •• 4821</p><p>IMEI 2: 35 1234 •• 4839</p><em>OK</em>`
+    : `<h5>UzIMEI</h5><p>35 1234 •• 4821</p><p class="ok">✓ ${T.st}</p><em>OK</em>`;
+
+  // uzimei.uz
+  card('screen', t, 12.0, 20.6);
+  $('i1').innerHTML = typ(t, '35 1234 •• 4821', 13.0, 14.2) + caret(t, 13.0, 14.2);
+  $('i2').innerHTML = typ(t, '35 1234 •• 4839', 14.4, 15.6) + caret(t, 14.4, 15.6);
+  const f = p(t, 16.0, 16.6, back);
+  set('file', { opacity: t < 16 ? 0 : 1, transform: `translateX(${(1 - f) * 120}px)` });
+  const press = Math.max(p(t, 17.2, 17.4) - p(t, 17.4, 17.7), 0);
+  set('send', { transform: `scale(${1 - press * 0.06})`, background: t > 17.4 ? '#0b4a43' : '#1b4f8f' });
+  set('prog', { transform: `scaleX(${p(t, 17.6, 18.8)})` });
+  const ok = p(t, 18.9, 19.3, back);
+  set('okline', { opacity: t < 18.9 ? 0 : 1, transform: `scale(${0.85 + ok * 0.15})`, transformOrigin: '0 50%' });
+
+  captions(t, [[T.c[0], 0.3, 5.8], [T.c[1], 6.0, 11.6], [T.c[2], 11.8, 20.6], [T.c[3], 20.8, 26.4]]);
+  progress(t, [[0, 6], [6, 11.8], [11.8, 20.8], [20.8, 26.5]]);
+  final(t, 26.6);
+}
+play(render, 33.5);
+</script>
+</body>
+</html>

@@ -22,6 +22,8 @@ faq:
 
 Your onboarding specialist will help you open a Hamkorbank card for receiving your salary. The whole process takes **1–2 days**. All you need are your documents and one visit to the bank.
 
+<div class="video-reel" data-reel="card"></div>
+
 ### 1. Prepare your documents
 
 - passport (**original**);

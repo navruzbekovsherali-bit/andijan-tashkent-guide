@@ -62,7 +62,11 @@ This is the most important page for your first days. Follow the steps in order. 
 2. **Get your documents ready:** international passport, the slip from your previous address (if you have one), and the owner's consent.
 3. **Meet your Buddy.** Your mentor will help you settle into life at the bank faster.
 
+<div class="video-reel" data-reel="apartment"></div>
+
 ## First 72 hours
+
+<div class="video-reel" data-reel="imei"></div>
 
 1. **Check that your registration is done.** The deadline is 3 days after arrival. Every time you move to a new address, you register again, also within 3 days.
 2. **Register your phone's IMEI** on [uzimei.uz](https://uzimei.uz) if you use a local SIM card. You can check the status by dialling `*1170#`, by sending your IMEI by SMS to 1170, on uzimei.uz or on my.gov.uz.

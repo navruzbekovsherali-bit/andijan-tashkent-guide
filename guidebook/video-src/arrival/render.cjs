@@ -16,6 +16,7 @@ const path = require('path');
   const p = await browser.newPage({ viewport: { width: 1080, height: 1920 } });
   await p.goto(`file://${page}?lang=${lang}`);
   await p.evaluate(() => document.fonts.ready);
+  await p.waitForFunction(() => window.ready !== false);
   const dur = await p.evaluate(() => window.DUR);
   const frames = Math.round(dur * fps);
   for (let i = 0; i < frames; i++) {
@@ -27,7 +28,7 @@ const path = require('path');
   execFileSync('ffmpeg', ['-v', 'error', '-y', '-framerate', String(fps), '-i', path.join(dir, '%05d.jpg'), '-c:v', 'libx264', '-crf', '18', '-preset', 'slow', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', master]);
   const out = path.resolve(__dirname, `../../public/video/${film}-${lang}.mp4`);
   execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', master, '-vf', 'scale=720:1280', '-c:v', 'libx264', '-crf', '25', '-preset', 'slow', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-an', out]);
-  execFileSync('ffmpeg', ['-v', 'error', '-y', '-ss', film === 'hotel' ? '20.4' : '14.8', '-i', master, '-frames:v', '1', '-vf', 'scale=720:1280', '-q:v', '80', out.replace('.mp4', '-poster.webp')]);
+  execFileSync('ffmpeg', ['-v', 'error', '-y', '-ss', String({ hotel: 20.4, arrival: 14.8, apartment: 17.8, firstday: 9.0, imei: 12.0 }[film] ?? 10), '-i', master, '-frames:v', '1', '-vf', 'scale=720:1280', '-q:v', '80', out.replace('.mp4', '-poster.webp')]);
   fs.rmSync(dir, { recursive: true, force: true });
   console.log(lang, 'frames', frames, '→', out, '| master', master);
 })();

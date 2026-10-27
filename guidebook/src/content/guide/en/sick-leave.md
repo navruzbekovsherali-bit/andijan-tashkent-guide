@@ -31,6 +31,8 @@ Life can be unpredictable: you may fall ill or need to deal with personal matter
 
 ## If you fall ill
 
+<div class="video-reel" data-reel="sickleave"></div>
+
 Your health comes first. If you feel unwell, do not force yourself to come to work.
 
 1. **Tell your manager and HR specialist straight away.** Write or call as early as possible, so colleagues have time to cover your tasks.

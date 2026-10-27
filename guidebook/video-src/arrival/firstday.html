@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>First day film</title>
+<!-- "First day" film: 08:30 at the office, met by HR, the pass, documents and desk, the rest of the day. -->
+<link rel="stylesheet" href="film.css" />
+<style>
+  .inside { position: absolute; inset: 0; z-index: 5; overflow: hidden; background: linear-gradient(180deg, #eef2ef 0%, #edf1ed 61%, var(--paper) 61%); }
+  .inside .floor { position: absolute; left: 0; top: 1180px; width: 2400px; height: 740px; background: var(--paper); border-top: 6px solid var(--ink); }
+  .iworld { position: absolute; left: 0; top: 0; width: 2400px; height: 1920px; }
+  .clock { position: absolute; left: 64px; top: 230px; z-index: 16; display: inline-flex; align-items: center; gap: 16px; padding: 16px 30px 16px 20px; border-radius: 999px; background: var(--night); color: #fff; font-size: 44px; font-weight: 750; font-variant-numeric: tabular-nums; }
+  .clock i { width: 22px; height: 22px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 0 8px rgb(26 167 82 / 0.25); }
+  .pass { position: absolute; left: 290px; top: 300px; width: 500px; height: 760px; z-index: 18; border-radius: 40px; background: #fff; overflow: hidden;
+    box-shadow: 0 60px 120px -40px rgb(10 46 42 / 0.55), inset 0 0 0 2px rgb(14 26 24 / 0.08); text-align: center; }
+  .pass .top { height: 190px; background: radial-gradient(80% 90% at 80% 0%, rgb(26 167 82 / 0.5), transparent 70%), var(--night); display: grid; place-items: center; }
+  .pass .top svg { width: 90px; }
+  .pass .slot { position: absolute; left: 50%; top: 30px; width: 110px; height: 22px; margin-left: -55px; border-radius: 11px; background: #fff; opacity: 0.9; }
+  .pass .ava { width: 210px; height: 210px; margin: -105px auto 26px; border-radius: 50%; background: #fff; border: 8px solid #fff; box-shadow: inset 0 0 0 5px var(--ink); display: grid; place-items: center; overflow: hidden; }
+  .pass b { display: block; font-size: 48px; letter-spacing: -0.02em; }
+  .pass span { display: block; margin-top: 10px; font-size: 32px; color: var(--ink-3); }
+  .pass .strip { position: absolute; left: 0; right: 0; bottom: 0; height: 90px; background: var(--brand); color: #fff; font-size: 30px; font-weight: 750; letter-spacing: 0.1em; display: grid; place-items: center; }
+  .plan { position: absolute; left: 90px; width: 900px; top: 300px; padding: 54px 58px 40px; border-radius: 44px; background: #fff; z-index: 18; box-shadow: 0 60px 120px -40px rgb(10 46 42 / 0.55), inset 0 0 0 2px rgb(14 26 24 / 0.06); }
+  .plan small { display: block; font-size: 28px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+  .plan h3 { margin: 12px 0 26px; font-size: 56px; letter-spacing: -0.03em; }
+  .slot-row { display: grid; grid-template-columns: 150px 1fr; gap: 26px; padding: 26px 0; border-top: 3px solid var(--paper-2); align-items: baseline; }
+  .slot-row b { font-size: 40px; font-variant-numeric: tabular-nums; color: var(--brand-ink); }
+  .slot-row span { font-size: 40px; font-weight: 650; line-height: 1.25; }
+  .slot-row em { display: block; font-style: normal; font-size: 30px; font-weight: 500; color: var(--ink-3); margin-top: 6px; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <!-- outside: the office in the morning -->
+  <svg class="abs" width="220" height="220" style="left:110px;top:400px"><circle cx="110" cy="110" r="64" fill="#ffe7a3" stroke="#0e1a18" stroke-width="6"/></svg>
+  <svg class="abs" width="640" height="900" style="left:400px;top:286px">
+    <rect x="20" y="120" width="600" height="774" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+    <rect x="110" y="20" width="420" height="110" rx="22" fill="#0a2e2a"/>
+    <g transform="translate(140 38) scale(0.054)"><circle cx="965" cy="965" r="616.5" fill="none" stroke="#1aa752" stroke-width="137" stroke-dasharray="1500 300 1500 572" transform="translate(-270 -270)"/><polygon transform="translate(-270 -270)" points="1215,476 1440,466 1125,1307 902,1307 1007,1023 880,1023 720,1480 495,1465 812,622 1033,622 928,908 1052,908" fill="#1aa752"/></g
+    ><text x="360" y="92" text-anchor="middle" fill="#fff" font-size="46" font-weight="800" font-family="Manrope, Onest" letter-spacing="-1">Hamkor Bank</text>
+    <g fill="#dfeef5" stroke="#0e1a18" stroke-width="5">
+      <rect x="70" y="180" width="150" height="120"/><rect x="245" y="180" width="150" height="120"/><rect x="420" y="180" width="150" height="120"/>
+      <rect x="70" y="340" width="150" height="120"/><rect x="245" y="340" width="150" height="120"/><rect x="420" y="340" width="150" height="120"/>
+      <rect x="70" y="500" width="150" height="120"/><rect x="245" y="500" width="150" height="120"/><rect x="420" y="500" width="150" height="120"/>
+    </g>
+    <path d="M60 670 H580" stroke="#1aa752" stroke-width="12" stroke-linecap="round"/>
+    <rect x="220" y="700" width="200" height="194" fill="#cfe0d8" stroke="#0e1a18" stroke-width="6"/>
+    <path class="line" d="M320 700 V894"/>
+  </svg>
+  <svg class="abs" width="200" height="420" style="left:-20px;top:766px"><path class="line" d="M100 414 V230"/><circle cx="100" cy="170" r="84" fill="#bfe3c9" stroke="#0e1a18" stroke-width="6"/></svg>
+
+  <!-- inside: lobby with a turnstile, then the desk -->
+  <div class="inside" id="inside">
+    <div class="iworld" id="iworld">
+      <div class="floor"></div>
+      <svg class="abs" width="520" height="160" style="left:140px;top:430px">
+        <rect x="10" y="10" width="500" height="140" rx="26" fill="#0a2e2a"/>
+        <g transform="translate(40 30) scale(0.072)"><circle cx="965" cy="965" r="616.5" fill="none" stroke="#1aa752" stroke-width="137" stroke-dasharray="1500 300 1500 572" transform="translate(-270 -270)"/><polygon transform="translate(-270 -270)" points="1215,476 1440,466 1125,1307 902,1307 1007,1023 880,1023 720,1480 495,1465 812,622 1033,622 928,908 1052,908" fill="#1aa752"/></g>
+        <text x="300" y="100" text-anchor="middle" fill="#fff" font-size="54" font-weight="800" font-family="Manrope, Onest" letter-spacing="-1">Hamkor Bank</text>
+      </svg>
+      <!-- turnstile -->
+      <svg class="abs" width="260" height="300" style="left:760px;top:886px">
+        <rect x="20" y="60" width="60" height="234" rx="12" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+        <rect x="180" y="60" width="60" height="234" rx="12" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+        <circle id="lamp" cx="50" cy="96" r="14" fill="#c8372d"/>
+        <rect id="gateBar" x="80" y="150" width="100" height="14" rx="7" fill="#0e1a18" style="transform-origin:80px 157px"/>
+      </svg>
+      <!-- desk -->
+      <svg class="abs" width="620" height="420" style="left:1560px;top:766px">
+        <rect x="200" y="40" width="260" height="170" rx="12" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+        <rect x="218" y="58" width="224" height="134" rx="6" fill="#0a2e2a"/>
+        <g transform="translate(300 90) scale(0.05)"><circle cx="965" cy="965" r="616.5" fill="none" stroke="#1aa752" stroke-width="137" stroke-dasharray="1500 300 1500 572" transform="translate(-270 -270)"/><polygon transform="translate(-270 -270)" points="1215,476 1440,466 1125,1307 902,1307 1007,1023 880,1023 720,1480 495,1465 812,622 1033,622 928,908 1052,908" fill="#1aa752"/></g>
+        <path class="line" d="M330 210 V260 M280 262 H380"/>
+        <rect x="20" y="270" width="580" height="24" rx="8" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+        <path class="line" d="M80 294 V414 M540 294 V414"/>
+        <rect x="70" y="200" width="90" height="70" rx="10" fill="#fff" stroke="#0e1a18" stroke-width="5"/>
+        <path d="M500 270 a28 24 0 0 1 56 0z" fill="#bfe3c9" stroke="#0e1a18" stroke-width="5"/>
+      </svg>
+      <svg class="abs" width="200" height="420" style="left:2200px;top:766px"><rect x="50" y="300" width="100" height="114" rx="10" fill="#fff" stroke="#0e1a18" stroke-width="6"/><path class="line" d="M100 300 V180"/><ellipse cx="100" cy="150" rx="40" ry="70" fill="#bfe3c9" stroke="#0e1a18" stroke-width="5"/></svg>
+    </div>
+  </div>
+
+  <div class="clock" id="clock"><i></i><span id="clockT"></span></div>
+
+  <div class="pass" id="pass">
+    <div class="top"><span class="slot"></span><svg viewBox="270 270 1390 1390"><circle cx="965" cy="965" r="616.5" fill="none" stroke="#1aa752" stroke-width="137" stroke-dasharray="1500 300 1500 572"/><polygon points="1215,476 1440,466 1125,1307 902,1307 1007,1023 880,1023 720,1480 495,1465 812,622 1033,622 928,908 1052,908" fill="#1aa752"/></svg></div>
+    <div class="ava"><svg viewBox="0 0 120 120" width="170"><circle cx="60" cy="46" r="24" fill="#fff" stroke="#0e1a18" stroke-width="5"/><path d="M38 40 Q42 18 62 20 Q82 22 84 42 Q72 32 58 34z" fill="#0e1a18"/><path d="M20 118 Q20 78 60 78 Q100 78 100 118" fill="#0b4a43" stroke="#0e1a18" stroke-width="5"/></svg></div>
+    <b id="pName"></b><span id="pRole"></span>
+    <div class="strip" id="pStrip"></div>
+  </div>
+
+  <div class="docs-card card" id="docs" style="padding-bottom:60px">
+    <small id="dK"></small>
+    <h3 id="dH"></h3>
+    <div class="row"><label id="dL1"></label><div><span class="tick" id="t1"></span><span id="v1"></span></div></div>
+    <div class="row"><label id="dL2"></label><div><span class="tick" id="t2"></span><span id="v2"></span></div></div>
+    <div class="row"><label id="dL3"></label><div><span class="tick" id="t3"></span><span id="v3"></span></div></div>
+  </div>
+
+  <div class="plan" id="plan">
+    <small id="plK"></small>
+    <h3 id="plH"></h3>
+    <div id="slots"></div>
+  </div>
+
+  <div class="bubble them" id="b1"></div>
+</div>
+<script src="film.js"></script>
+<script>
+const { p, key, fade, $, set, typ, card, person, walk, init, captions, progress, final, play, easeOut, back } = Film;
+const T = init({
+  ru: {
+    c: [['Утро', 'Первый день', 'Приходите к 08:30. Вас встретит специалист по адаптации HR или ваш Buddy.'],
+        ['Знакомство', 'Экскурсия и пропуск', 'Знакомство с Buddy, экскурсия по офису и пропуск — до 10:00.'],
+        ['Оформление', 'Документы и рабочее место', 'Трудовой договор, анкеты и настройка рабочего места.'],
+        ['День', 'Дальше по плану', 'Обед с Buddy, встреча с руководителем и доступы к системам.']],
+    hello: 'Добро пожаловать в команду!',
+    pName: 'Новый сотрудник', pRole: 'Hamkor Bank', pStrip: 'ПРОПУСК',
+    dK: 'Оформление', dH: 'С 10:00 до 12:00', dL1: 'Документы', v1: 'Трудовой договор', dL2: 'Анкеты', v2: 'Заполнены', dL3: 'Рабочее место', v3: 'Компьютер настроен',
+    plK: 'Программа дня', plH: 'После обеда',
+    slots: [['12:30', 'Обед', 'Buddy покажет, где поесть, и познакомит с коллегами'], ['14:00', 'Встреча с руководителем', 'Задачи, проекты и доступы к системам'], ['16:00', 'Вопросы и ответы', 'План адаптации на первые месяцы']],
+    final: { title: 'Первый день пройден', items: [{ text: 'Пропуск получен' }, { text: 'Документы оформлены' }, { text: 'Рабочее место готово' }, { text: 'Не волнуйтесь', small: 'Первый день — для знакомства, а не для рекордов', next: true }] },
+  },
+  en: {
+    c: [['Morning', 'Your first day', 'Come at 08:30. The HR onboarding specialist or your Buddy will meet you.'],
+        ['Welcome', 'Office tour and pass', 'Meet your Buddy, see the office and get your pass — by 10:00.'],
+        ['Paperwork', 'Documents and your desk', 'Employment contract, forms and setting up your workplace.'],
+        ['The day', 'The rest of the plan', 'Lunch with your Buddy, meeting your manager and system access.']],
+    hello: 'Welcome to the team!',
+    pName: 'New colleague', pRole: 'Hamkor Bank', pStrip: 'STAFF PASS',
+    dK: 'Paperwork', dH: '10:00 to 12:00', dL1: 'Documents', v1: 'Employment contract', dL2: 'Forms', v2: 'Filled in', dL3: 'Workplace', v3: 'Computer set up',
+    plK: 'Plan of the day', plH: 'After lunch',
+    slots: [['12:30', 'Lunch', 'Your Buddy shows you where to eat and introduces the team'], ['14:00', 'Meeting your manager', 'Tasks, projects and access to systems'], ['16:00', 'Questions and answers', 'Your onboarding plan for the first months']],
+    final: { title: 'First day done', items: [{ text: 'Pass received' }, { text: 'Documents signed' }, { text: 'Workplace ready' }, { text: 'Take it easy', small: 'Day one is for getting to know people, not for records', next: true }] },
+  },
+}, { segs: 4 });
+$('stage').insertAdjacentHTML('beforeend', person('me', { bag: false }) + person('hr', { bag: false, jacket: '#1aa752', z: 5 }));
+$('iworld').insertAdjacentHTML('beforeend', person('me2', { bag: false }) + person('buddy', { bag: false, jacket: '#1aa752' }));
+for (const k of ['pName', 'pRole', 'pStrip', 'dK', 'dH', 'dL1', 'dL2', 'dL3', 'plK', 'plH']) $(k).textContent = T[k];
+$('b1').textContent = T.hello;
+$('slots').innerHTML = T.slots.map((s, i) => `<div class="slot-row" id="s${i}"><b>${s[0]}</b><span>${s[1]}<em>${s[2]}</em></span></div>`).join('');
+
+const IN = 6.6;
+const ME2 = [[IN, 300], [9.0, 560], [11.4, 560], [12.4, 1180], [13.6, 1480], [30, 1480]];
+function render(t) {
+  const inside = t >= IN;
+  // morning outside: walk to the door, HR is waiting
+  walk('me', t, [[0, -160], [3.0, 500], [IN, 500]], { show: inside ? 0 : 1 });
+  walk('hr', t, [[0, 740], [30, 740]], { face: -1, show: inside ? 0 : 1, arm: -Math.max(p(t, 3.2, 3.6) - p(t, 5.2, 5.6), 0) * 50 });
+  const b = fade(t, 3.3, 3.7, 5.6, 6.0);
+  set('b1', { right: '60px', top: '640px', opacity: b, transform: `translateY(${(1 - b) * 20}px) scale(${0.92 + b * 0.08})`, transformOrigin: '100% 100%' });
+  // clock in the corner counts the day
+  const mins = Math.round(key(t, [[0, 8 * 60 + 25], [3, 8 * 60 + 30], [IN, 8 * 60 + 58], [11.5, 9 * 60 + 40], [14, 10 * 60], [20, 12 * 60], [21.5, 12 * 60 + 30]], (k) => k));
+  $('clockT').textContent = `${String(Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`;
+  set('clock', { opacity: 1 - p(t, 26.6, 27) });
+
+  // inside: the pass, the turnstile, the desk
+  const cut = p(t, IN - 0.4, IN + 0.3);
+  set('inside', { opacity: cut, clipPath: `circle(${cut * 150}% at 60% 70%)` });
+  const x2 = Film.key(t, ME2);
+  const cam = Math.max(0, Math.min(2400 - 1080, x2 - 480)) * p(t, 11.6, 12.4);
+  set('iworld', { transform: `translateX(${-cam}px)` });
+  walk('me2', t, ME2, { show: inside ? 1 : 0, arm: -Math.max(p(t, 11.0, 11.3) - p(t, 11.7, 12.0), 0) * 60 });
+  walk('buddy', t, [[IN, 120], [9.2, 380], [11.4, 380], [12.4, 1000], [13.8, 1300], [30, 1300]], { show: inside ? 1 : 0 });
+  const open = p(t, 11.3, 11.7);
+  set('gateBar', { transform: `rotate(${open * 80}deg)` });
+  $('lamp').setAttribute('fill', t > 11.3 ? '#1aa752' : '#c8372d');
+  // the pass, close up
+  card('pass', t, 8.2, 11.0);
+  set($('pass'), { rotate: `${Math.sin(t * 2) * 1.5}deg` });
+  // paperwork
+  card('docs', t, 14.2, 20.4);
+  [['t1', 'v1', 15.2], ['t2', 'v2', 16.4], ['t3', 'v3', 17.6]].forEach(([tk, v, a]) => {
+    $(tk).classList.toggle('on', t > a);
+    $(v).innerHTML = typ(t, T[v], a + 0.1, a + 0.9);
+  });
+  $('t1').classList.toggle('on', t > 15.2);
+  // the rest of the day
+  card('plan', t, 20.8, 26.6);
+  T.slots.forEach((_, i) => { const v = p(t, 21.8 + i * 1.1, 22.3 + i * 1.1, easeOut); set(`s${i}`, { opacity: v, transform: `translateX(${(1 - v) * -30}px)` }); });
+
+  captions(t, [[T.c[0], 0.3, 6.4], [T.c[1], 6.8, 13.8], [T.c[2], 14.0, 20.4], [T.c[3], 20.6, 26.6]]);
+  progress(t, [[0, 6.6], [6.6, 14], [14, 20.6], [20.6, 26.8]]);
+  final(t, 26.8);
+}
+play(render, 33);
+</script>
+</body>
+</html>

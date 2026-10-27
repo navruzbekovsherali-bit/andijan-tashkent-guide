@@ -37,6 +37,8 @@ We have prepared everything for a comfortable start. Below is the plan for your 
 
 ## Your first day
 
+<div class="video-reel" data-reel="firstday"></div>
+
 | Time | What happens |
 |---|---|
 | 08:30 | Arrive at the office |

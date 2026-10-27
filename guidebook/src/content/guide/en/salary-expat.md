@@ -26,6 +26,8 @@ This page covers how you are paid, taxes, and practical tips on currency and cas
 
 ## When the money arrives
 
+<div class="video-reel" data-reel="salary"></div>
+
 Salary is paid **once a month**, usually **by the 10th**.
 
 ## What your income is made of

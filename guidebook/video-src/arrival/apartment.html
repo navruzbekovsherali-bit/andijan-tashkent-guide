@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Apartment film</title>
+<!-- "Apartment" film: arrive at a flat, keys from the owner, documents, emehmon.uz, registration done. -->
+<link rel="stylesheet" href="film.css" />
+<style>
+  .room { position: absolute; inset: 0; z-index: 5; background: linear-gradient(180deg, #eef1ec 0%, #edf0ea 61%, var(--paper) 61%); }
+  .room .floor { position: absolute; left: 0; right: 0; top: 1180px; height: 740px; background: var(--paper); border-top: 6px solid var(--ink); }
+  .docs { position: absolute; left: 110px; width: 860px; top: 330px; padding: 56px 60px 60px; border-radius: 44px; background: #fff; z-index: 18; box-shadow: 0 60px 120px -40px rgb(10 46 42 / 0.55), inset 0 0 0 2px rgb(14 26 24 / 0.06); }
+  .docs small { display: block; font-size: 28px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+  .docs h3 { margin: 12px 0 30px; font-size: 56px; letter-spacing: -0.03em; }
+  .doc { display: flex; align-items: center; gap: 28px; padding: 28px 0; border-top: 3px solid var(--paper-2); font-size: 42px; font-weight: 650; }
+  .doc .box { flex: none; display: grid; place-items: center; width: 62px; height: 62px; border-radius: 18px; box-shadow: inset 0 0 0 5px var(--ink); }
+  .doc .box svg { width: 40px; opacity: 0; }
+  .doc.on .box { background: var(--brand); box-shadow: none; }
+  .doc.on .box svg { opacity: 1; }
+  .doc em { display: block; font-style: normal; font-size: 30px; font-weight: 500; color: var(--ink-3); margin-top: 4px; }
+  .send { margin-top: 30px; padding: 22px; border-radius: 20px; background: #1b4f8f; color: #fff; font-size: 38px; font-weight: 750; text-align: center; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <!-- outside: the building, the owner with the keys -->
+  <svg class="abs" width="200" height="420" style="left:60px;top:766px"><path class="line" d="M100 414 V230"/><circle cx="100" cy="170" r="90" fill="#bfe3c9" stroke="#0e1a18" stroke-width="6"/></svg>
+  <svg class="abs" width="560" height="860" style="left:500px;top:326px">
+    <rect x="20" y="20" width="520" height="834" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+    <g fill="#dfe9e4" stroke="#0e1a18" stroke-width="5">
+      <rect x="70" y="80" width="110" height="100"/><rect x="380" y="80" width="110" height="100"/>
+      <rect x="70" y="240" width="110" height="100"/><rect x="380" y="240" width="110" height="100"/>
+      <rect x="70" y="400" width="110" height="100"/><rect x="380" y="400" width="110" height="100"/>
+      <rect x="70" y="560" width="110" height="100"/><rect x="380" y="560" width="110" height="100"/>
+    </g>
+    <g fill="none" stroke="#0e1a18" stroke-width="5"><path d="M55 180 H195 M365 180 H505 M55 340 H195 M365 340 H505 M55 500 H195 M365 500 H505"/></g>
+    <rect id="aptWin" x="225" y="240" width="110" height="100" fill="#ffe7a3" stroke="#0e1a18" stroke-width="5"/>
+    <rect x="200" y="680" width="160" height="174" fill="#cfe0d8" stroke="#0e1a18" stroke-width="6"/>
+    <path d="M200 660 H360" stroke="#1aa752" stroke-width="12" stroke-linecap="round"/>
+    <text x="280" y="140" text-anchor="middle" font-size="40" font-weight="800" font-family="Onest" fill="#0e1a18">12</text>
+  </svg>
+  <svg class="abs" id="keys" width="90" height="70"><circle cx="24" cy="30" r="18" fill="none" stroke="#0e1a18" stroke-width="6"/><path d="M42 30 H84 M70 30 V46 M80 30 V42" stroke="#0e1a18" stroke-width="6" stroke-linecap="round"/><circle cx="24" cy="30" r="7" fill="#1aa752"/></svg>
+
+  <!-- inside the flat -->
+  <div class="room" id="room">
+    <div class="floor"></div>
+    <svg class="abs" width="360" height="400" style="left:600px;top:420px">
+      <rect x="10" y="10" width="340" height="300" rx="12" fill="#dfeef5" stroke="#0e1a18" stroke-width="6"/>
+      <path class="line" d="M180 10 V310 M10 160 H350"/>
+      <g fill="#fff" stroke="#0e1a18" stroke-width="4" opacity=".9"><rect x="40" y="200" width="40" height="110"/><rect x="100" y="230" width="50" height="80"/><rect x="220" y="190" width="44" height="120"/><rect x="280" y="240" width="46" height="70"/></g>
+      <path d="M0 330 H360" stroke="#0e1a18" stroke-width="8" stroke-linecap="round"/>
+    </svg>
+    <svg class="abs" width="200" height="420" style="left:880px;top:766px"><path class="line" d="M100 414 V160"/><path d="M40 160 H160 L130 80 H70z" fill="#ffe7a3" stroke="#0e1a18" stroke-width="6" stroke-linejoin="round"/><path class="line" d="M60 414 H140"/></svg>
+    <svg class="abs" width="520" height="300" style="left:380px;top:886px">
+      <rect x="100" y="40" width="190" height="124" rx="10" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <rect x="116" y="56" width="158" height="92" rx="4" fill="#1b4f8f"/>
+      <path d="M70 172 H320" stroke="#0e1a18" stroke-width="10" stroke-linecap="round"/>
+      <rect x="10" y="176" width="500" height="22" rx="8" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <path class="line" d="M60 198 V294 M460 198 V294"/>
+      <rect x="360" y="120" width="60" height="56" rx="8" fill="#fff" stroke="#0e1a18" stroke-width="5"/>
+    </svg>
+  </div>
+
+  <div class="docs" id="docs">
+    <small id="dK"></small>
+    <h3 id="dH"></h3>
+    <div class="doc" id="d1"><span class="box"></span><span id="d1t"></span></div>
+    <div class="doc" id="d2"><span class="box"></span><span id="d2t"></span></div>
+    <div class="doc" id="d3"><span class="box"></span><span id="d3t"></span></div>
+  </div>
+
+  <div class="screen" id="screen">
+    <div class="bar"><i></i><span>emehmon.uz</span></div>
+    <div class="body">
+      <h4 id="sH"></h4>
+      <div class="row"><label id="sL1"></label><div id="sV1"></div></div>
+      <div class="row"><label id="sL2"></label><div id="sV2"></div></div>
+      <div class="row"><label id="sL3"></label><div id="sV3"></div></div>
+      <div class="send" id="send"></div>
+      <div class="prog"><b id="prog"></b></div>
+      <div class="okline" id="okline"><span><svg viewBox="0 0 24 24" width="46"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b id="sOk"></b></div>
+    </div>
+  </div>
+
+  <div class="bubble them" id="b1"></div>
+</div>
+<script src="film.js"></script>
+<script>
+const { p, key, fade, $, set, typ, caret, card, person, walk, init, captions, progress, final, play, TICK, easeOut, back, clamp } = Film;
+const T = init({
+  ru: {
+    c: [['Квартира', 'Живёте в квартире?', 'Тогда регистрацию оформляете вы — в течение 3 дней после заселения.'],
+        ['Документы', 'Подготовьте документы', 'Загранпаспорт, согласие владельца жилья и талон с прошлого места, если он есть.'],
+        ['Онлайн', 'Заявка на emehmon.uz', 'Заполните её сами — или сходите с владельцем в отдел миграции.']],
+    owner: 'Добро пожаловать! Вот ключи',
+    dK: 'Регистрация в квартире', dH: 'Что понадобится', d1: 'Загранпаспорт', d2: 'Согласие владельца жилья', d3: ['Талон с прошлого места', 'если вы уже где-то жили'],
+    sH: 'Регистрация по месту пребывания', sL1: 'Адрес', sV1: 'Ташкент, дом 12, кв. 34', sL2: 'Владелец', sV2: 'согласие приложено ✓', sL3: 'Проживание', sV3: '28.10 — 30.11', send: 'Отправить', sOk: 'Регистрация оформлена',
+    final: { title: 'Готово. Вы зарегистрированы', items: [{ text: 'Документы собраны' }, { text: 'Регистрация оформлена' }, { text: 'Переезжаете — регистрируйтесь снова', small: 'Тоже в течение 3 дней на новом месте', next: true }] },
+  },
+  en: {
+    c: [['Flat', 'Living in a flat?', 'Then you register yourself — within 3 days of moving in.'],
+        ['Documents', 'Get the documents ready', 'Your passport, the owner’s consent and the slip from your previous place, if you have one.'],
+        ['Online', 'Apply on emehmon.uz', 'Fill it in yourself — or go with the owner to the migration office.']],
+    owner: 'Welcome! Here are your keys',
+    dK: 'Registering in a flat', dH: 'What you need', d1: 'Passport', d2: 'Owner’s consent', d3: ['Slip from your previous place', 'if you have stayed somewhere already'],
+    sH: 'Registration of the place of stay', sL1: 'Address', sV1: 'Tashkent, bldg 12, flat 34', sL2: 'Owner', sV2: 'consent attached ✓', sL3: 'Stay', sV3: '28.10 — 30.11', send: 'Submit', sOk: 'Registration done',
+    final: { title: 'Done. Your stay is registered', items: [{ text: 'Documents ready' }, { text: 'Registration done' }, { text: 'Moving? Register again', small: 'Within 3 days at the new place, too', next: true }] },
+  },
+});
+document.getElementById('stage').insertAdjacentHTML('beforeend', person('me') + person('owner', { bag: false, jacket: '#4a524f', hair: '#6b726f', z: 5 }));
+for (const k of ['dK', 'dH', 'sH', 'sL1', 'sL2', 'sL3', 'sOk']) $(k).textContent = T[k];
+$('d1t').textContent = T.d1; $('d2t').textContent = T.d2; $('d3t').innerHTML = `${T.d3[0]}<em>${T.d3[1]}</em>`;
+$('send').textContent = T.send; $('b1').textContent = T.owner;
+document.querySelectorAll('.doc .box').forEach((b) => (b.innerHTML = TICK));
+
+const IN = 5.0;
+function render(t) {
+  const inside = t >= IN;
+  // outside: arrive, keys from the owner
+  walk('me', t, [[0, -160], [2.4, 470], [IN, 470]], { show: inside ? p(t, IN, IN + 0.3) : p(t, 0, 0.3) });
+  if (inside) walk('me', t, [[IN, -160], [7.0, 330], [30, 330]], { show: p(t, IN, IN + 0.3), arm: -p(t, 10.8, 11.3) * 40 });
+  walk('owner', t, [[0, 820], [30, 820]], { face: -1, show: inside ? 0 : 1, arm: -Math.max(p(t, 2.8, 3.2) - p(t, 3.8, 4.2), 0) * 60 });
+  const k = p(t, 3.1, 3.8);
+  set('keys', { transform: `translate(${720 - k * 150}px, ${990 - Math.sin(k * Math.PI) * 70}px) rotate(${k * -30}deg)`, opacity: t > 3.0 && t < 3.9 ? 1 : 0, zIndex: 7 });
+  const b = fade(t, 2.5, 2.9, 4.4, 4.8);
+  set('b1', { right: '60px', top: '600px', opacity: b, transform: `translateY(${(1 - b) * 20}px) scale(${0.92 + b * 0.08})`, transformOrigin: '100% 100%' });
+  set('aptWin', { opacity: 0.6 + 0.4 * Math.abs(Math.sin(t * 1.5)) });
+  // cut into the flat
+  const cut = p(t, IN - 0.4, IN + 0.3);
+  set('room', { opacity: cut, clipPath: `circle(${cut * 150}% at 50% 40%)` });
+  // documents, ticked one by one
+  card('docs', t, 6.0, 11.2);
+  ['d1', 'd2', 'd3'].forEach((id, i) => $(id).classList.toggle('on', t > 7.0 + i * 0.8));
+  // emehmon.uz on the laptop
+  card('screen', t, 11.4, 19.8);
+  $('sV1').innerHTML = typ(t, T.sV1, 12.4, 13.6) + caret(t, 12.4, 13.6);
+  $('sV2').innerHTML = typ(t, T.sV2, 13.8, 14.6) + caret(t, 13.8, 14.6);
+  $('sV3').innerHTML = typ(t, T.sV3, 14.8, 15.4) + caret(t, 14.8, 15.4);
+  const press = Math.max(p(t, 15.8, 16.0) - p(t, 16.0, 16.3), 0);
+  set('send', { transform: `scale(${1 - press * 0.06})`, background: t > 16.0 ? '#0b4a43' : '#1b4f8f' });
+  set('prog', { transform: `scaleX(${p(t, 16.2, 17.4)})` });
+  const ok = p(t, 17.5, 17.9, back);
+  set('okline', { opacity: t < 17.5 ? 0 : 1, transform: `scale(${0.85 + ok * 0.15})`, transformOrigin: '0 50%' });
+  captions(t, [[T.c[0], 0.3, 5.6], [T.c[1], 5.8, 11.2], [T.c[2], 11.4, 19.8]]);
+  progress(t, [[0, 5.6], [5.6, 11.2], [11.2, 20]]);
+  final(t, 20.0);
+}
+play(render, 26.5);
+</script>
+</body>
+</html>

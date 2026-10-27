@@ -28,6 +28,8 @@ faq:
 
 The bank's HR team handles this process. Below is a short overview of what happens and what you will need to do.
 
+<div class="video-reel" data-reel="permit"></div>
+
 ## Work permit
 
 A foreign citizen can work in Uzbekistan once two documents are in place:

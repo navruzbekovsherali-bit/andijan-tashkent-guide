@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Work permit film</title>
+<!-- "Work permit" film: two documents, your part (documents, quick answers to HR), PINFL and what it opens. -->
+<link rel="stylesheet" href="film.css" />
+<style>
+  .bg { position: absolute; inset: 0; background: radial-gradient(70% 40% at 50% 38%, #e3efe7, transparent 70%), linear-gradient(180deg, var(--sky) 0%, #f3f5f1 100%); }
+  .doc2 { position: absolute; top: 380px; width: 430px; height: 560px; padding: 40px 36px; border-radius: 26px; background: #fffdf8; z-index: 12; box-shadow: 0 40px 90px -36px rgb(10 46 42 / 0.55), inset 0 0 0 2px rgb(14 26 24 / 0.08); }
+  .doc2 small { display: block; font-size: 24px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+  .doc2 h4 { margin: 12px 0 24px; font-size: 40px; line-height: 1.12; letter-spacing: -0.02em; }
+  .doc2 i { display: block; height: 14px; margin: 18px 0; border-radius: 7px; background: var(--paper-2); }
+  .doc2 i:nth-of-type(2) { width: 80%; } .doc2 i:nth-of-type(3) { width: 64%; }
+  .doc2 .who { position: absolute; left: 36px; right: 36px; bottom: 40px; padding: 18px 20px; border-radius: 16px; font-size: 30px; font-weight: 750; text-align: center; }
+  .phone { left: 260px; top: 280px; width: 560px; height: 1020px; }
+  .chat { position: absolute; left: 30px; right: 30px; top: 130px; display: grid; gap: 22px; }
+  .chat .who { display: flex; align-items: center; gap: 16px; padding-bottom: 18px; border-bottom: 2px solid #e4e7ec; font-size: 32px; font-weight: 750; }
+  .chat .who i { width: 64px; height: 64px; border-radius: 50%; background: var(--brand); }
+  .msg { max-width: 84%; padding: 20px 26px; border-radius: 28px; font-size: 32px; line-height: 1.3; }
+  .msg.me { justify-self: end; background: var(--brand); color: #fff; border-bottom-right-radius: 8px; }
+  .msg.them { justify-self: start; background: #e9ecef; border-bottom-left-radius: 8px; }
+  .msg.file { display: flex; align-items: center; gap: 16px; }
+  .msg.file b { width: 40px; height: 50px; border-radius: 6px; background: #fff; flex: none; }
+  .center { position: absolute; inset: 0; z-index: 5; background: linear-gradient(180deg, #eef2ef 0%, #edf1ed 61%, var(--paper) 61%); }
+  .center .floor { position: absolute; left: 0; right: 0; top: 1180px; height: 740px; background: var(--paper); border-top: 6px solid var(--ink); }
+  .pinfl { position: absolute; left: 140px; width: 800px; top: 330px; padding: 46px 52px; border-radius: 36px; background: var(--night); color: #fff; z-index: 18; box-shadow: 0 60px 120px -40px rgb(10 46 42 / 0.7); }
+  .pinfl small { font-size: 28px; letter-spacing: 0.1em; color: #a9c2bc; font-weight: 700; }
+  .pinfl b { display: block; margin-top: 12px; font-size: 62px; letter-spacing: 0.08em; font-variant-numeric: tabular-nums; }
+  .tiles { position: absolute; left: 140px; width: 800px; top: 640px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; z-index: 18; }
+  .tiles div { padding: 30px 28px; border-radius: 28px; background: #fff; box-shadow: 0 30px 60px -30px rgb(10 46 42 / 0.5), inset 0 0 0 2px rgb(14 26 24 / 0.06); font-size: 38px; font-weight: 750; }
+  .tiles div em { display: block; font-style: normal; font-size: 28px; font-weight: 500; color: var(--ink-3); margin-top: 6px; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="bg"></div>
+
+  <div class="doc2" id="docA" style="left:80px"><small id="aK"></small><h4 id="aH"></h4><i></i><i></i><i></i><div class="who" id="aW" style="background:var(--night);color:#fff"></div></div>
+  <div class="doc2" id="docB" style="left:570px"><small id="bK"></small><h4 id="bH"></h4><i></i><i></i><i></i><div class="who" id="bW" style="background:#eef6f1;color:var(--brand-ink);box-shadow:inset 0 0 0 2px rgb(26 167 82 / .4)"></div></div>
+
+  <div class="phone" id="phone">
+    <div class="scr">
+      <div class="island"></div>
+      <div class="chat">
+        <div class="who"><i></i><span id="who"></span></div>
+        <div class="msg them" id="m1"></div>
+        <div class="msg me file" id="m2"><b></b><span id="m2t"></span></div>
+        <div class="msg me" id="m3"></div>
+        <div class="msg them" id="m4"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="center" id="center">
+    <div class="floor"></div>
+    <svg class="abs" width="680" height="760" style="left:380px;top:426px">
+      <rect x="20" y="140" width="640" height="614" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <rect x="60" y="40" width="560" height="116" rx="22" fill="#1b4f8f"/>
+      <text x="340" y="114" text-anchor="middle" fill="#fff" font-size="44" font-weight="800" font-family="Onest" id="cT"></text>
+      <g fill="#dfeef5" stroke="#0e1a18" stroke-width="5"><rect x="70" y="200" width="160" height="150"/><rect x="260" y="200" width="160" height="150"/><rect x="450" y="200" width="160" height="150"/><rect x="70" y="390" width="160" height="150"/><rect x="450" y="390" width="160" height="150"/></g>
+      <rect x="260" y="570" width="160" height="184" fill="#cfe0d8" stroke="#0e1a18" stroke-width="6"/><path class="line" d="M340 570 V754"/>
+    </svg>
+    <svg class="abs" width="200" height="420" style="left:30px;top:766px"><path class="line" d="M100 414 V230"/><circle cx="100" cy="170" r="84" fill="#bfe3c9" stroke="#0e1a18" stroke-width="6"/></svg>
+  </div>
+
+  <div class="pinfl" id="pinfl"><small>ПИНФЛ · PINFL</small><b id="pnum"></b></div>
+  <div class="tiles" id="tiles"></div>
+</div>
+<script src="film.js"></script>
+<script>
+const { p, key, fade, $, set, typ, caret, card, person, walk, init, captions, progress, final, play, easeOut, back } = Film;
+const T = init({
+  ru: {
+    c: [['Что нужно', 'Два документа', 'Разрешение банка на привлечение иностранцев и подтверждение вашего права на работу.'],
+        ['Ваша часть', 'Документы и быстрые ответы', 'Оформление ведёт HR банка. Готовьте документы заранее и отвечайте без задержек.'],
+        ['ПИНФЛ', 'Получите ПИНФЛ', 'Лично в Центре госуслуг или отделе миграции, с загранпаспортом.']],
+    aK: 'Документ 1', aH: 'Разрешение работодателя', aW: 'Получает банк',
+    bK: 'Документ 2', bH: 'Подтверждение вашего права на работу', bW: 'С вашими документами',
+    who: 'HR банка', m1: 'Здравствуйте! Пришлите, пожалуйста, скан паспорта', m2: 'passport.pdf', m3: 'Отправляю. Что-то ещё нужно?', m4: 'Спасибо! Остальное оформим сами',
+    center: 'Центр госуслуг',
+    tiles: [['OneID', 'вход в госуслуги'], ['ЭЦП', 'электронная подпись'], ['Налоги', 'налоговые сервисы'], ['Банк', 'приложения и услуги']],
+    final: { title: 'Документы в работе', items: [{ text: 'Разрешение получает банк' }, { text: 'Документы — HR вовремя' }, { text: 'ПИНФЛ получен' }, { text: 'Сроки и порядок — у HR', small: 'Для специалистов действует упрощённый порядок', next: true }] },
+  },
+  en: {
+    c: [['What is needed', 'Two documents', 'The bank’s permit to employ foreigners, and confirmation of your right to work.'],
+        ['Your part', 'Documents and quick replies', 'The bank’s HR runs the process. Prepare documents early and reply without delay.'],
+        ['PINFL', 'Get your PINFL', 'In person at a Public Services Centre or the migration office, with your passport.']],
+    aK: 'Document 1', aH: 'Employer’s permit', aW: 'The bank gets it',
+    bK: 'Document 2', bH: 'Confirmation of your right to work', bW: 'With your documents',
+    who: 'Bank HR', m1: 'Hello! Could you send us a scan of your passport?', m2: 'passport.pdf', m3: 'Sending it now. Anything else?', m4: 'Thank you! We will handle the rest',
+    center: 'Public Services',
+    tiles: [['OneID', 'government services'], ['E-signature', 'digital signature'], ['Taxes', 'tax services'], ['Bank', 'apps and services']],
+    final: { title: 'Your documents are in progress', items: [{ text: 'The bank gets the permit' }, { text: 'Documents to HR on time' }, { text: 'PINFL received' }, { text: 'Timing and procedure — ask HR', small: 'Specialists have a simplified procedure', next: true }] },
+  },
+});
+$('center').insertAdjacentHTML('beforeend', person('me', { bag: false }));
+for (const k of ['aK', 'aH', 'aW', 'bK', 'bH', 'bW', 'who']) $(k).textContent = T[k];
+$('cT').textContent = T.center; $('m2t').textContent = T.m2;
+$('tiles').innerHTML = T.tiles.map((x, i) => `<div id="tl${i}">${x[0]}<em>${x[1]}</em></div>`).join('');
+
+const IN = 15.2;
+function render(t) {
+  // two documents
+  const da = p(t, 0.6, 1.4, back), db = p(t, 1.4, 2.2, back), dOut = p(t, 7.4, 8.0);
+  set('docA', { opacity: t < 0.6 || t > 8 ? 0 : 1, transform: `translateY(${(1 - da) * 900 - dOut * 1300}px) rotate(${-3 + (1 - da) * -8}deg)` });
+  set('docB', { opacity: t < 1.4 || t > 8 ? 0 : 1, transform: `translateY(${(1 - db) * 900 - dOut * 1300}px) rotate(${3 + (1 - db) * 8}deg)` });
+  const wa = p(t, 3.2, 3.6, back), wb = p(t, 4.4, 4.8, back);
+  set('aW', { opacity: t < 3.2 ? 0 : 1, transform: `scale(${0.8 + wa * 0.2})` });
+  set('bW', { opacity: t < 4.4 ? 0 : 1, transform: `scale(${0.8 + wb * 0.2})` });
+  // chat with HR
+  card('phone', t, 8.2, 14.8);
+  const bubble = (id, a, from) => { const v = p(t, a, a + 0.4, back); set(id, { opacity: t < a ? 0 : 1, transform: `translateY(${(1 - v) * 30}px) scale(${0.9 + v * 0.1})`, transformOrigin: from }); };
+  bubble('m1', 9.2, '0 100%'); $('m1').textContent = T.m1;
+  bubble('m2', 10.6, '100% 100%');
+  bubble('m3', 11.4, '100% 100%'); $('m3').innerHTML = typ(t, T.m3, 11.4, 12.4) + caret(t, 11.4, 12.4);
+  bubble('m4', 13.0, '0 100%'); $('m4').textContent = T.m4;
+  // Public Services: PINFL and what it opens
+  const cut = p(t, IN - 0.4, IN + 0.3);
+  set('center', { opacity: cut, clipPath: `circle(${cut * 150}% at 50% 70%)` });
+  walk('me', t, [[IN, -160], [17.4, 640], [18.0, 680], [30, 680]], { show: t < IN ? 0 : 1 - p(t, 17.6, 18.0) });
+  card('pinfl', t, 18.4, 24.4);
+  $('pnum').textContent = typ(t, '3 1234 •••• 5678', 19.0, 20.0);
+  T.tiles.forEach((_, i) => { const v = p(t, 20.4 + i * 0.35, 20.9 + i * 0.35, back); set(`tl${i}`, { opacity: t < 20.4 + i * 0.35 ? 0 : 1 - p(t, 23.9, 24.4), transform: `translateY(${(1 - v) * 60 - p(t, 23.9, 24.4) * 1300}px) scale(${0.8 + v * 0.2})` }); });
+
+  captions(t, [[T.c[0], 0.3, 8.0], [T.c[1], 8.2, 14.8], [T.c[2], 15.0, 24.4]]);
+  progress(t, [[0, 8.1], [8.1, 15], [15, 24.5]]);
+  final(t, 24.6);
+}
+play(render, 31.3);
+</script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Sick leave film</title>
+<!-- "Sick leave" film: tell your manager and HR → the doctor opens an electronic sick note → who pays. -->
+<link rel="stylesheet" href="film.css" />
+<style>
+  .room { position: absolute; inset: 0; background: linear-gradient(180deg, #e9eef2 0%, #e8edf1 61%, var(--paper) 61%); }
+  .room .floor, .clinic .floor { position: absolute; left: 0; right: 0; top: 1180px; height: 740px; background: var(--paper); border-top: 6px solid var(--ink); }
+  .clinic { position: absolute; inset: 0; z-index: 5; background: linear-gradient(180deg, #eef3f2 0%, #edf3f1 61%, var(--paper) 61%); }
+  .phone { left: 260px; top: 280px; width: 560px; height: 1020px; }
+  .chat { position: absolute; left: 30px; right: 30px; top: 130px; display: grid; gap: 22px; }
+  .chat .who { display: flex; align-items: center; gap: 16px; padding-bottom: 18px; border-bottom: 2px solid #e4e7ec; font-size: 32px; font-weight: 750; }
+  .chat .who i { width: 64px; height: 64px; border-radius: 50%; background: var(--brand); }
+  .msg { max-width: 82%; padding: 20px 26px; border-radius: 28px; font-size: 32px; line-height: 1.3; }
+  .msg.me { justify-self: end; background: var(--brand); color: #fff; border-bottom-right-radius: 8px; }
+  .msg.them { justify-self: start; background: #e9ecef; border-bottom-left-radius: 8px; }
+  .temp { position: absolute; z-index: 9; padding: 14px 26px; border-radius: 999px; background: #fff; box-shadow: inset 0 0 0 4px var(--red); color: var(--red); font-size: 44px; font-weight: 800; }
+  .pay { position: absolute; left: 90px; width: 900px; top: 330px; padding: 56px 58px 54px; border-radius: 44px; background: #fff; z-index: 18; box-shadow: 0 60px 120px -40px rgb(10 46 42 / 0.55), inset 0 0 0 2px rgb(14 26 24 / 0.06); }
+  .pay small { display: block; font-size: 28px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+  .pay h3 { margin: 12px 0 40px; font-size: 54px; letter-spacing: -0.03em; }
+  .days { display: grid; grid-template-columns: repeat(10, 1fr); gap: 10px; }
+  .days i { height: 92px; border-radius: 16px; background: var(--paper-2); display: grid; place-items: center; font-style: normal; font-size: 32px; font-weight: 750; color: var(--ink-3); transition: none; }
+  .days i.a { background: var(--brand); color: #fff; }
+  .days i.b { background: #1b4f8f; color: #fff; }
+  .legend { display: grid; gap: 22px; margin-top: 40px; }
+  .legend > div { display: flex; align-items: center; gap: 22px; font-size: 38px; font-weight: 650; line-height: 1.25; }
+  .legend > div > div { display: block; }
+  .legend span { flex: none; width: 40px; height: 40px; border-radius: 12px; }
+  .legend em { display: block; font-style: normal; font-size: 30px; font-weight: 500; color: var(--ink-3); }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <!-- bedroom: ill in the morning -->
+  <div class="room" id="room">
+    <div class="floor"></div>
+    <svg class="abs" width="300" height="300" style="left:110px;top:420px"><rect x="10" y="10" width="280" height="250" rx="12" fill="#dfeef5" stroke="#0e1a18" stroke-width="6"/><path class="line" d="M150 10 V260 M10 135 H290"/><circle cx="220" cy="70" r="30" fill="#ffe7a3" stroke="#0e1a18" stroke-width="5"/></svg>
+    <svg class="abs" width="860" height="420" style="left:150px;top:766px">
+      <rect x="30" y="230" width="800" height="120" rx="20" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <path class="line" d="M40 350 V414 M820 350 V414"/>
+      <rect x="10" y="120" width="40" height="294" rx="12" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <rect x="70" y="180" width="170" height="70" rx="30" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <circle cx="170" cy="170" r="48" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <path d="M124 160 Q130 118 170 120 Q210 122 216 160 Q196 140 170 142 Q144 142 124 160z" fill="#0e1a18"/>
+      <path class="line" d="M150 176 Q160 170 170 176 M180 176 Q190 170 200 176" style="stroke-width:4"/>
+      <path d="M220 200 Q420 150 800 210 L800 300 Q420 280 220 300z" fill="#0b4a43" stroke="#0e1a18" stroke-width="6"/>
+      <path d="M260 230 Q480 200 780 240" stroke="#1aa752" stroke-width="8" fill="none" stroke-linecap="round"/>
+    </svg>
+    <div class="temp" id="temp">38,2°</div>
+  </div>
+
+  <!-- clinic -->
+  <div class="clinic" id="clinic">
+    <div class="floor"></div>
+    <svg class="abs" width="560" height="160" style="left:260px;top:420px"><rect x="10" y="10" width="540" height="140" rx="26" fill="#fff" stroke="#0e1a18" stroke-width="6"/><rect x="40" y="38" width="84" height="84" rx="18" fill="#c8372d"/><path d="M82 52 V108 M54 80 H110" stroke="#fff" stroke-width="16" stroke-linecap="round"/><text x="330" y="100" text-anchor="middle" font-size="52" font-weight="800" font-family="Onest" fill="#0e1a18" id="clinicT"></text></svg>
+    <svg class="abs" width="520" height="520" style="left:520px;top:666px">
+      <circle cx="300" cy="150" r="46" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <path d="M252 140 Q258 96 300 96 Q344 96 348 140 Q330 120 300 120 Q270 120 252 140z" fill="#6b726f"/>
+      <circle cx="284" cy="154" r="5" fill="#0e1a18"/><path class="line" d="M276 176 Q284 182 294 176" style="stroke-width:4"/>
+      <path d="M218 300 Q218 212 300 212 Q382 212 382 300" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <path class="line" d="M270 226 Q262 260 290 262 Q318 262 312 228" style="stroke-width:4"/>
+      <rect x="380" y="200" width="120" height="96" rx="10" fill="#fff" stroke="#0e1a18" stroke-width="6" transform="rotate(-4 440 248)"/>
+      <rect x="10" y="300" width="510" height="214" rx="18" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <path d="M50 420 H480" stroke="#c8372d" stroke-width="10" stroke-linecap="round" opacity=".7"/>
+    </svg>
+  </div>
+
+  <div class="phone" id="phone">
+    <div class="scr">
+      <div class="island"></div>
+      <div class="chat">
+        <div class="who"><i></i><span id="who"></span></div>
+        <div class="msg me" id="m1"></div>
+        <div class="msg me" id="m2"></div>
+        <div class="msg them" id="m3"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen">
+    <div class="bar"><i></i><span id="sBar"></span></div>
+    <div class="body">
+      <h4 id="sH"></h4>
+      <div class="row"><label id="sL1"></label><div id="sV1"></div></div>
+      <div class="row"><label id="sL2"></label><div id="sV2"></div></div>
+      <div class="prog"><b id="prog"></b></div>
+      <div class="okline" id="okline"><span><svg viewBox="0 0 24 24" width="46"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b id="sOk"></b></div>
+    </div>
+  </div>
+
+  <div class="pay" id="pay">
+    <small id="pK"></small>
+    <h3 id="pH"></h3>
+    <div class="days" id="days"></div>
+    <div class="legend">
+      <div id="lg1"><span style="background:var(--brand)"></span><div><b id="l1"></b><em id="l1s"></em></div></div>
+      <div id="lg2"><span style="background:#1b4f8f"></span><div><b id="l2"></b><em id="l2s"></em></div></div>
+    </div>
+  </div>
+</div>
+<script src="film.js"></script>
+<script>
+const { p, key, fade, $, set, typ, caret, card, person, walk, init, captions, progress, final, play, easeOut, back, clamp } = Film;
+const T = init({
+  ru: {
+    c: [['Шаг 1', 'Заболели — сообщите сразу', 'Руководителю и HR, как можно раньше. Потом — к врачу.'],
+        ['Шаг 2', 'Врач и электронный больничный', 'Листок нетрудоспособности только электронный — бумажный приносить не нужно.'],
+        ['Шаг 3', 'Кто платит', 'С 01.07.2026: первые 5 дней — банк, с 6-го дня — Фонд соцстрахования через «Baraka».']],
+    who: 'Руководитель', m1: 'Доброе утро! Мне нехорошо, температура 38,2°', m2: 'Сегодня иду к врачу, HR в копии', m3: 'Выздоравливайте! Задачи подхватим',
+    clinic: 'Клиника', sBar: 'Электронный больничный', sH: 'Листок нетрудоспособности', sL1: 'Пациент', sV1: 'SMITH JOHN', sL2: 'Открыт', sV2: '28.10.2026', sOk: 'Оформлен электронно',
+    pK: 'Оплата больничного', pH: 'Кто платит за какие дни', l1: 'Дни 1–5 — банк', l1s: 'как работодатель', l2: 'С 6-го дня — Фонд соцстрахования', l2s: 'на вашу карту через «Baraka», при стаже от 6 месяцев',
+    final: { title: 'Выздоравливайте', items: [{ text: 'Руководитель и HR в курсе' }, { text: 'Больничный открыт у врача' }, { text: 'Закроют — сообщите HR' }, { text: 'Нужен отгул без болезни?', small: 'Согласуйте с руководителем за 1–2 дня', next: true }] },
+  },
+  en: {
+    c: [['Step 1', 'Ill? Tell them right away', 'Your manager and HR, as early as you can. Then see a doctor.'],
+        ['Step 2', 'Doctor and an e-sick note', 'The sick note is electronic only — no paper to bring.'],
+        ['Step 3', 'Who pays', 'From 01.07.2026: days 1–5 by the bank, from day 6 by the Social Insurance Fund via “Baraka”.']],
+    who: 'Manager', m1: 'Good morning! I feel unwell, 38.2°', m2: 'Seeing a doctor today, HR in copy', m3: 'Get well! We will cover your tasks',
+    clinic: 'Clinic', sBar: 'Electronic sick note', sH: 'Sick note', sL1: 'Patient', sV1: 'SMITH JOHN', sL2: 'Opened', sV2: '28.10.2026', sOk: 'Issued electronically',
+    pK: 'Sick pay', pH: 'Who pays for which days', l1: 'Days 1–5 — the bank', l1s: 'as your employer', l2: 'From day 6 — Social Insurance Fund', l2s: 'to your card via “Baraka”, with 6+ months of service',
+    final: { title: 'Get well soon', items: [{ text: 'Manager and HR know' }, { text: 'Sick note opened by the doctor' }, { text: 'When it is closed, tell HR' }, { text: 'Need a day off, not ill?', small: 'Agree it with your manager 1–2 days ahead', next: true }] },
+  },
+});
+$('clinic').insertAdjacentHTML('beforeend', person('me', { bag: false }));
+for (const k of ['who', 'sBar', 'sH', 'sL1', 'sL2', 'sOk', 'pK', 'pH', 'l1', 'l1s', 'l2', 'l2s']) $(k).textContent = T[k];
+$('clinicT').textContent = T.clinic;
+$('days').innerHTML = Array.from({ length: 10 }, (_, i) => `<i>${i + 1}</i>`).join('');
+
+const IN = 9.2;
+function render(t) {
+  // morning: fever, then a message to the manager
+  const tp = fade(t, 0.8, 1.2, 3.0, 3.4);
+  set('temp', { left: '330px', top: `${880 - tp * 30}px`, opacity: tp, transform: `scale(${0.8 + tp * 0.2})` });
+  card('phone', t, 2.6, 8.8);
+  const msg = (id, s, a, b) => { const v = p(t, a, a + 0.4, back); set(id, { opacity: t < a ? 0 : 1, transform: `translateY(${(1 - v) * 30}px) scale(${0.9 + v * 0.1})`, transformOrigin: id === 'm3' ? '0 100%' : '100% 100%' }); $(id).innerHTML = typ(t, s, a, b) + caret(t, a, b); };
+  msg('m1', T.m1, 3.6, 4.8); msg('m2', T.m2, 5.0, 5.9);
+  const m3 = p(t, 6.6, 7.0, back);
+  set('m3', { opacity: t < 6.6 ? 0 : 1, transform: `translateY(${(1 - m3) * 30}px) scale(${0.9 + m3 * 0.1})`, transformOrigin: '0 100%' });
+  $('m3').textContent = T.m3;
+  // the clinic
+  const cut = p(t, IN - 0.4, IN + 0.3);
+  set('clinic', { opacity: cut, clipPath: `circle(${cut * 150}% at 50% 60%)` });
+  walk('me', t, [[IN, -160], [11.4, 400], [30, 400]], { show: t >= IN ? 1 : 0 });
+  card('screen', t, 12.0, 18.0);
+  $('sV1').innerHTML = typ(t, T.sV1, 13.0, 13.8) + caret(t, 13.0, 13.8);
+  $('sV2').innerHTML = typ(t, T.sV2, 14.0, 14.7) + caret(t, 14.0, 14.7);
+  set('prog', { transform: `scaleX(${p(t, 15.0, 16.0)})` });
+  const ok = p(t, 16.1, 16.5, back);
+  set('okline', { opacity: t < 16.1 ? 0 : 1, transform: `scale(${0.85 + ok * 0.15})`, transformOrigin: '0 50%' });
+  // who pays: the days fill in
+  card('pay', t, 18.4, 25.2);
+  [...$('days').children].forEach((d, i) => { d.className = t > 19.6 + i * 0.28 ? (i < 5 ? 'a' : 'b') : ''; });
+  set('lg1', { opacity: p(t, 20.4, 20.9, easeOut) });
+  set('lg2', { opacity: p(t, 22.0, 22.5, easeOut) });
+
+  captions(t, [[T.c[0], 0.3, 9.0], [T.c[1], 9.4, 18.0], [T.c[2], 18.2, 25.2]]);
+  progress(t, [[0, 9.2], [9.2, 18.2], [18.2, 25.3]]);
+  final(t, 25.4);
+}
+play(render, 32);
+</script>
+</body>
+</html>

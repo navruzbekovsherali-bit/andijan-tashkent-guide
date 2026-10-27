@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Salary card film</title>
+<!-- "Salary card" film: documents → a 10–15 minute visit to the branch → the card → the app. -->
+<link rel="stylesheet" href="film.css" />
+<style>
+  .hall { position: absolute; inset: 0; z-index: 5; background: linear-gradient(180deg, #edf2ee 0%, #ecf1ec 61%, var(--paper) 61%); }
+  .hall .floor { position: absolute; left: 0; right: 0; top: 1180px; height: 740px; background: var(--paper); border-top: 6px solid var(--ink); }
+  .docs { position: absolute; left: 110px; width: 860px; top: 300px; padding: 56px 60px 50px; border-radius: 44px; background: #fff; z-index: 18; box-shadow: 0 60px 120px -40px rgb(10 46 42 / 0.55), inset 0 0 0 2px rgb(14 26 24 / 0.06); }
+  .docs small { display: block; font-size: 28px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+  .docs h3 { margin: 12px 0 20px; font-size: 56px; letter-spacing: -0.03em; }
+  .doc { display: flex; align-items: center; gap: 26px; padding: 22px 0; border-top: 3px solid var(--paper-2); font-size: 40px; font-weight: 650; }
+  .doc .box { flex: none; display: grid; place-items: center; width: 58px; height: 58px; border-radius: 16px; box-shadow: inset 0 0 0 5px var(--ink); }
+  .doc .box svg { width: 38px; opacity: 0; }
+  .doc.on .box { background: var(--brand); box-shadow: none; }
+  .doc.on .box svg { opacity: 1; }
+  .sent { display: flex; align-items: center; gap: 18px; margin-top: 24px; padding: 20px 26px; border-radius: 20px; background: #eef6f1; font-size: 34px; font-weight: 700; color: var(--brand-ink); }
+  .sent svg { width: 48px; flex: none; }
+  .timer { position: absolute; left: 64px; top: 230px; z-index: 16; display: inline-flex; align-items: center; gap: 18px; padding: 14px 30px 14px 16px; border-radius: 999px; background: var(--night); color: #fff; font-size: 40px; font-weight: 750; }
+  .timer svg { width: 56px; height: 56px; }
+  .sign { position: absolute; left: 110px; width: 860px; top: 330px; padding: 56px 60px 60px; border-radius: 26px; background: #fffdf8; z-index: 18; box-shadow: 0 60px 120px -40px rgb(10 46 42 / 0.55), inset 0 0 0 2px rgb(14 26 24 / 0.08); }
+  .sign small { display: block; font-size: 28px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+  .sign h3 { margin: 12px 0 30px; font-size: 54px; letter-spacing: -0.03em; }
+  .sign .lines i { display: block; height: 16px; margin: 20px 0; border-radius: 8px; background: var(--paper-2); }
+  .sign .lines i:nth-child(2) { width: 86%; } .sign .lines i:nth-child(3) { width: 70%; }
+  .sign .sig { margin-top: 50px; border-bottom: 4px solid var(--ink); position: relative; height: 140px; }
+  .sign .sig span { position: absolute; left: 0; bottom: -46px; font-size: 28px; color: var(--ink-3); }
+  .sign .sig svg { position: absolute; left: 40px; bottom: 6px; width: 420px; height: 130px; }
+  .sign .sig path { fill: none; stroke: #1b3f8f; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; }
+  .bank-card { position: absolute; left: 140px; top: 520px; width: 800px; height: 504px; z-index: 18; border-radius: 40px; overflow: hidden;
+    background: radial-gradient(90% 120% at 100% 0%, #36c46f 0%, #1aa752 45%, #0f7a3c 100%);
+    box-shadow: 0 60px 120px -40px rgb(10 46 42 / 0.7); color: #fff; }
+  .bank-card .pat { position: absolute; inset: 0; opacity: 0.18; }
+  .bank-card .logo { position: absolute; right: 50px; top: 46px; display: flex; align-items: center; gap: 16px; font-family: 'Manrope', 'Onest'; font-size: 44px; font-weight: 800; letter-spacing: -0.04em; line-height: 0.95; }
+  .bank-card .logo svg { width: 82px; }
+  .bank-card .chip { position: absolute; left: 60px; top: 200px; width: 116px; height: 88px; border-radius: 16px; background: linear-gradient(135deg, #f2d98a, #c9a43b); box-shadow: inset 0 0 0 3px rgb(0 0 0 / 0.18); }
+  .bank-card .nfc { position: absolute; left: 196px; top: 210px; width: 60px; }
+  .bank-card .num { position: absolute; left: 60px; bottom: 120px; font-size: 46px; letter-spacing: 0.08em; font-variant-numeric: tabular-nums; }
+  .bank-card .name { position: absolute; left: 60px; bottom: 56px; font-size: 30px; letter-spacing: 0.12em; opacity: 0.9; }
+  .bank-card .shine { position: absolute; top: -50%; bottom: -50%; width: 160px; background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.45), transparent); transform: rotate(20deg); }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <!-- outside: the branch -->
+  <svg class="abs" width="200" height="420" style="left:60px;top:766px"><path class="line" d="M100 414 V230"/><circle cx="100" cy="170" r="84" fill="#bfe3c9" stroke="#0e1a18" stroke-width="6"/></svg>
+  <svg class="abs" width="640" height="640" style="left:420px;top:546px">
+    <rect x="20" y="140" width="600" height="494" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+    <rect x="80" y="40" width="480" height="116" rx="22" fill="#0a2e2a"/>
+    <g transform="translate(108 60) scale(0.056)"><circle cx="965" cy="965" r="616.5" fill="none" stroke="#1aa752" stroke-width="137" stroke-dasharray="1500 300 1500 572" transform="translate(-270 -270)"/><polygon transform="translate(-270 -270)" points="1215,476 1440,466 1125,1307 902,1307 1007,1023 880,1023 720,1480 495,1465 812,622 1033,622 928,908 1052,908" fill="#1aa752"/></g>
+    <text x="350" y="116" text-anchor="middle" fill="#fff" font-size="50" font-weight="800" font-family="Manrope, Onest" letter-spacing="-1">Hamkor Bank</text>
+    <g fill="#dfeef5" stroke="#0e1a18" stroke-width="5"><rect x="70" y="200" width="200" height="190"/><rect x="370" y="200" width="200" height="190"/></g>
+    <path d="M60 420 H580" stroke="#1aa752" stroke-width="12" stroke-linecap="round"/>
+    <rect x="230" y="450" width="180" height="184" fill="#cfe0d8" stroke="#0e1a18" stroke-width="6"/><path class="line" d="M320 450 V634"/>
+  </svg>
+
+  <!-- inside: the counter -->
+  <div class="hall" id="hall">
+    <div class="floor"></div>
+    <svg class="abs" width="520" height="150" style="left:500px;top:430px">
+      <rect x="10" y="10" width="500" height="130" rx="24" fill="#0a2e2a"/>
+      <g transform="translate(36 28) scale(0.068)"><circle cx="965" cy="965" r="616.5" fill="none" stroke="#1aa752" stroke-width="137" stroke-dasharray="1500 300 1500 572" transform="translate(-270 -270)"/><polygon transform="translate(-270 -270)" points="1215,476 1440,466 1125,1307 902,1307 1007,1023 880,1023 720,1480 495,1465 812,622 1033,622 928,908 1052,908" fill="#1aa752"/></g>
+      <text x="300" y="94" text-anchor="middle" fill="#fff" font-size="52" font-weight="800" font-family="Manrope, Onest" letter-spacing="-1">Hamkor Bank</text>
+    </svg>
+    <svg class="abs" width="520" height="520" style="left:500px;top:666px">
+      <circle cx="300" cy="150" r="46" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <path d="M252 150 Q252 96 300 94 Q348 96 348 150 Q340 116 300 116 Q262 116 252 150z" fill="#6b4a2f"/>
+      <circle cx="284" cy="154" r="5" fill="#0e1a18"/>
+      <path class="line" d="M276 176 Q284 182 294 176" style="stroke-width:4"/>
+      <path d="M218 300 Q218 212 300 212 Q382 212 382 300" fill="#1aa752" stroke="#0e1a18" stroke-width="6"/>
+      <rect x="380" y="200" width="120" height="96" rx="10" fill="#fff" stroke="#0e1a18" stroke-width="6" transform="rotate(-4 440 248)"/>
+      <rect x="10" y="300" width="510" height="214" rx="18" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <rect x="10" y="300" width="510" height="40" rx="16" fill="#0a2e2a"/>
+      <path d="M50 420 H480" stroke="#1aa752" stroke-width="10" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <div class="timer" id="timer"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="24" fill="none" stroke="rgb(255 255 255 / .25)" stroke-width="7"/><circle id="ring" cx="30" cy="30" r="24" fill="none" stroke="#1aa752" stroke-width="7" stroke-linecap="round" pathLength="1" stroke-dasharray="1" transform="rotate(-90 30 30)"/></svg><span id="timerT"></span></div>
+
+  <div class="docs" id="docs">
+    <small id="dK"></small>
+    <h3 id="dH"></h3>
+    <div id="docList"></div>
+    <div class="sent" id="sent"><svg viewBox="0 0 24 24"><path d="M3 11.5 21 3l-6 18-3.5-7.5z" fill="#1aa752"/><path d="M11.5 13.5 21 3" stroke="#fff" stroke-width="1.6"/></svg><span id="sentT"></span></div>
+  </div>
+
+  <div class="sign" id="sign">
+    <small id="gK"></small>
+    <h3 id="gH"></h3>
+    <div class="lines"><i></i><i></i><i></i><i></i></div>
+    <div class="sig"><svg viewBox="0 0 420 130"><path id="sig" pathLength="1" d="M10 90 C 40 20, 60 20, 70 80 S 110 120, 130 60 S 170 10, 190 70 C 200 100, 230 100, 250 60 C 262 40, 280 40, 290 70 C 300 95, 330 95, 410 40"/></svg><span id="gS"></span></div>
+  </div>
+
+  <div class="bank-card" id="bcard">
+    <svg class="pat" viewBox="0 0 800 504" preserveAspectRatio="none"><g fill="none" stroke="#fff" stroke-width="3"><circle cx="640" cy="420" r="120"/><circle cx="640" cy="420" r="190"/><circle cx="640" cy="420" r="260"/><circle cx="640" cy="420" r="330"/></g></svg>
+    <div class="logo"><svg viewBox="270 270 1390 1390"><circle cx="965" cy="965" r="616.5" fill="none" stroke="#fff" stroke-width="137" stroke-dasharray="1500 300 1500 572"/><polygon points="1215,476 1440,466 1125,1307 902,1307 1007,1023 880,1023 720,1480 495,1465 812,622 1033,622 928,908 1052,908" fill="#fff"/></svg><span>Hamkor<br/>Bank</span></div>
+    <span class="chip"></span>
+    <svg class="nfc" viewBox="0 0 24 24"><path d="M8 7a7 7 0 010 10M12 5a10 10 0 010 14M16 3a13 13 0 010 18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+    <span class="num">8600 •••• •••• 9012</span>
+    <span class="name">NEW COLLEAGUE</span>
+    <span class="shine" id="shine"></span>
+  </div>
+
+  <div class="bubble them" id="b1"></div>
+</div>
+<script src="film.js"></script>
+<script>
+const { p, key, fade, $, set, card, person, walk, init, captions, progress, final, play, easeOut, back, clamp, TICK } = Film;
+const T = init({
+  ru: {
+    c: [['Шаг 1', 'Подготовьте документы', 'Анкету заранее заполните, подпишите и отправьте специалисту по адаптации.'],
+        ['Шаг 2', 'Визит в отделение', 'Встречу назначит специалист по адаптации. Подписать документы — 10–15 минут.'],
+        ['Шаг 3', 'Карта готова', 'Весь процесс — 1–2 дня. Дальше — приложение Hamkorbank.']],
+    dK: 'Карта для зарплаты', dH: 'Документы', docs: ['Паспорт (оригинал)', 'Регистрация по месту пребывания', 'ПИНФЛ', 'Анкета и заявление'], sent: 'Анкета отправлена специалисту по адаптации',
+    hello: 'Здравствуйте! Hello!', minutes: 'мин',
+    gK: 'Hamkor Bank', gH: 'Заявление на выпуск карты', gS: 'Подпись',
+    final: { title: 'Карта для зарплаты готова', items: [{ text: 'Документы собраны' }, { text: 'Визит в банк — 10–15 минут' }, { text: 'Карта у вас' }, { text: 'Скачайте приложение Hamkorbank', small: 'Вход по карте, ПИН-код и отпечаток пальца', next: true }] },
+  },
+  en: {
+    c: [['Step 1', 'Get the documents ready', 'Fill in and sign the form first, then send it to your onboarding specialist.'],
+        ['Step 2', 'Visit the branch', 'Your onboarding specialist books the visit. Signing takes 10–15 minutes.'],
+        ['Step 3', 'Your card is ready', 'The whole process takes 1–2 days. Next: the Hamkorbank app.']],
+    dK: 'Salary card', dH: 'Documents', docs: ['Passport (original)', 'Registration of your stay', 'PINFL', 'Form and application'], sent: 'Form sent to your onboarding specialist',
+    hello: 'Hello! Здравствуйте!', minutes: 'min',
+    gK: 'Hamkor Bank', gH: 'Card application', gS: 'Signature',
+    final: { title: 'Your salary card is ready', items: [{ text: 'Documents ready' }, { text: 'Branch visit — 10–15 minutes' }, { text: 'Card in hand' }, { text: 'Get the Hamkorbank app', small: 'Sign up with your card, PIN and fingerprint', next: true }] },
+  },
+});
+$('stage').insertAdjacentHTML('beforeend', person('me', { bag: false }));
+for (const k of ['dK', 'dH', 'gK', 'gH', 'gS']) $(k).textContent = T[k];
+$('sentT').textContent = T.sent; $('b1').textContent = T.hello;
+$('docList').innerHTML = T.docs.map((d, i) => `<div class="doc" id="d${i}"><span class="box">${TICK}</span><span>${d}</span></div>`).join('');
+
+const IN = 9.6;
+function render(t) {
+  const inside = t >= IN;
+  // documents, the form flies off to the onboarding specialist
+  card('docs', t, 0.3, 7.0);
+  T.docs.forEach((_, i) => $(`d${i}`).classList.toggle('on', t > 1.4 + i * 0.7));
+  const s = p(t, 4.6, 5.1, back);
+  set('sent', { opacity: t < 4.6 ? 0 : 1, transform: `translateX(${(1 - s) * -60}px)` });
+  // outside the branch, then in
+  walk('me', t, inside ? [[IN, -160], [11.6, 380], [30, 380]] : [[6.6, -160], [9.2, 560], [IN, 560]], { show: inside ? 1 : p(t, 6.8, 7.1) * (1 - p(t, 9.1, 9.4)), arm: -Math.max(p(t, 18.6, 19.0) - p(t, 19.6, 20.0), 0) * 50 });
+  const cut = p(t, IN - 0.4, IN + 0.3);
+  set('hall', { opacity: cut, clipPath: `circle(${cut * 150}% at 70% 70%)` });
+  const b = fade(t, 11.4, 11.8, 13.0, 13.4);
+  set('b1', { right: '80px', top: '600px', opacity: b, transform: `translateY(${(1 - b) * 20}px) scale(${0.92 + b * 0.08})`, transformOrigin: '100% 100%' });
+  // 10–15 minute timer
+  const tm = fade(t, 10.2, 10.6, 18.4, 18.8);
+  const mins = Math.round(key(t, [[11.6, 0], [18.2, 15]], (k) => k));
+  $('timerT').textContent = `${mins} ${T.minutes}`;
+  $('ring').setAttribute('stroke-dashoffset', String(1 - mins / 15));
+  set('timer', { opacity: tm });
+  // signing
+  card('sign', t, 13.6, 18.4);
+  $('sig').setAttribute('stroke-dashoffset', String(1 - p(t, 15.4, 17.0, (k) => k)));
+  // the card
+  const c = p(t, 18.8, 19.9, back); const co = p(t, 23.6, 24.1);
+  set('bcard', { opacity: t < 18.8 || t > 24.1 ? 0 : 1, transform: `perspective(1600px) translateY(${(1 - c) * 900 + co * -1200}px) rotateY(${(1 - p(t, 18.8, 20.4, easeOut)) * -70}deg) rotateZ(${Math.sin(t * 1.2) * 1.2}deg)` });
+  set('shine', { left: `${key(t, [[20.4, -300], [21.6, 1000]], easeOut)}px` });
+
+  captions(t, [[T.c[0], 0.3, 7.0], [T.c[1], 7.2, 18.4], [T.c[2], 18.6, 24.0]]);
+  progress(t, [[0, 7.1], [7.1, 18.6], [18.6, 24.1]]);
+  final(t, 24.2);
+}
+play(render, 31);
+</script>
+</body>
+</html>

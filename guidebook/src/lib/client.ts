@@ -581,6 +581,30 @@ const REELS: Record<
   },
 };
 
+/** Guidebook animations (video-src/arrival): RU and EN files, no sound. */
+const FILMS: Record<string, [[string, string], [string, string]]> = {
+  apartment: [['Квартира: регистрация', 'Документы и заявка на emehmon.uz — за 25 секунд.'], ['Flat: registration', 'Documents and an application on emehmon.uz — in 25 seconds.']],
+  imei: [['Регистрация IMEI', '*#06#, заявка на uzimei.uz и проверка статуса — за 30 секунд.'], ['IMEI registration', '*#06#, an application on uzimei.uz and the status check — in 30 seconds.']],
+  firstday: [['Первый день в офисе', 'От 08:30 до вечера: пропуск, документы, рабочее место.'], ['Your first day at the office', 'From 08:30 to the evening: pass, paperwork, your desk.']],
+  card: [['Карта для зарплаты', 'Документы, визит в отделение на 10–15 минут и карта.'], ['Your salary card', 'Documents, a 10–15 minute branch visit, and the card.']],
+  sickleave: [['Если заболели', 'Кому сообщить, электронный больничный и кто платит.'], ['If you fall ill', 'Who to tell, the electronic sick note and who pays.']],
+  metro: [['Метро Ташкента', 'Карта Atto, турникет и поезд — за 25 секунд.'], ['Tashkent metro', 'The Atto card, the turnstile and the train — in 25 seconds.']],
+  permit: [['Разрешение на работу', 'Что делает HR, что нужно от вас и зачем ПИНФЛ.'], ['Work permit', 'What HR does, what you need to do, and why PINFL matters.']],
+  salary: [['Когда приходит зарплата', 'Даты выплат для экспатов и местных сотрудников.'], ['When salary arrives', 'Pay dates for expats and local hires.']],
+  cities: [['Путешествие по Узбекистану', 'Ташкент, Самарканд, Бухара, Хива и Андижан на одной карте.'], ['Travelling around Uzbekistan', 'Tashkent, Samarkand, Bukhara, Khiva and Andijan on one map.']],
+};
+for (const [name, [ru, en]] of Object.entries(FILMS)) {
+  REELS[name] = {
+    src: `video/${name}-ru.mp4`,
+    poster: `video/${name}-ru-poster.webp`,
+    srcEn: `video/${name}-en.mp4`,
+    posterEn: `video/${name}-en-poster.webp`,
+    silent: true,
+    ru: [ru[0], ru[1], 'Анимация гайдбука'],
+    en: [en[0], en[1], 'Guidebook animation'],
+  };
+}
+
 function reels() {
   const lang = document.documentElement.lang === 'en' ? 'en' : 'ru';
   const L = lang === 'en' ? { on: 'Turn sound on', off: 'Turn sound off', play: 'Play', pause: 'Pause' } : { on: 'Включить звук', off: 'Выключить звук', play: 'Смотреть', pause: 'Пауза' };
