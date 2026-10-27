@@ -1688,7 +1688,7 @@ article {
   padding: 0 18px;
   border-radius: 999px;
   background: var(--white);
-  box-shadow: inset 0 0 0 1px var(--line);
+  box-shadow: inset 0 0 0 1px rgb(14 26 24 / 0.42);
   color: var(--ink-3);
 }
 .search-field:focus-within {
@@ -2359,4 +2359,7 @@ a.tel {
 .faq-aud {
   max-width: 420px;
   margin-top: 14px;
+}
+input[type='search']::-webkit-search-cancel-button {
+  appearance: none;
 }
