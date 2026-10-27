@@ -64,6 +64,15 @@ const rays = Array.from({ length: 8 }, (_, k) => {
   }
   <g class="g-tiles">{placed.filter((t) => t.fill).map((t) => <path class={`g-tile g-${t.kind}`} d={t.path} fill={t.fill} style={`--d:${t.delay}`} />)}</g>
   {
+    !rosette && (
+      <g class="g-lines g-band-lines">
+        {placed.map((t) => (
+          <path d={t.path} pathLength="1" style={`--d:${t.delay}`} />
+        ))}
+      </g>
+    )
+  }
+  {
     rosette && (
       <g class="g-lines">
         {placed.map((t) => (

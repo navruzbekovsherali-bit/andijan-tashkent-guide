@@ -57,7 +57,7 @@ await writeFile(
   `<title>Гайдбук Hamkorbank</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Предпросмотр сайта-гайдбука">
-<style>body{font:16px system-ui,sans-serif;background:#edf1ec;color:#16202b;display:grid;place-items:center;min-height:100%;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}a{color:#4e36a0}</style>
+<style>body{font:16px system-ui,sans-serif;background:#0c201e;color:#ffffff;display:grid;place-items:center;min-height:100%;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}a{color:#1de38a}</style>
 <p>Открываем гайдбук… <a href="home.html">Открыть</a></p>
 <script>location.replace('home.html');</script>
 `,
