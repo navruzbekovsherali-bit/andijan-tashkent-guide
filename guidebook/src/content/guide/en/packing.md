@@ -25,6 +25,8 @@ faq:
 
 Moving and starting a new job is always exciting. This checklist will help you remember everything and feel confident from your first days in Uzbekistan.
 
+<div class="video-reel" data-reel="packing"></div>
+
 ## Documents and money
 
 Put these in your hand luggage so they are always close at hand.

@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Phrases film</title>
+<!-- "Phrases" film: a greeting at work, a question at the market, a stop in a taxi — Uzbek words with translations. -->
+<link rel="stylesheet" href="film.css" />
+<style>
+  .scene { position: absolute; inset: 0; overflow: hidden; isolation: isolate; }
+  .scene .floor { position: absolute; left: 0; right: 0; top: 1180px; height: 740px; background: var(--paper); border-top: 6px solid var(--ink); }
+  #s1 { z-index: 1; background: linear-gradient(180deg, #eef2ef 0%, #edf1ed 61%, var(--paper) 61%); }
+  #s2 { background: linear-gradient(180deg, #f6efe3 0%, #f4ecdf 61%, var(--paper) 61%); z-index: 2; }
+  #s3 { background: linear-gradient(180deg, var(--sky) 0%, #f3f5f1 61%, var(--paper) 61%); z-index: 3; }
+  .say { position: absolute; z-index: 16; max-width: 640px; padding: 28px 36px 26px; border-radius: 40px; background: #fff; box-shadow: 0 24px 50px -24px rgb(10 46 42 / 0.45), inset 0 0 0 3px var(--ink); }
+  .say b { display: block; font-size: 60px; letter-spacing: -0.03em; line-height: 1.05; }
+  .say span { display: block; margin-top: 10px; font-size: 32px; color: var(--ink-3); font-weight: 600; }
+  .say.me { border-bottom-left-radius: 10px; }
+  .say.them { border-bottom-right-radius: 10px; background: var(--night); color: #fff; box-shadow: 0 24px 50px -24px rgb(10 46 42 / 0.6); }
+  .say.them span { color: #a9c2bc; }
+  .heart { position: absolute; z-index: 15; width: 70px; height: 70px; }
+  .price { position: absolute; z-index: 15; padding: 16px 28px; border-radius: 999px; background: #ffe7a3; box-shadow: inset 0 0 0 4px var(--ink); font-size: 44px; font-weight: 800; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <!-- 1: the office lobby -->
+  <div class="scene" id="s1"><div class="floor"></div>
+    <svg class="abs" width="520" height="150" style="left:280px;top:430px"><rect x="10" y="10" width="500" height="130" rx="24" fill="#0a2e2a"/><text x="260" y="96" text-anchor="middle" fill="#fff" font-size="56" font-weight="800" font-family="Manrope, Onest" letter-spacing="-1">Hamkor Bank</text></svg>
+    <svg class="abs" width="200" height="420" style="left:880px;top:766px"><rect x="50" y="300" width="100" height="114" rx="10" fill="#fff" stroke="#0e1a18" stroke-width="6"/><path class="line" d="M100 300 V180"/><ellipse cx="100" cy="150" rx="40" ry="70" fill="#bfe3c9" stroke="#0e1a18" stroke-width="5"/></svg>
+  </div>
+  <!-- 2: the market -->
+  <div class="scene" id="s2"><div class="floor"></div>
+    <svg class="abs" width="620" height="620" style="left:440px;top:566px">
+      <path d="M20 120 L310 20 L600 120 Z" fill="#c8372d" stroke="#0e1a18" stroke-width="6" stroke-linejoin="round"/>
+      <path d="M20 120 Q92 160 165 120 Q237 160 310 120 Q382 160 455 120 Q527 160 600 120" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <path class="line" d="M60 130 V614 M560 130 V614"/>
+      <circle cx="380" cy="300" r="44" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <path d="M334 290 Q340 250 380 250 Q420 250 426 290 Q404 268 380 270 Q356 268 334 290z" fill="#0e1a18"/>
+      <path d="M300 440 Q300 360 380 360 Q460 360 460 440" fill="#6b4a2f" stroke="#0e1a18" stroke-width="6"/>
+      <rect x="40" y="430" width="540" height="184" rx="16" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <g stroke="#0e1a18" stroke-width="5"><ellipse cx="130" cy="420" rx="58" ry="40" fill="#f2d35f"/><ellipse cx="240" cy="416" rx="54" ry="38" fill="#e7c04a"/><circle cx="350" cy="420" r="30" fill="#c8372d"/><circle cx="410" cy="426" r="28" fill="#b42d24"/><circle cx="470" cy="420" r="30" fill="#c8372d"/></g>
+    </svg>
+  </div>
+  <!-- 3: a taxi ride -->
+  <div class="scene" id="s3"><div class="floor"></div>
+    <svg class="abs" width="2400" height="400" id="city" style="left:0;top:786px" opacity=".9">
+      <g fill="#e6ece8" stroke="#0e1a18" stroke-width="5"><rect x="40" y="120" width="180" height="274"/><rect x="260" y="40" width="150" height="354"/><rect x="450" y="150" width="200" height="244"/><rect x="700" y="80" width="160" height="314"/><rect x="900" y="170" width="190" height="224"/><rect x="1140" y="100" width="150" height="294"/><rect x="1330" y="160" width="200" height="234"/><rect x="1580" y="60" width="160" height="334"/><rect x="1790" y="140" width="190" height="254"/><rect x="2030" y="90" width="150" height="304"/></g>
+    </svg>
+    <svg class="abs" id="taxi" width="560" height="260" viewBox="0 0 420 200">
+      <path d="M20 150 V110 Q20 96 34 92 L110 82 L160 34 Q170 26 184 26 H290 Q306 26 316 38 L356 84 L392 92 Q406 96 406 112 V150 Z" fill="#fff" stroke="#0e1a18" stroke-width="6" stroke-linejoin="round"/>
+      <path d="M128 84 L172 42 H234 V84 Z M250 42 H300 L338 84 H250 Z" fill="#dfe9e4" stroke="#0e1a18" stroke-width="5" stroke-linejoin="round"/>
+      <circle cx="200" cy="62" r="16" fill="#fff" stroke="#0e1a18" stroke-width="4"/><circle cx="276" cy="62" r="16" fill="#fff" stroke="#0e1a18" stroke-width="4"/>
+      <path d="M26 122 H400" stroke="#1aa752" stroke-width="10"/>
+      <rect x="196" y="8" width="56" height="20" rx="6" fill="#ffd34d" stroke="#0e1a18" stroke-width="4"/>
+      <g id="w1"><circle cx="100" cy="156" r="30" fill="#0e1a18"/><path d="M100 136 V176 M80 156 H120" stroke="#fff" stroke-width="5"/></g>
+      <g id="w2"><circle cx="326" cy="156" r="30" fill="#0e1a18"/><path d="M326 136 V176 M306 156 H346" stroke="#fff" stroke-width="5"/></g>
+    </svg>
+  </div>
+
+  <div class="say me" id="b1"><b></b><span></span></div>
+  <div class="say them" id="b2"><b></b><span></span></div>
+  <svg class="heart" id="heart" viewBox="0 0 24 24"><path d="M12 21s-8-5.2-8-11a4.5 4.5 0 018-2.8A4.5 4.5 0 0120 10c0 5.8-8 11-8 11z" fill="#c8372d"/></svg>
+  <div class="price" id="price">15 000</div>
+</div>
+<script src="film.js"></script>
+<script>
+const { p, key, fade, $, set, person, walk, init, captions, progress, final, play, easeOut, back, easeInOut } = Film;
+const T = init({
+  ru: {
+    c: [['Приветствие', 'Assalomu alaykum', 'Здороваясь, приложите правую руку к сердцу — знак уважения.'],
+        ['На рынке', 'Qancha turadi?', 'А после покупки скажите «Baraka toping» — пусть будет благословение.'],
+        ['В такси', 'Shu yerda to‘xtang', 'Адрес проще показать точкой на карте в телефоне.']],
+    say: [['Assalomu alaykum!', 'Здравствуйте'], ['Salom!', 'Привет'], ['Qancha turadi?', 'Сколько стоит?'], ['Rahmat! Baraka toping', 'Спасибо! Пусть будет благословение'], ['Shu yerda to‘xtang', 'Остановите здесь'], ['Rahmat!', 'Спасибо!']],
+    final: { title: 'Пара слов — и вам улыбнутся', items: [{ text: 'Assalomu alaykum — здравствуйте' }, { text: 'Rahmat — спасибо' }, { text: 'Qancha turadi? — сколько стоит?' }, { text: 'Все фразы — в статье', small: '«Полезные фразы на узбекском»', next: true }] },
+  },
+  en: {
+    c: [['Greeting', 'Assalomu alaykum', 'When you greet someone, put your right hand to your heart — a sign of respect.'],
+        ['At the market', 'Qancha turadi?', 'And after buying, say “Baraka toping” — may it bring blessings.'],
+        ['In a taxi', 'Shu yerda to‘xtang', 'For the address, just show a pin on the map in your phone.']],
+    say: [['Assalomu alaykum!', 'Hello'], ['Salom!', 'Hi'], ['Qancha turadi?', 'How much is it?'], ['Rahmat! Baraka toping', 'Thank you! May it bring blessings'], ['Shu yerda to‘xtang', 'Stop here, please'], ['Rahmat!', 'Thank you!']],
+    final: { title: 'A few words go a long way', items: [{ text: 'Assalomu alaykum — hello' }, { text: 'Rahmat — thank you' }, { text: 'Qancha turadi? — how much?' }, { text: 'All the phrases are in the article', small: '“Useful Uzbek phrases”', next: true }] },
+  },
+});
+$('s1').insertAdjacentHTML('beforeend', person('me', { bag: false }) + person('col', { bag: false, jacket: '#1aa752' }));
+$('s2').insertAdjacentHTML('beforeend', person('me2', { bag: false }));
+
+function bubble(id, i, a, b, pos) {
+  const v = fade(t0, a, a + 0.4, b, b + 0.35);
+  const el = $(id);
+  if (v > 0.001) { el.querySelector('b').textContent = T.say[i][0]; el.querySelector('span').textContent = T.say[i][1]; }
+  return v;
+}
+let t0 = 0;
+function render(t) {
+  t0 = t;
+  // scene 1: greeting, hand to heart
+  walk('me', t, [[0, -160], [2.0, 330], [30, 330]], { arm: -Math.max(p(t, 2.4, 2.8) - p(t, 5.6, 6.0), 0) * 75 });
+  walk('col', t, [[0, 1240], [2.0, 760], [30, 760]], { face: -1, arm: -Math.max(p(t, 4.4, 4.8) - p(t, 6.4, 6.8), 0) * 75 });
+  const h = fade(t, 2.6, 3.0, 5.6, 6.0);
+  set('heart', { left: '330px', top: `${800 - h * 40}px`, opacity: h, transform: `scale(${0.6 + h * 0.5})` });
+  // scene 2: the market
+  const c2 = p(t, 8.0, 8.7);
+  set('s2', { opacity: c2, clipPath: `circle(${c2 * 150}% at 60% 60%)` });
+  walk('me2', t, [[8.0, -160], [10.0, 300], [30, 300]], { arm: -Math.max(p(t, 13.4, 13.8) - p(t, 15.0, 15.4), 0) * 60 });
+  const pr = fade(t, 11.8, 12.2, 14.6, 15.0);
+  set('price', { left: '820px', top: `${700 - pr * 30}px`, opacity: pr, transform: `scale(${0.8 + p(t, 11.8, 12.2, back) * 0.2})` });
+  // scene 3: the taxi
+  const c3 = p(t, 16.0, 16.7);
+  set('s3', { opacity: c3, clipPath: `circle(${c3 * 150}% at 50% 60%)` });
+  const cx = key(t, [[16, 0], [19.8, 1300], [20.6, 1340], [30, 1340]], (k) => 1 - Math.pow(1 - k, 2));
+  set('city', { transform: `translateX(${-cx}px)` });
+  const moving = t < 20.6;
+  set('taxi', { left: '260px', top: `${1180 - 252 + (moving ? Math.sin(t * 40) * 1.5 : 0)}px` });
+  ['w1', 'w2'].forEach((w) => $(w).setAttribute('transform', `rotate(${cx * 0.9} ${w === 'w1' ? 100 : 326} 156)`));
+
+  // who says what, when
+  const b1 = [[0, 2.4, 5.4, '70px', '640px'], [2, 10.4, 12.8, '70px', '640px'], [3, 13.2, 15.6, '60px', '600px'], [4, 18.0, 21.0, '120px', '520px']];
+  const b2 = [[1, 4.2, 6.6, '600px', '700px'], [5, 21.2, 23.2, '120px', '520px']];
+  const show = (id, list) => {
+    const cur = list.find(([, a, b]) => t >= a && t <= b + 0.4);
+    if (!cur) return set(id, { opacity: 0 });
+    const [i, a, b, l, tp] = cur;
+    const v = bubble(id, i, a, b);
+    set(id, { left: l, top: tp, opacity: v, transform: `translateY(${(1 - v) * 20}px) scale(${0.92 + v * 0.08})`, transformOrigin: id === 'b1' ? '0 100%' : '100% 100%' });
+  };
+  show('b1', b1); show('b2', b2);
+
+  captions(t, [[T.c[0], 0.3, 7.8], [T.c[1], 8.2, 15.8], [T.c[2], 16.2, 23.6]]);
+  progress(t, [[0, 8], [8, 16], [16, 23.8]]);
+  final(t, 24.0);
+}
+play(render, 31);
+</script>
+</body>
+</html>

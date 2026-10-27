@@ -554,7 +554,6 @@ const REELS: Record<
     poster: 'video/hotel-ru-poster.webp',
     srcEn: 'video/hotel-en.mp4',
     posterEn: 'video/hotel-en-poster.webp',
-    silent: true,
     ru: ['Отель и регистрация', 'Из аэропорта в отель, регистрация на ресепшене и талон — за 30 секунд.', 'Анимация гайдбука'],
     en: ['Hotel and registration', 'From the airport to the hotel, registration at reception and the slip — in 30 seconds.', 'Guidebook animation'],
   },
@@ -563,7 +562,6 @@ const REELS: Record<
     poster: 'video/arrival-ru-poster.webp',
     srcEn: 'video/arrival-en.mp4',
     posterEn: 'video/arrival-en-poster.webp',
-    silent: true,
     ru: ['Прилёт: первые 15 минут', 'Таможня и SIM-карта — что делать сразу после посадки, за 30 секунд.', 'Анимация гайдбука'],
     en: ['Arrival: the first 15 minutes', 'Customs and a SIM card — what to do right after landing, in 30 seconds.', 'Guidebook animation'],
   },
@@ -581,7 +579,7 @@ const REELS: Record<
   },
 };
 
-/** Guidebook animations (video-src/arrival): RU and EN files, no sound. */
+/** Guidebook animations (video-src/arrival): RU and EN files, with original music (music.py). */
 const FILMS: Record<string, [[string, string], [string, string]]> = {
   apartment: [['Квартира: регистрация', 'Документы и заявка на emehmon.uz — за 25 секунд.'], ['Flat: registration', 'Documents and an application on emehmon.uz — in 25 seconds.']],
   imei: [['Регистрация IMEI', '*#06#, заявка на uzimei.uz и проверка статуса — за 30 секунд.'], ['IMEI registration', '*#06#, an application on uzimei.uz and the status check — in 30 seconds.']],
@@ -591,6 +589,9 @@ const FILMS: Record<string, [[string, string], [string, string]]> = {
   metro: [['Метро Ташкента', 'Карта Atto, турникет и поезд — за 25 секунд.'], ['Tashkent metro', 'The Atto card, the turnstile and the train — in 25 seconds.']],
   permit: [['Разрешение на работу', 'Что делает HR, что нужно от вас и зачем ПИНФЛ.'], ['Work permit', 'What HR does, what you need to do, and why PINFL matters.']],
   salary: [['Когда приходит зарплата', 'Даты выплат для экспатов и местных сотрудников.'], ['When salary arrives', 'Pay dates for expats and local hires.']],
+  packing: [['Что взять с собой', 'Ручная кладь, аптечка, одежда и таможня — за 25 секунд.'], ['What to pack', 'Hand luggage, medicines, clothes and customs — in 25 seconds.']],
+  emergency: [['Экстренная ситуация', '112, что сказать оператору и прямые номера служб.'], ['In an emergency', '112, what to tell the operator, and the direct numbers.']],
+  phrases: [['Пара слов по-узбекски', 'Приветствие, рынок и такси — с переводом.'], ['A few words in Uzbek', 'A greeting, the market and a taxi — with translations.']],
   cities: [['Путешествие по Узбекистану', 'Ташкент, Самарканд, Бухара, Хива и Андижан на одной карте.'], ['Travelling around Uzbekistan', 'Tashkent, Samarkand, Bukhara, Khiva and Andijan on one map.']],
 };
 for (const [name, [ru, en]] of Object.entries(FILMS)) {
@@ -599,7 +600,6 @@ for (const [name, [ru, en]] of Object.entries(FILMS)) {
     poster: `video/${name}-ru-poster.webp`,
     srcEn: `video/${name}-en.mp4`,
     posterEn: `video/${name}-en-poster.webp`,
-    silent: true,
     ru: [ru[0], ru[1], 'Анимация гайдбука'],
     en: [en[0], en[1], 'Guidebook animation'],
   };

@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Packing film</title>
+<!-- "Packing" film: items fly into an open suitcase with a label each; it closes; customs limits. -->
+<link rel="stylesheet" href="film.css" />
+<style>
+  .bg { position: absolute; inset: 0; background: radial-gradient(70% 40% at 50% 45%, #e6efe8, transparent 70%), linear-gradient(180deg, var(--sky) 0%, #f3f5f1 61%, var(--paper) 61%); }
+  .bg::after { content: ''; position: absolute; left: 0; right: 0; top: 1180px; border-top: 6px solid var(--ink); }
+  .tag { position: absolute; left: 90px; right: 90px; top: 300px; z-index: 14; padding: 30px 36px; border-radius: 34px; background: #fff; box-shadow: 0 30px 60px -28px rgb(10 46 42 / 0.45), inset 0 0 0 2px rgb(14 26 24 / 0.06); text-align: center; }
+  .tag b { display: block; font-size: 52px; letter-spacing: -0.03em; }
+  .tag span { display: block; margin-top: 10px; font-size: 32px; color: var(--ink-2); }
+  .item { position: absolute; left: 0; top: 0; width: 200px; height: 200px; z-index: 9; }
+  .rules { position: absolute; left: 90px; width: 900px; top: 300px; padding: 52px 56px 44px; border-radius: 44px; background: #fff; z-index: 18; box-shadow: 0 60px 120px -40px rgb(10 46 42 / 0.55), inset 0 0 0 2px rgb(14 26 24 / 0.06); }
+  .rules small { display: block; font-size: 28px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+  .rules h3 { margin: 12px 0 22px; font-size: 54px; letter-spacing: -0.03em; }
+  .rule { display: grid; grid-template-columns: 90px 1fr; gap: 22px; align-items: center; padding: 22px 0; border-top: 3px solid var(--paper-2); }
+  .rule i { display: grid; place-items: center; width: 80px; height: 80px; border-radius: 22px; background: #eef6f1; font-style: normal; font-size: 44px; font-weight: 800; color: #0b4a43; }
+  .rule b { display: block; font-size: 38px; }
+  .rule span { display: block; font-size: 30px; color: var(--ink-3); margin-top: 4px; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="bg"></div>
+  <!-- suitcase: back lid hinges at the top of the box -->
+  <svg class="abs" width="640" height="560" style="left:220px;top:630px;z-index:8">
+    <g id="lid" style="transform-origin:320px 330px">
+      <rect x="40" y="40" width="560" height="290" rx="34" fill="#0b4a43" stroke="#0e1a18" stroke-width="6"/>
+      <path d="M80 110 H560 M80 180 H560 M80 250 H560" stroke="#1aa752" stroke-width="6" opacity=".5"/>
+    </g>
+    <path class="line" d="M260 330 V300 H380 V330" id="handle" style="opacity:0"/>
+  </svg>
+  <svg class="abs" width="640" height="300" style="left:220px;top:886px;z-index:10">
+    <rect x="40" y="70" width="560" height="220" rx="30" fill="#1aa752" stroke="#0e1a18" stroke-width="6"/>
+    <path d="M40 120 H600" stroke="#0e1a18" stroke-width="5" opacity=".35"/>
+    <rect id="zip" x="40" y="62" width="0" height="16" rx="8" fill="#0e1a18"/>
+    <circle cx="120" cy="296" r="0" fill="#0e1a18"/>
+  </svg>
+  <div id="items"></div>
+  <div class="tag" id="tag"><b id="tagB"></b><span id="tagS"></span></div>
+  <div class="rules" id="rules"><small id="rK"></small><h3 id="rH"></h3><div id="ruleList"></div></div>
+</div>
+<script src="film.js"></script>
+<script>
+const { p, key, fade, $, set, card, init, captions, progress, final, play, easeOut, back, easeInOut, clamp } = Film;
+// Simple line icons for each thing in the bag.
+const ICON = {
+  passport: '<rect x="50" y="30" width="100" height="140" rx="12" fill="#0a2e2a" stroke="#0e1a18" stroke-width="6"/><circle cx="100" cy="90" r="24" fill="none" stroke="#e6c86a" stroke-width="6"/><path d="M76 140 H124" stroke="#e6c86a" stroke-width="6" stroke-linecap="round"/>',
+  cash: '<rect x="20" y="60" width="160" height="84" rx="10" fill="#cfe8d6" stroke="#0e1a18" stroke-width="6" transform="rotate(-8 100 100)"/><rect x="24" y="70" width="160" height="84" rx="10" fill="#e3f2e7" stroke="#0e1a18" stroke-width="6"/><circle cx="104" cy="112" r="20" fill="none" stroke="#0e1a18" stroke-width="5"/><text x="104" y="122" text-anchor="middle" font-size="28" font-weight="800" font-family="Onest" fill="#0e1a18">$</text>',
+  cards: '<rect x="20" y="56" width="150" height="96" rx="14" fill="#1b4f8f" stroke="#0e1a18" stroke-width="6"/><rect x="34" y="70" width="150" height="96" rx="14" fill="#1aa752" stroke="#0e1a18" stroke-width="6"/><rect x="52" y="96" width="36" height="28" rx="5" fill="#e6c86a"/>',
+  rx: '<path d="M50 26 H130 L156 52 V174 H50z" fill="#fff" stroke="#0e1a18" stroke-width="6" stroke-linejoin="round"/><text x="74" y="96" font-size="44" font-weight="800" font-family="Onest" fill="#c8372d">Rx</text><path d="M70 126 H136 M70 148 H120" stroke="#0e1a18" stroke-width="5" stroke-linecap="round"/>',
+  pills: '<rect x="62" y="60" width="76" height="114" rx="16" fill="#fff" stroke="#0e1a18" stroke-width="6"/><rect x="56" y="34" width="88" height="34" rx="10" fill="#c8372d" stroke="#0e1a18" stroke-width="6"/><path d="M84 112 H116 M100 96 V128" stroke="#c8372d" stroke-width="8" stroke-linecap="round"/>',
+  layers: '<path d="M40 60 L80 36 H120 L160 60 L148 96 L132 90 V170 H68 V90 L52 96z" fill="#e6ece8" stroke="#0e1a18" stroke-width="6" stroke-linejoin="round"/><path d="M80 36 Q100 60 120 36" fill="none" stroke="#0e1a18" stroke-width="5"/><path d="M68 120 H132" stroke="#1aa752" stroke-width="6"/>',
+  scarf: '<path d="M40 70 Q100 30 160 70 Q140 110 160 170 L120 160 Q110 120 100 110 Q90 120 80 160 L40 170 Q60 110 40 70z" fill="#bfe3c9" stroke="#0e1a18" stroke-width="6" stroke-linejoin="round"/>',
+  sun: '<rect x="40" y="80" width="56" height="96" rx="12" fill="#ffe7a3" stroke="#0e1a18" stroke-width="6"/><text x="68" y="136" text-anchor="middle" font-size="22" font-weight="800" font-family="Onest" fill="#0e1a18">SPF</text><circle cx="124" cy="80" r="22" fill="#0e1a18"/><circle cx="170" cy="80" r="22" fill="#0e1a18"/><path d="M146 80 H148" stroke="#0e1a18" stroke-width="6"/>',
+};
+const T = init({
+  ru: {
+    c: [['Ручная кладь', 'Документы и деньги', 'Самое важное — при себе, а не в багаже.'],
+        ['Багаж', 'Аптечка и одежда', 'Климат резко континентальный, солнце активное.'],
+        ['Таможня', 'Что знать при въезде', 'Лимиты беспошлинного ввоза и телефон.']],
+    items: [['passport', 'Загранпаспорт', 'действует ещё минимум 6 месяцев'], ['cash', 'Наличные USD или EUR', 'новые купюры без пометок'], ['cards', 'Карты Visa и Mastercard', 'на рынках нужны наличные сумы'], ['rx', 'Рецепты на лекарства', 'на английском или русском'],
+            ['pills', 'Привычные лекарства', 'антибиотики здесь — только по рецепту'], ['layers', 'Многослойная одежда', 'вечером в горах прохладно'], ['scarf', 'Платок', 'для мечетей и тихих районов'], ['sun', 'SPF 30+ и очки', 'солнце очень активное']],
+    rK: 'Таможня', rH: 'При въезде',
+    rules: [['<svg viewBox=\"0 0 24 24\" width=\"44\"><path d=\"M10.5 13.5L4 11l1.5-1.5 7 1L17 6a1.8 1.8 0 012.5 2.5L15 13l1 7-1.5 1.5-2.5-6.5L9 18v2.5L7.5 22 6 18l-4-1.5L3.5 15H6z\" fill=\"#0b4a43\"/></svg>', 'Самолётом — до $1000', 'без пошлины, если были за границей от 3 суток'], ['$', 'Валюта — без ограничений', 'крупную сумму задекларируйте письменно'], ['<svg viewBox=\"0 0 24 24\" width=\"40\"><rect x=\"6\" y=\"2\" width=\"12\" height=\"20\" rx=\"3\" fill=\"none\" stroke=\"#0b4a43\" stroke-width=\"2.2\"/><circle cx=\"12\" cy=\"18\" r=\"1.3\" fill=\"#0b4a43\"/></svg>', 'Телефон — красный коридор', 'иначе 30% от цены при регистрации IMEI']],
+    final: { title: 'Чемодан собран', items: [{ text: 'Документы и деньги — при себе' }, { text: 'Аптечка с рецептами' }, { text: 'Одежда слоями и платок' }, { text: 'Не везите весь дом', small: 'Всё необходимое легко купить на месте', next: true }] },
+  },
+  en: {
+    c: [['Hand luggage', 'Documents and money', 'The essentials stay with you, not in the hold.'],
+        ['Suitcase', 'Medicine and clothes', 'A sharply continental climate and strong sun.'],
+        ['Customs', 'What to know on entry', 'Duty-free limits and your phone.']],
+    items: [['passport', 'Passport', 'valid for at least 6 more months'], ['cash', 'Cash in USD or EUR', 'new notes, no marks'], ['cards', 'Visa and Mastercard', 'markets need cash in sums'], ['rx', 'Prescriptions', 'in English or Russian'],
+            ['pills', 'Your usual medicines', 'antibiotics here need a prescription'], ['layers', 'Layers', 'evenings in the mountains are cool'], ['scarf', 'A scarf', 'for mosques and quiet districts'], ['sun', 'SPF 30+ and sunglasses', 'the sun is very strong']],
+    rK: 'Customs', rH: 'On entry',
+    rules: [['<svg viewBox=\"0 0 24 24\" width=\"44\"><path d=\"M10.5 13.5L4 11l1.5-1.5 7 1L17 6a1.8 1.8 0 012.5 2.5L15 13l1 7-1.5 1.5-2.5-6.5L9 18v2.5L7.5 22 6 18l-4-1.5L3.5 15H6z\" fill=\"#0b4a43\"/></svg>', 'By air — up to $1000', 'duty-free if abroad for 3+ days'], ['$', 'Currency — no limit', 'declare a large amount in writing'], ['<svg viewBox=\"0 0 24 24\" width=\"40\"><rect x=\"6\" y=\"2\" width=\"12\" height=\"20\" rx=\"3\" fill=\"none\" stroke=\"#0b4a43\" stroke-width=\"2.2\"/><circle cx=\"12\" cy=\"18\" r=\"1.3\" fill=\"#0b4a43\"/></svg>', 'Phone — red channel', 'or pay 30% of its price at IMEI registration']],
+    final: { title: 'Your bag is packed', items: [{ text: 'Documents and money with you' }, { text: 'Medicines with prescriptions' }, { text: 'Layers and a scarf' }, { text: 'Do not bring the whole house', small: 'Everything else is easy to buy here', next: true }] },
+  },
+});
+$('items').innerHTML = T.items.map(([k], i) => `<svg class="item" id="it${i}" viewBox="0 0 200 200">${ICON[k]}</svg>`).join('');
+$('rK').textContent = T.rK; $('rH').textContent = T.rH;
+$('ruleList').innerHTML = T.rules.map((r, i) => `<div class="rule" id="r${i}"><i>${r[0]}</i><div><b>${r[1]}</b><span>${r[2]}</span></div></div>`).join('');
+
+// Where each thing lands in the suitcase (peeking over the edge), and when it flies.
+const SLOT = [[320, 922], [440, 930], [560, 922], [680, 930], [380, 948], [500, 952], [620, 948], [740, 952]];
+const START = [1.2, 2.6, 4.0, 5.4, 9.0, 10.4, 11.8, 13.2];
+function render(t) {
+  const lidOpen = 1 - p(t, 16.0, 16.8, easeInOut);
+  set('lid', { transform: `rotateX(${(1 - lidOpen) * 0}deg) scaleY(${0.25 + 0.75 * lidOpen}) translateY(${(1 - lidOpen) * 0}px)` });
+  $('zip').setAttribute('width', String(p(t, 16.8, 17.6) * 560));
+  T.items.forEach((_, i) => {
+    const a = START[i];
+    const f = p(t, a, a + 0.9, easeInOut);
+    const [sx, sy] = SLOT[i];
+    const x0 = i % 2 ? 1180 : -260, y0 = 260;
+    const x = x0 + (sx - x0) * f, y = y0 + (sy - y0) * f - Math.sin(f * Math.PI) * 160;
+    const sc = 1.35 - f * 0.7;
+    const hide = p(t, 16.0, 16.5);
+    set(`it${i}`, { transform: `translate(${x - 100}px, ${y - 100}px) scale(${sc * (1 - hide * 0.4)}) rotate(${(1 - f) * (i % 2 ? 30 : -30)}deg)`, opacity: t < a ? 0 : 1 - hide });
+  });
+  // the label of the thing in the air
+  const cur = START.findIndex((a, i) => t >= a - 0.1 && t < (START[i + 1] ?? 15) - 0.1 && t < a + 1.35);
+  if (cur >= 0) {
+    const a = START[cur];
+    const v = fade(t, a, a + 0.3, a + 1.15, a + 1.35);
+    $('tagB').textContent = T.items[cur][1]; $('tagS').textContent = T.items[cur][2];
+    set('tag', { opacity: v, transform: `translateY(${(1 - v) * -20}px) scale(${0.96 + v * 0.04})` });
+  } else set('tag', { opacity: 0 });
+  // customs rules
+  card('rules', t, 17.8, 24.2);
+  T.rules.forEach((_, i) => { const v = p(t, 18.8 + i * 0.9, 19.3 + i * 0.9, easeOut); set(`r${i}`, { opacity: v, transform: `translateX(${(1 - v) * -30}px)` }); });
+
+  captions(t, [[T.c[0], 0.3, 8.6], [T.c[1], 8.8, 17.4], [T.c[2], 17.6, 24.2]]);
+  progress(t, [[0, 8.7], [8.7, 17.5], [17.5, 24.3]]);
+  final(t, 24.4);
+}
+play(render, 31);
+</script>
+</body>
+</html>

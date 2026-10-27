@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Emergency film</title>
+<!-- "Emergency" film: dial 112, say what happened and where, the direct numbers, save them. -->
+<link rel="stylesheet" href="film.css" />
+<style>
+  .bg { position: absolute; inset: 0; background: radial-gradient(70% 40% at 50% 40%, #f6e6e3, transparent 70%), linear-gradient(180deg, #f4efee 0%, #f3f2ee 100%); }
+  .phone { left: 250px; top: 270px; width: 580px; height: 1040px; }
+  .dial { position: absolute; inset: 0; padding-top: 170px; text-align: center; }
+  .typed { height: 120px; font-size: 110px; font-weight: 650; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
+  .keys { display: grid; grid-template-columns: repeat(3, 110px); gap: 26px 34px; justify-content: center; margin-top: 30px; }
+  .keys span { display: grid; place-items: center; width: 110px; height: 110px; border-radius: 50%; background: #e9ecef; font-size: 46px; font-weight: 600; }
+  .keys span.hit { background: #c9cfd6; }
+  .call { width: 120px; height: 120px; margin: 34px auto 0; border-radius: 50%; background: var(--brand); display: grid; place-items: center; }
+  .call svg { width: 56px; }
+  .calling { position: absolute; inset: 0; background: linear-gradient(180deg, #2a1312, #4a1d1a); color: #fff; text-align: center; padding-top: 210px; }
+  .calling b { display: block; font-size: 120px; font-weight: 750; letter-spacing: 0.04em; }
+  .calling span { display: block; margin-top: 10px; font-size: 36px; opacity: 0.8; }
+  .ring { position: absolute; left: 50%; top: 290px; width: 220px; height: 220px; margin-left: -110px; border-radius: 50%; border: 4px solid rgb(255 255 255 / 0.5); }
+  .hint { position: absolute; left: 30px; right: 30px; padding: 24px 28px; border-radius: 28px; background: rgb(255 255 255 / 0.12); text-align: left; font-size: 34px; font-weight: 700; display: flex; gap: 20px; align-items: center; }
+  .hint i { flex: none; width: 70px; height: 70px; border-radius: 20px; background: #fff; color: #4a1d1a; display: grid; place-items: center; font-style: normal; font-size: 40px; font-weight: 800; }
+  .hint small { display: block; font-size: 28px; font-weight: 500; opacity: 0.8; }
+  .op { position: absolute; left: 30px; top: 480px; padding: 20px 26px; border-radius: 28px; border-bottom-left-radius: 8px; background: #fff; color: #111; font-size: 34px; font-weight: 650; }
+  .nums { position: absolute; left: 90px; width: 900px; top: 300px; z-index: 18; padding: 50px 50px 40px; border-radius: 44px; background: #fff; box-shadow: 0 60px 120px -40px rgb(10 46 42 / 0.55), inset 0 0 0 2px rgb(14 26 24 / 0.06); }
+  .nums small { display: block; font-size: 28px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+  .nums h3 { margin: 12px 0 26px; font-size: 54px; letter-spacing: -0.03em; }
+  .ng { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .ng div { padding: 22px 26px; border-radius: 24px; background: var(--paper); box-shadow: inset 0 0 0 2px rgb(14 26 24 / 0.08); }
+  .ng b { display: block; font-size: 60px; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+  .ng span { font-size: 30px; color: var(--ink-2); }
+  .save { margin-top: 26px; padding: 24px; border-radius: 22px; background: var(--night); color: #fff; font-size: 38px; font-weight: 750; text-align: center; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="bg"></div>
+  <div class="phone" id="phone">
+    <div class="scr">
+      <div class="island"></div>
+      <div class="dial" id="dial">
+        <div class="typed" id="typed"></div>
+        <div class="keys" id="keys"></div>
+        <div class="call"><svg viewBox="0 0 24 24"><path d="M6.5 3.5h3l1.5 4.5-2 1.5a11 11 0 005.5 5.5l1.5-2 4.5 1.5v3A2 2 0 0118.5 20 15 15 0 014 5.5a2 2 0 012.5-2z" fill="#fff"/></svg></div>
+      </div>
+      <div class="calling" id="calling">
+        <span class="ring" id="ring1"></span><span class="ring" id="ring2"></span>
+        <b>112</b><span id="callS"></span>
+        <div class="op" id="op"></div>
+        <div class="hint" id="h1" style="top:640px"><i>?</i><div><span id="h1t"></span><small id="h1s"></small></div></div>
+        <div class="hint" id="h2" style="top:790px"><i><svg viewBox="0 0 24 24" width="40"><path d="M12 22s-7-6.5-7-12a7 7 0 0114 0c0 5.5-7 12-7 12z" fill="#4a1d1a"/><circle cx="12" cy="10" r="2.6" fill="#fff"/></svg></i><div><span id="h2t"></span><small id="h2s"></small></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="nums" id="nums"><small id="nK"></small><h3 id="nH"></h3><div class="ng" id="ng"></div><div class="save" id="save"></div></div>
+</div>
+<script src="film.js"></script>
+<script>
+const { p, key, fade, $, set, typ, card, init, captions, progress, final, play, easeOut, back } = Film;
+const T = init({
+  ru: {
+    c: [['Главное', 'Один номер — 112', 'Единая служба для любого экстренного случая. Круглосуточно.'],
+        ['Что сказать', 'Что случилось и где вы', 'Коротко и по делу. Операторы в больших городах часто понимают русский и английский.'],
+        ['Номера', 'Прямые номера служб', 'Сохраните их в телефоне сразу после прилёта.']],
+    callS: 'Вызов…', op: '112, слушаю вас', h1: 'Что случилось', h1s: 'одной-двумя фразами', h2: 'Где вы', h2s: 'адрес или ориентир; можно попросить прохожих',
+    nK: 'Экстренные службы', nH: 'Если нужно напрямую', nums: [['101', 'Пожарные'], ['102', 'Милиция'], ['103', 'Скорая'], ['104', 'Газовая служба'], ['1050', 'МЧС']], save: 'Сохранить в контакты', saved: 'Сохранено ✓',
+    final: { title: 'Вы готовы', items: [{ text: '112 — для любого случая' }, { text: 'Номера сохранены' }, { text: 'Скорая в экстренных случаях бесплатна' }, { text: 'Установите MyGov', small: 'Статусы документов и справки онлайн', next: true }] },
+  },
+  en: {
+    c: [['Key point', 'One number — 112', 'A single service for any emergency. Around the clock.'],
+        ['What to say', 'What happened and where you are', 'Short and clear. Operators in big cities often understand Russian and English.'],
+        ['Numbers', 'Direct numbers', 'Save them in your phone as soon as you land.']],
+    callS: 'Calling…', op: '112, how can I help?', h1: 'What happened', h1s: 'in a sentence or two', h2: 'Where you are', h2s: 'address or landmark; ask people nearby to help',
+    nK: 'Emergency services', nH: 'If you need them directly', nums: [['101', 'Fire'], ['102', 'Police'], ['103', 'Ambulance'], ['104', 'Gas leak'], ['1050', 'Rescue (MChS)']], save: 'Save to contacts', saved: 'Saved ✓',
+    final: { title: 'You are ready', items: [{ text: '112 — for any emergency' }, { text: 'Numbers saved' }, { text: 'Emergency ambulance is free' }, { text: 'Install MyGov', small: 'Document status and certificates online', next: true }] },
+  },
+});
+const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'];
+$('keys').innerHTML = KEYS.map((k) => `<span data-k="${k}">${k}</span>`).join('');
+for (const k of ['callS', 'op', 'nK', 'nH']) $(k).textContent = T[k];
+$('h1t').textContent = T.h1; $('h1s').textContent = T.h1s; $('h2t').textContent = T.h2; $('h2s').textContent = T.h2s;
+$('ng').innerHTML = T.nums.map((n, i) => `<div id="n${i}"><b>${n[0]}</b><span>${n[1]}</span></div>`).join('');
+
+function render(t) {
+  const ph = p(t, 0.2, 1.0, back); const phOut = p(t, 13.6, 14.1);
+  set('phone', { transform: `translateY(${(1 - ph) * 1300 + phOut * -1400}px)` });
+  const s = typ(t, '112', 1.6, 2.6);
+  $('typed').textContent = s;
+  $('keys').querySelectorAll('span').forEach((el) => el.classList.toggle('hit', t > 1.6 && t < 2.8 && el.dataset.k === s.slice(-1)));
+  // calling: rings pulse out, the operator answers, what to say
+  set('calling', { opacity: p(t, 3.2, 3.6) });
+  [['ring1', 0], ['ring2', 0.8]].forEach(([id, o]) => { const k = ((t - 3.4 + o) % 1.6) / 1.6; set(id, { transform: `scale(${1 + k * 1.2})`, opacity: t < 3.4 ? 0 : (1 - k) * (1 - p(t, 7.0, 7.4)) }); });
+  $('callS').textContent = t < 6.6 ? T.callS : '00:0' + Math.min(9, Math.floor(t - 6.6));
+  const op = p(t, 6.6, 7.0, back);
+  set('op', { opacity: t < 6.6 ? 0 : 1, transform: `scale(${0.85 + op * 0.15})`, transformOrigin: '0 100%' });
+  [['h1', 8.2], ['h2', 9.8]].forEach(([id, a]) => { const v = p(t, a, a + 0.5, back); set(id, { opacity: t < a ? 0 : 1, transform: `translateY(${(1 - v) * 40}px)` }); });
+  // the direct numbers, and saving them
+  card('nums', t, 14.2, 22.8);
+  T.nums.forEach((_, i) => { const v = p(t, 15.0 + i * 0.4, 15.5 + i * 0.4, back); set(`n${i}`, { opacity: t < 15.0 + i * 0.4 ? 0 : 1, transform: `scale(${0.8 + v * 0.2})` }); });
+  const press = Math.max(p(t, 19.0, 19.2) - p(t, 19.2, 19.5), 0);
+  $('save').textContent = t > 19.3 ? T.saved : T.save;
+  set('save', { transform: `scale(${1 - press * 0.05})`, background: t > 19.3 ? 'var(--brand)' : 'var(--night)' });
+
+  captions(t, [[T.c[0], 0.3, 7.4], [T.c[1], 7.6, 13.8], [T.c[2], 14.0, 22.8]]);
+  progress(t, [[0, 7.5], [7.5, 13.9], [13.9, 23]]);
+  final(t, 23.4);
+}
+play(render, 30);
+</script>
+</body>
+</html>

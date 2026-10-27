@@ -47,6 +47,8 @@ All services work 24 hours a day. If something goes wrong, call without hesitati
 
 > **Tip.** In Tashkent and other large cities, 112 operators often understand Russian and English. Be ready to explain briefly what has happened and where you are, or ask people nearby to help.
 
+<div class="video-reel" data-reel="emergency"></div>
+
 ## Bank contacts
 
 Ask your onboarding specialist for the contacts of your HR Business Partner, the bank's emergency line, the office address and working hours. Save them in your phone on your very first day.
