@@ -65,18 +65,24 @@ const here = Astro.url.pathname;
         }
         if (document.prerendering) document.addEventListener('prerenderingchange', takeCover, { once: true });
         else takeCover();
-        // Every page opens at its top, also after "Назад" (the owner's rule); only #anchors keep their place.
+        // A new page opens at its top; "Назад" returns to the exact place you left (the site remembers it
+        // itself, since some browsers and previews restore it wrongly). #anchors keep their own place.
         try { history.scrollRestoration = 'manual'; } catch (e) {}
         if (!location.hash) {
+          var nav = performance.getEntriesByType ? performance.getEntriesByType('navigation')[0] : null;
+          var y = 0;
+          if (nav && nav.type === 'back_forward') {
+            try { y = JSON.parse(sessionStorage.getItem('gb-y') || '{}')[location.pathname] || 0; } catch (e) {}
+          }
           var moved = false;
           var mark = function () { moved = true; };
           ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
             window.addEventListener(t, mark, { once: true, passive: true });
           });
-          var top = function () { if (!moved && window.scrollY) window.scrollTo(0, 0); };
-          document.addEventListener('DOMContentLoaded', top, { once: true });
-          window.addEventListener('pagereveal', top, { once: true });
-          window.addEventListener('load', top, { once: true });
+          var place = function () { if (!moved && Math.abs(window.scrollY - y) > 2) window.scrollTo(0, y); };
+          document.addEventListener('DOMContentLoaded', place, { once: true });
+          window.addEventListener('pagereveal', place, { once: true });
+          window.addEventListener('load', function () { place(); requestAnimationFrame(place); }, { once: true });
         }
         window.addEventListener('pagereveal', function (e) {
           if (!e.viewTransition || !d.classList.contains('is-covered')) return;

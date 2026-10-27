@@ -905,11 +905,21 @@ function liftCover() {
   });
 }
 
+// Remember where you were on each page, so "Назад" brings you back to that exact place.
+window.addEventListener('pagehide', () => {
+  try {
+    const all = JSON.parse(sessionStorage.getItem('gb-y') || '{}');
+    all[location.pathname] = Math.round(window.scrollY);
+    sessionStorage.setItem('gb-y', JSON.stringify(all));
+  } catch {
+    /* without storage, Back opens the page at its top */
+  }
+});
+
 // Back from the bfcache: the page we left was still covered.
 window.addEventListener('pageshow', (e) => {
   if (!e.persisted) return;
   document.documentElement.classList.remove('is-covering', 'is-covered', 'is-lifting');
-  if (!location.hash) window.scrollTo(0, 0);
   const trail = readTrail();
   const at = trail.lastIndexOf(location.pathname);
   try {
