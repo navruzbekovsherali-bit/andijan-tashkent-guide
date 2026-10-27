@@ -14,9 +14,9 @@ const groups = groupBySection(await getPages(lang))
   .filter((g) => g.items.length > 0);
 ---
 
-<Base lang={lang} title={tr('faq')} description={tr('faqLead')} path="/faq/" current="faq" field="lapis">
-  <header class="mast mast-hub" data-glaze="lapis">
-    <Girih variant="hero" class="mast-art" />
+<Base lang={lang} title={tr('faq')} description={tr('faqLead')} path="/faq/" current="faq" field="deep">
+  <header class="mast mast-hub" data-glaze="deep">
+    <Girih variant="rosette" class="mast-art" />
     <div class="wrap mast-inner">
       <h1 class="display">{tr('faq')}</h1>
       <p class="mast-lead">{tr('faqLead')}</p>

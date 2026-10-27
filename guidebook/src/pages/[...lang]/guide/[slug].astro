@@ -44,12 +44,12 @@ const glaze = glazeOf(data.section);
 <Base lang={lang} title={data.title} description={data.description} path={`/guide/${slug}/`} audience={audience} field={glaze}>
   <div class="read-progress" aria-hidden="true"></div>
   <header class="mast mast-article" data-glaze={glaze}>
-    <Girih variant="hero" class="mast-art" />
+    <Girih variant="rosette" class="mast-art" />
     <div class="wrap mast-inner">
       <nav class="crumbs" aria-label="breadcrumbs">
-        <a href={url(lang, '/')} data-glaze="cobalt">{tr('home')}</a>
+        <a href={url(lang, '/')} data-glaze="night">{tr('home')}</a>
         <span class="sep" aria-hidden="true">/</span>
-        <a href={url(lang, `/${hubAud}/#${data.section}`)} data-glaze={hubAud === 'local' ? 'malachite' : 'saffron'}>{section.title[lang]}</a>
+        <a href={url(lang, `/${hubAud}/#${data.section}`)} data-glaze={hubAud === 'local' ? 'emerald' : 'mint'}>{section.title[lang]}</a>
       </nav>
       <h1 class="display">{data.title}</h1>
       <p class="mast-lead">{data.description}</p>
@@ -144,18 +144,17 @@ const glaze = glazeOf(data.section);
 
   <nav class="pager" aria-label={`${tr('prev')} / ${tr('next')}`}>
     {next && (
-      <a class="next" href={url(lang, `/guide/${next.slug}/`)} data-glaze={glazeOf(next.entry.data.section)}>
+      <a class="next" href={url(lang, `/guide/${next.slug}/`)} data-glaze={glazeOf(next.entry.data.section)} aria-label={`${tr('next')}: ${next.entry.data.title}`}>
         <span class="wrap">
-          <small>{tr('next')}</small>
           <strong>{next.entry.data.title}</strong>
           <Icon name="arrow" size={28} />
         </span>
       </a>
     )}
     {prev && (
-      <a class="prev" href={url(lang, `/guide/${prev.slug}/`)} data-glaze={glazeOf(prev.entry.data.section)}>
+      <a class="prev" href={url(lang, `/guide/${prev.slug}/`)} data-glaze={glazeOf(prev.entry.data.section)} aria-label={`${tr('prev')}: ${prev.entry.data.title}`}>
         <span class="wrap">
-          <small><Icon name="back" size={16} />{tr('prev')}</small>
+          <Icon name="back" size={20} />
           <strong>{prev.entry.data.title}</strong>
         </span>
       </a>

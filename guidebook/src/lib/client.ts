@@ -325,6 +325,7 @@ export function initSite() {
   followingGuide();
   headerOnScroll();
   mastParallax();
+  bandsOnScroll();
   wordsReveal();
   liftCover();
 }
@@ -701,7 +702,7 @@ function coverAndGo(e: MouseEvent, link: HTMLAnchorElement) {
   if (to.pathname === location.pathname && to.search === location.search) return; // anchor on this page
   if (reduceMotion()) return;
   e.preventDefault();
-  const glaze = link.dataset.glaze || link.closest<HTMLElement>('[data-glaze]')?.dataset.glaze || 'cobalt';
+  const glaze = link.dataset.glaze || link.closest<HTMLElement>('[data-glaze]')?.dataset.glaze || 'night';
   const x = e.clientX || window.innerWidth / 2;
   const y = e.clientY || window.innerHeight / 2;
   closeSheets();
@@ -723,7 +724,7 @@ function liftCover() {
     return;
   }
   if (!root.classList.contains('is-covered')) return;
-  const cover = drawCover(root.dataset.cover || 'cobalt', window.innerWidth / 2, 0);
+  const cover = drawCover(root.dataset.cover || 'night', window.innerWidth / 2, 0);
   requestAnimationFrame(() => {
     root.classList.remove('is-covered');
     root.classList.add('is-lifting');
@@ -750,5 +751,18 @@ function mastParallax() {
   onScrollFrame(() => {
     const y = window.scrollY;
     if (y <= mast.offsetHeight) art.style.setProperty('--sy', (y * 0.35).toFixed(1));
+  });
+}
+
+/* ---------- Tile bands set themselves, tile by tile, as they scroll into view ---------- */
+function bandsOnScroll() {
+  const bands = Array.from(document.querySelectorAll<SVGElement>('.girih-band'));
+  if (!bands.length || reduceMotion()) return;
+  onScrollFrame(() => {
+    const vh = window.innerHeight;
+    for (const b of bands) {
+      const top = b.getBoundingClientRect().top;
+      b.style.setProperty('--p', clamp01((vh - top) / (vh * 0.45)).toFixed(3));
+    }
   });
 }

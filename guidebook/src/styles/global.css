@@ -12,21 +12,23 @@
 /* ---------- Tokens ---------- */
 :root {
   color-scheme: light;
-  /* glazes */
-  --g-cobalt: #1b3a9e;
-  --g-turquoise: #067a87;
-  --g-turquoise-hi: #12a7b5;
-  --g-malachite: #0a6e48;
-  --g-saffron: #f2a51a;
-  --g-pomegranate: #b0233b;
-  --g-lapis: #232a6b;
-  /* white glaze and ink — the only neutrals */
+  /* Hamkorbank brand: night green-black to glowing mint (from the bank's logo) */
+  --g-night: #0c201e;
+  --g-deep: #103a40;
+  --g-pine: #14403a;
+  --g-teal: #0b6b5b;
+  --g-teal-hi: #2fc4a4;
+  --g-emerald: #087a50;
+  --g-mint: #1de38a;
+  --warn: #c2283f; /* only for "важно" and errors */
+  /* white and ink — the only neutrals */
   --white: #ffffff;
-  --ground: #f4f6fb;
-  --ink: #0e1530;
-  --ink-2: #39425f;
-  --ink-3: #555e7c;
-  --rule: #d5dae8;
+  --ground: #ffffff;
+  --ink: #0b1f1d;
+  --ink-2: #33504b;
+  --ink-3: #4f6964;
+  --rule: #d3e0dd;
+  --tint: #edf4f2; /* quiet fills on white: inputs, segmented controls */
 
   --f-display: 'Tektur Variable', 'Geologica Variable', system-ui, sans-serif;
   --f-body: 'Geologica Variable', system-ui, sans-serif;
@@ -55,78 +57,84 @@
   --star: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-1 -1 2 2'%3E%3Cpath d='M1 0L.354 .146.707 .707.146 .354 0 1-.146 .354-.707 .707-.354 .146-1 0-.354-.146-.707-.707-.146-.354 0-1 .146-.354.707-.707.354-.146Z'/%3E%3C/svg%3E");
 }
 
-/* Each glaze: field colour, text on it, its tint on white, its ink on white, and its tiles. */
-[data-glaze='cobalt'] {
-  --field: var(--g-cobalt);
+/* Each field: colour, text on it, its tint on white, its ink on white, and its tiles. */
+[data-glaze='night'] {
+  --field: var(--g-night);
   --on-field: #fff;
-  --on-field-2: #d6defa;
-  --field-ink: var(--g-cobalt);
-  --field-soft: #e8ecf8;
-  --tile-star: var(--g-turquoise-hi);
+  --on-field-2: #c3dbd5;
+  --field-ink: var(--g-emerald);
+  --field-soft: #e3efec;
+  --tile-star: var(--g-mint);
   --tile-alt: #fff;
-  --tile-heart: var(--g-saffron);
-  --tile-cross: #142c7a;
-  --line: rgb(255 255 255 / 0.55);
+  --tile-heart: var(--g-teal-hi);
+  --tile-cross: #081614;
+  --line: rgb(29 227 138 / 0.5);
+  --glow: rgb(29 227 138 / 0.32);
 }
-[data-glaze='turquoise'] {
-  --field: var(--g-turquoise);
+[data-glaze='deep'] {
+  --field: var(--g-deep);
   --on-field: #fff;
-  --on-field-2: #d5f1f3;
-  --field-ink: var(--g-turquoise);
-  --field-soft: #e2f3f4;
-  --tile-star: var(--g-saffron);
-  --tile-alt: #fff;
-  --tile-heart: var(--g-cobalt);
-  --tile-cross: #045660;
-  --line: rgb(255 255 255 / 0.55);
-}
-[data-glaze='malachite'] {
-  --field: var(--g-malachite);
-  --on-field: #fff;
-  --on-field-2: #d3efe2;
-  --field-ink: var(--g-malachite);
-  --field-soft: #e1f1ea;
-  --tile-star: var(--g-saffron);
-  --tile-alt: #fff;
-  --tile-heart: var(--g-pomegranate);
-  --tile-cross: #06492f;
-  --line: rgb(255 255 255 / 0.5);
-}
-[data-glaze='saffron'] {
-  --field: var(--g-saffron);
-  --on-field: var(--ink);
-  --on-field-2: #3a2a06;
-  --field-ink: #8a5600;
-  --field-soft: #fdf1da;
-  --tile-star: var(--g-cobalt);
-  --tile-alt: #fff;
-  --tile-heart: var(--g-pomegranate);
-  --tile-cross: #d98b06;
-  --line: rgb(14 21 48 / 0.4);
-}
-[data-glaze='pomegranate'] {
-  --field: var(--g-pomegranate);
-  --on-field: #fff;
-  --on-field-2: #fadbe0;
-  --field-ink: var(--g-pomegranate);
-  --field-soft: #f9e6e9;
-  --tile-star: var(--g-saffron);
-  --tile-alt: #fff;
-  --tile-heart: var(--g-cobalt);
-  --tile-cross: #7c1428;
-  --line: rgb(255 255 255 / 0.5);
-}
-[data-glaze='lapis'] {
-  --field: var(--g-lapis);
-  --on-field: #fff;
-  --on-field-2: #d9dcf5;
-  --field-ink: var(--g-lapis);
-  --field-soft: #e7e8f4;
-  --tile-star: var(--g-turquoise-hi);
-  --tile-alt: var(--g-saffron);
+  --on-field-2: #c6e0e2;
+  --field-ink: var(--g-teal);
+  --field-soft: #e2eff0;
+  --tile-star: var(--g-teal-hi);
+  --tile-alt: var(--g-mint);
   --tile-heart: #fff;
-  --tile-cross: #161b4a;
-  --line: rgb(255 255 255 / 0.5);
+  --tile-cross: #0a2a2f;
+  --line: rgb(47 196 164 / 0.55);
+  --glow: rgb(47 196 164 / 0.3);
+}
+[data-glaze='pine'] {
+  --field: var(--g-pine);
+  --on-field: #fff;
+  --on-field-2: #c9e0da;
+  --field-ink: var(--g-teal);
+  --field-soft: #e3efeb;
+  --tile-star: var(--g-mint);
+  --tile-alt: #fff;
+  --tile-heart: var(--g-teal-hi);
+  --tile-cross: #0c2d28;
+  --line: rgb(29 227 138 / 0.45);
+  --glow: rgb(29 227 138 / 0.25);
+}
+[data-glaze='teal'] {
+  --field: var(--g-teal);
+  --on-field: #fff;
+  --on-field-2: #d2efe8;
+  --field-ink: var(--g-teal);
+  --field-soft: #e0f1ed;
+  --tile-star: var(--g-mint);
+  --tile-alt: #fff;
+  --tile-heart: var(--g-night);
+  --tile-cross: #08544a;
+  --line: rgb(255 255 255 / 0.45);
+  --glow: rgb(29 227 138 / 0.3);
+}
+[data-glaze='emerald'] {
+  --field: var(--g-emerald);
+  --on-field: #fff;
+  --on-field-2: #d3f1e3;
+  --field-ink: var(--g-emerald);
+  --field-soft: #e0f3ea;
+  --tile-star: var(--g-mint);
+  --tile-alt: #fff;
+  --tile-heart: var(--g-night);
+  --tile-cross: #066140;
+  --line: rgb(255 255 255 / 0.45);
+  --glow: rgb(29 227 138 / 0.35);
+}
+[data-glaze='mint'] {
+  --field: var(--g-mint);
+  --on-field: var(--ink);
+  --on-field-2: #12382c;
+  --field-ink: var(--g-emerald);
+  --field-soft: #ddf9ec;
+  --tile-star: var(--g-night);
+  --tile-alt: #fff;
+  --tile-heart: var(--g-teal);
+  --tile-cross: #17c87a;
+  --line: rgb(11 31 29 / 0.35);
+  --glow: rgb(255 255 255 / 0.45);
 }
 [data-glaze] {
   --band-star: var(--tile-star);
@@ -163,7 +171,7 @@ body {
   }
 }
 ::selection {
-  background: var(--g-saffron);
+  background: var(--g-mint);
   color: var(--ink);
 }
 * {
@@ -171,7 +179,7 @@ body {
   scrollbar-width: thin;
 }
 input {
-  caret-color: var(--g-pomegranate);
+  caret-color: var(--g-emerald);
 }
 h1,
 h2,
@@ -199,7 +207,7 @@ svg {
   margin-inline: auto;
 }
 :focus-visible {
-  outline: 3px solid var(--g-saffron);
+  outline: 3px solid var(--g-mint);
   outline-offset: 3px;
 }
 .visually-hidden {
@@ -335,11 +343,11 @@ svg {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   padding: 6px;
-  background: var(--ink);
+  background: #12302c;
   color: #fff;
   clip-path: var(--chamfer);
   --ch: 14px;
-  box-shadow: 0 18px 40px -16px rgb(14 21 48 / 0.6);
+  box-shadow: inset 0 0 0 1px rgb(29 227 138 / 0.28);
 }
 .dock a,
 .dock button {
@@ -361,7 +369,7 @@ svg {
   transition: background-color 160ms, color 160ms;
 }
 .dock [aria-current='page'] {
-  color: var(--g-saffron);
+  color: var(--g-mint);
 }
 .dock a:active,
 .dock button:active {
@@ -380,6 +388,14 @@ svg {
   background: var(--field);
   color: var(--on-field);
   isolation: isolate;
+}
+.mast::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background: radial-gradient(120% 90% at 100% 0%, var(--glow), transparent 60%);
 }
 .mast-inner {
   position: relative;
@@ -408,17 +424,19 @@ svg {
 }
 
 /* home */
+/* phones: the rosette fills the top of the screen, the greeting sits lower left,
+   the two choices wait above the dock, under the thumb */
 .mast-home {
   display: flex;
   flex-direction: column;
-  padding: 0 0 48px;
+  min-height: calc(100svh - var(--header-h));
+  padding: 0 0 calc(var(--dock-h) + 28px);
 }
 .mast-home .display {
   font-size: clamp(2.3rem, 1.6rem + 5.2vw, 5.6rem);
   max-width: 11ch;
   font-stretch: 88%;
 }
-/* phones: the pattern is its own block above the words, never under them */
 .mast-home .mast-art,
 .mast-hub .mast-art {
   position: relative;
@@ -428,23 +446,28 @@ svg {
   min-height: 150px;
 }
 .mast-home .mast-art {
-  flex: none;
-  height: clamp(120px, 22svh, 220px);
-  min-height: 0;
-}
-.mast-home .mast-inner {
-  display: flex;
-  flex-direction: column;
-  padding-top: 16px;
-}
-/* phones: the two choices come right under the greeting, the explanation after them */
-.mast-home .doors {
-  order: 2;
-  margin-top: 20px;
+  flex: 1 1 0;
+  height: 0;
+  min-height: 140px;
+  margin: 12px 0 4px;
 }
 .mast-home .mast-lead {
-  order: 3;
-  margin-top: 24px;
+  display: none;
+}
+.phone-lead {
+  margin-top: 36px;
+  max-width: 40ch;
+  font-size: var(--step-1);
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+@media (min-width: 720px) {
+  .mast-home .mast-lead {
+    display: block;
+  }
+  .phone-lead {
+    display: none;
+  }
 }
 .doors {
   display: grid;
@@ -538,21 +561,16 @@ svg {
     width: 52%;
   }
   .mast-home {
-    min-height: calc(100svh - var(--header-h));
     justify-content: flex-end;
     padding-bottom: 72px;
+  }
+  .mast-home .mast-art {
+    margin: 0;
+    right: 2%;
   }
   .mast-home .display {
     max-width: 15ch;
     hyphens: manual;
-  }
-  .mast-home .doors {
-    order: 3;
-    margin-top: 28px;
-  }
-  .mast-home .mast-lead {
-    order: 2;
-    margin-top: 16px;
   }
 }
 .mast-article .mast-art {
@@ -623,7 +641,7 @@ svg {
   background: var(--on-field);
   color: var(--field);
 }
-[data-glaze='saffron'] .chip.stamp {
+[data-glaze='mint'] .chip.stamp {
   color: var(--ink);
   background: #fff;
 }
@@ -657,24 +675,25 @@ svg {
   transform-box: fill-box;
   transform-origin: center;
 }
-.js .girih-hero .g-grid {
+.js .girih-rosette .g-grid {
   stroke-dasharray: 1;
   animation: g-draw 1600ms var(--ease-out) 100ms both;
 }
-.js .girih-hero .g-compass,
-.js .girih-hero .g-lines path {
+.js .girih-rosette .g-compass,
+.js .girih-rosette .g-lines path {
   stroke-dasharray: 1;
   animation: g-draw 900ms var(--ease-in-out) calc(var(--d) * 1s + 250ms) both;
 }
-.js .girih-hero .g-lines path {
+.js .girih-rosette .g-lines path {
   animation-delay: calc(var(--d) * 1s + 500ms);
 }
 .js .girih .g-tile {
   animation: g-set 900ms var(--ease-out) calc(var(--d) * 1s + 900ms) both;
 }
+/* bands set tile by tile as they scroll into view (--p from lib/client.ts) */
 .js .girih-band .g-tile {
-  animation-delay: calc(var(--d) * 0.7s + 200ms);
-  animation-duration: 600ms;
+  animation: none;
+  transform: scale(clamp(0, calc(var(--p, 1) * 2.4 - var(--d) * 1.3), 1)) rotate(calc((1 - min(1, var(--p, 1) * 1.6)) * -45deg));
 }
 @keyframes g-draw {
   from {
@@ -715,13 +734,13 @@ svg {
   width: 100%;
   height: 100%;
   overflow: visible;
-  --guide-1: var(--g-saffron);
-  --guide-2: var(--g-pomegranate);
+  --guide-1: var(--g-mint);
+  --guide-2: var(--g-night);
 }
 .guide-bubble {
   position: relative;
   padding: 16px 18px;
-  background: var(--white);
+  background: var(--field-soft);
   clip-path: polygon(0 0, calc(100% - var(--ch)) 0, 100% var(--ch), 100% 100%, var(--ch) 100%, 0 calc(100% - var(--ch)));
   --ch: 12px;
 }
@@ -730,7 +749,7 @@ svg {
   font-family: var(--f-display);
   font-weight: 700;
   font-size: 0.85rem;
-  color: var(--g-pomegranate);
+  color: var(--g-emerald);
   margin-bottom: 4px;
 }
 .guide-bubble p {
@@ -743,7 +762,7 @@ svg {
   gap: 8px;
 }
 .guide-bubble li::marker {
-  color: var(--g-saffron);
+  color: var(--g-mint);
 }
 
 /* statement that reads itself */
@@ -759,63 +778,113 @@ svg {
   color: var(--ink);
 }
 .statement .w {
-  opacity: clamp(0.18, calc(var(--p, 1) * (var(--n) + 4) - var(--i)), 1);
+  opacity: clamp(0.45, calc(var(--p, 1) * (var(--n) + 4) - var(--i)), 1);
   transition: opacity 120ms linear;
 }
 
-/* rows: popular pages, coloured by chapter */
-.rows {
+/* tiles: popular pages, each in its own chapter's field */
+.tiles {
   list-style: none;
   margin: 0;
   padding: 0;
-  border-top: 1px solid var(--rule);
+  display: grid;
+  gap: 8px;
 }
-.rows li {
-  border-bottom: 1px solid var(--rule);
+@media (min-width: 720px) {
+  .tiles {
+    grid-template-columns: 1fr 1fr;
+  }
 }
-.rows a {
+.tiles a {
   position: relative;
   display: grid;
-  grid-template-columns: 22px 1fr auto;
-  column-gap: 14px;
-  align-items: center;
-  padding: 18px 0;
+  grid-template-columns: 1fr auto;
+  column-gap: 16px;
+  align-content: start;
+  min-height: 132px;
+  padding: 18px 20px 20px 52px;
+  background: var(--field);
+  color: var(--on-field);
   text-decoration: none;
+  clip-path: var(--chamfer);
+  --ch: 14px;
+  transition: transform 260ms var(--ease-out), filter 200ms;
 }
-.rows a::before {
+.tiles a::before {
   content: '';
-  grid-row: 1 / span 2;
+  position: absolute;
+  left: 18px;
+  top: 20px;
   width: 22px;
   height: 22px;
-  background: var(--field);
+  background: var(--tile-star);
   mask: var(--star) center / contain no-repeat;
-  transition: transform 500ms var(--ease-out);
+  transition: transform 600ms var(--ease-out);
 }
-.rows a:hover::before {
+.tiles a:hover {
+  filter: brightness(1.07);
+}
+.tiles a:hover::before {
   transform: rotate(45deg) scale(1.15);
 }
-.rows strong {
-  font-size: 1.15rem;
-  font-weight: 600;
-  line-height: 1.3;
+.tiles a:active {
+  transform: scale(0.985);
 }
-.rows .row-lead {
-  grid-column: 2;
-  color: var(--ink-3);
+.tiles strong {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  line-height: 1.2;
+}
+.tile-lead {
+  grid-column: 1;
+  margin-top: 8px;
+  color: var(--on-field-2);
   font-size: 0.98rem;
   line-height: 1.45;
 }
-.rows svg {
-  grid-column: 3;
-  grid-row: 1 / span 2;
-  color: var(--field-ink);
+.tiles svg {
+  grid-column: 2;
+  grid-row: 1;
   transition: transform 260ms var(--ease-out);
 }
-.rows a:hover svg {
+.tiles a:hover svg {
   transform: translateX(4px);
 }
-.rows a:hover strong {
-  color: var(--field-ink);
+
+/* home FAQ on the bank's night field */
+.home-faq {
+  margin-top: 88px;
+  padding-bottom: 72px;
+  background: var(--field);
+  color: var(--on-field);
+}
+.home-faq .block-title {
+  margin-top: 40px;
+}
+.band-edge {
+  width: 100%;
+  height: 36px;
+  background: #fff;
+}
+.home-faq .faq-list,
+.home-faq .faq-item {
+  border-color: rgb(255 255 255 / 0.16);
+}
+.home-faq .faq-item summary svg {
+  color: var(--g-mint);
+}
+.home-faq .faq-item summary:hover span {
+  color: var(--g-mint);
+}
+.home-faq .faq-a {
+  color: var(--on-field-2);
+}
+.home-faq .faq-src {
+  color: var(--g-mint);
+}
+main:has(.home-faq) {
+  padding-bottom: 0;
 }
 
 /* buttons */
@@ -875,14 +944,14 @@ svg {
   display: none;
 }
 .faq-item summary svg {
-  color: var(--g-pomegranate);
+  color: var(--g-emerald);
   transition: transform 300ms var(--ease-out);
 }
 .faq-item[open] summary svg {
   transform: rotate(90deg);
 }
 .faq-item summary:hover span {
-  color: var(--g-cobalt);
+  color: var(--g-emerald);
 }
 .faq-a {
   padding: 0 0 20px;
@@ -894,7 +963,7 @@ svg {
   gap: 6px;
   margin-top: 12px;
   font-weight: 600;
-  color: var(--field-ink, var(--g-cobalt));
+  color: var(--field-ink, var(--g-night));
   text-decoration: none;
 }
 .faq-src:hover {
@@ -917,7 +986,6 @@ svg {
   mask: var(--star) center / contain no-repeat;
 }
 .faq-filter {
-  background: var(--white);
   margin-top: 32px;
   max-width: var(--measure);
 }
@@ -1037,7 +1105,7 @@ article {
 }
 .note svg {
   flex: none;
-  color: var(--g-pomegranate);
+  color: var(--warn);
 }
 .read-progress {
   position: fixed;
@@ -1048,7 +1116,7 @@ article {
   height: 4px;
   transform-origin: 0 50%;
   transform: scaleX(var(--p, 0));
-  background: var(--g-saffron);
+  background: var(--g-mint);
   transition: top 320ms var(--ease-out);
 }
 
@@ -1124,19 +1192,19 @@ article {
   background: #f9e6e9;
 }
 .prose blockquote.is-warn::before {
-  background: var(--g-pomegranate);
+  background: var(--warn);
 }
 .prose blockquote.is-tip {
   background: #e1f1ea;
 }
 .prose blockquote.is-tip::before {
-  background: var(--g-malachite);
+  background: var(--g-emerald);
 }
 .prose blockquote.is-hr {
-  background: #e7e8f4;
+  background: #e2eff0;
 }
 .prose blockquote.is-hr::before {
-  background: var(--g-lapis);
+  background: var(--g-teal);
 }
 .prose table {
   display: block;
@@ -1304,23 +1372,16 @@ article {
 .pager .next .wrap {
   padding: 32px 0 36px;
 }
-.pager .next small {
-  font-weight: 500;
-  font-size: 0.95rem;
-  color: var(--on-field-2);
-}
 .pager .next strong {
   grid-column: 1;
   font-family: var(--f-display);
   font-weight: 700;
   font-size: var(--step-3);
   line-height: 1.05;
-  margin-top: 6px;
   hyphens: auto;
 }
 .pager .next svg {
   grid-column: 2;
-  grid-row: 1 / span 2;
   width: 40px;
   height: 40px;
   transition: transform 300ms var(--ease-out);
@@ -1333,14 +1394,12 @@ article {
   color: var(--ink);
 }
 .pager .prev .wrap {
+  grid-template-columns: auto 1fr;
+  align-items: center;
   padding: 18px 0 22px;
 }
-.pager .prev small {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.pager .prev svg {
   color: var(--ink-3);
-  font-size: 0.9rem;
 }
 .pager .prev strong {
   font-weight: 600;
@@ -1471,7 +1530,7 @@ main:has(.pager) {
   gap: 4px;
   padding: 4px;
   margin: 0 0 24px;
-  background: var(--ground);
+  background: var(--tint);
   clip-path: var(--chamfer);
 }
 .seg button,
@@ -1573,12 +1632,12 @@ main:has(.pager) {
   gap: 10px;
   min-height: 56px;
   padding: 0 16px;
-  background: var(--ground);
+  background: var(--tint);
   color: var(--ink-2);
   clip-path: var(--chamfer);
 }
 .search-field:focus-within {
-  box-shadow: inset 0 0 0 2px var(--g-cobalt);
+  box-shadow: inset 0 0 0 2px var(--g-night);
 }
 .search-field input {
   flex: 1;
@@ -1611,7 +1670,7 @@ main:has(.pager) {
 }
 .results .r-meta {
   font-size: 0.82rem;
-  color: var(--g-cobalt);
+  color: var(--g-night);
   font-weight: 500;
 }
 .results .r-title {
@@ -1624,7 +1683,7 @@ main:has(.pager) {
   line-height: 1.45;
 }
 .results mark {
-  background: #fdf1da;
+  background: #c8f7df;
   color: inherit;
 }
 
@@ -1835,7 +1894,7 @@ main:has(.pager) {
   display: block;
   font-size: 0.8rem;
   font-weight: 500;
-  color: var(--g-pomegranate);
+  color: var(--g-emerald);
 }
 .guide-fab-bubble [data-k='text'] {
   font-weight: 650;
@@ -1935,7 +1994,7 @@ main:has(.pager) {
   height: 1.1em;
   margin-left: 2px;
   vertical-align: -0.15em;
-  background: var(--g-pomegranate);
+  background: var(--g-emerald);
   animation: caret 1s steps(2) infinite;
 }
 @keyframes caret {
@@ -1961,7 +2020,7 @@ main:has(.pager) {
   transition: background-color 120ms;
 }
 .pd-keys span.is-hit {
-  background: var(--g-pomegranate);
+  background: var(--g-emerald);
   color: #fff;
 }
 .pd-call {
@@ -1996,7 +2055,7 @@ main:has(.pager) {
   font-style: normal;
   font-weight: 700;
   text-align: right;
-  color: var(--g-cobalt);
+  color: var(--g-night);
 }
 @keyframes sheet-in {
   from {
@@ -2034,7 +2093,7 @@ main:has(.pager) {
   color: var(--ink);
 }
 .pd-steps button:focus-visible {
-  outline: 2px solid var(--g-cobalt);
+  outline: 2px solid var(--g-night);
   outline-offset: 3px;
 }
 .pd figcaption small {
@@ -2058,7 +2117,7 @@ main:has(.pager) {
   content: '';
   display: block;
   height: 100%;
-  background: var(--g-saffron);
+  background: var(--g-mint);
   transform-origin: 0 50%;
   transform: scaleX(0);
 }

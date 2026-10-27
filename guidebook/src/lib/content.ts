@@ -20,7 +20,7 @@ export const SECTIONS: Record<SectionId, { title: Record<Lang, string>; icon: st
 };
 
 /** Glaze colour of each route line (see the --g-* tokens in global.css). */
-export const GLAZES = ['cobalt', 'turquoise', 'malachite', 'saffron', 'pomegranate', 'lapis'] as const;
+export const GLAZES = ['night', 'teal', 'emerald', 'mint', 'pine', 'deep'] as const;
 export type Glaze = (typeof GLAZES)[number];
 export const glazeOf = (id: SectionId): Glaze => GLAZES[(SECTIONS[id].line - 1) % GLAZES.length];
 

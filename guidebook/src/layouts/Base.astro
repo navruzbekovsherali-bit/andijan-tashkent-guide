@@ -19,7 +19,7 @@ interface Props {
   field?: Glaze;
 }
 
-const { lang, title, description, path, audience = 'both', current = 'page', field = 'cobalt' } = Astro.props;
+const { lang, title, description, path, audience = 'both', current = 'page', field = 'night' } = Astro.props;
 const tr = t(lang);
 const pages = await getPages(lang);
 const groups = groupBySection(pages);
@@ -34,7 +34,7 @@ const here = Astro.url.pathname;
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{pageTitle}</title>
     {description && <meta name="description" content={description} />}
-    <meta name="theme-color" content="#1b3a9e" data-field-color />
+    <meta name="theme-color" content="#0c201e" data-field-color />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="canonical" href={new URL(here, Astro.site)} />
     {LANGS.map((l) => <link rel="alternate" hreflang={l} href={new URL(url(l, path), Astro.site)} />)}
@@ -83,9 +83,9 @@ const here = Astro.url.pathname;
           <span>Hamkorbank<small>{tr('siteShort')}</small></span>
         </a>
         <nav class="header-nav" aria-label={tr('menu')}>
-          <a href={url(lang, '/local/')} data-nav="local" data-glaze="malachite">{tr('localShort')}</a>
-          <a href={url(lang, '/expat/')} data-nav="expat" data-glaze="cobalt">{tr('expatShort')}</a>
-          <a href={url(lang, '/faq/')} data-nav="faq" data-glaze="lapis">{tr('faq')}</a>
+          <a href={url(lang, '/local/')} data-nav="local" data-glaze="emerald">{tr('localShort')}</a>
+          <a href={url(lang, '/expat/')} data-nav="expat" data-glaze="night">{tr('expatShort')}</a>
+          <a href={url(lang, '/faq/')} data-nav="faq" data-glaze="deep">{tr('faq')}</a>
           <a href={url(lang, '/guide/contacts/')} data-nav="contacts">{tr('contacts')}</a>
         </nav>
         <div class="header-actions">
@@ -111,8 +111,8 @@ const here = Astro.url.pathname;
 
     <!-- Dock: everything reachable with a thumb -->
     <nav class="dock" aria-label={tr('menu')}>
-      <a href={url(lang, '/')} data-nav="home" data-glaze="cobalt"><Icon name="home" /><span>{tr('home')}</span></a>
-      <a href={url(lang, '/faq/')} data-nav="faq" data-glaze="lapis"><Icon name="question" /><span>{tr('faqShort')}</span></a>
+      <a href={url(lang, '/')} data-nav="home" data-glaze="night"><Icon name="home" /><span>{tr('home')}</span></a>
+      <a href={url(lang, '/faq/')} data-nav="faq" data-glaze="deep"><Icon name="question" /><span>{tr('faqShort')}</span></a>
       <button type="button" data-sheet="search"><Icon name="search" /><span>{tr('search')}</span></button>
       <button type="button" data-sheet="drawer"><Icon name="menu" /><span>{tr('menu')}</span></button>
     </nav>
@@ -148,7 +148,7 @@ const here = Astro.url.pathname;
             ))
           }
           <div class="drawer-foot">
-            <a class="drawer-faq" href={url(lang, '/faq/')} data-glaze="lapis">{tr('faq')}<Icon name="arrow" size={18} /></a>
+            <a class="drawer-faq" href={url(lang, '/faq/')} data-glaze="deep">{tr('faq')}<Icon name="arrow" size={18} /></a>
             <div>
               <p class="label">Язык · Language · Til</p>
               <div class="seg three">

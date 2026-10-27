@@ -20,7 +20,7 @@ const tr = t(lang);
 const groups = groupBySection(forAudience(await getPages(lang), aud));
 const title = aud === 'local' ? tr('local') : tr('expat');
 const lead = aud === 'local' ? tr('localLead') : tr('expatLead');
-const field = aud === 'local' ? 'malachite' : 'saffron';
+const field = aud === 'local' ? 'emerald' : 'mint';
 const hello: Record<Audience, Record<Lang, string>> = {
   local: {
     ru: 'Начните с «Первого дня и первой недели» — там весь план. Остальное открывайте, когда понадобится.',
@@ -40,7 +40,7 @@ const numbered = groups.map((g) => ({ ...g, steps: g.pages.map((p) => ({ p, n: +
 
 <Base lang={lang} title={title} description={lead} path={`/${aud}/`} audience={aud} current={aud} field={field}>
   <header class="mast mast-hub" data-glaze={field}>
-    <Girih variant="hero" class="mast-art" />
+    <Girih variant="rosette" class="mast-art" />
     <div class="wrap mast-inner">
       <h1 class="display">{title}</h1>
       <p class="mast-lead">{lead}</p>

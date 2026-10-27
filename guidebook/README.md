@@ -23,7 +23,8 @@ node scripts/make-preview.mjs   # предпросмотр с относител
 |---|---|
 | `src/content/guide/` | Тексты страниц (ru, потом en, uz) |
 | `src/lib/i18n.ts` | Надписи интерфейса на трёх языках |
-| `src/styles/global.css` | Цвета, шрифты, 3 варианта стиля |
+| `src/styles/global.css` | Цвета (глазури), шрифты, движение |
+| `src/lib/girih.ts` | Геометрия узора «звезда и крест» |
 | `src/pages/` | Шаблоны страниц |
 | `/search-index.<lang>.json` | Индекс поиска |
 | `/api/guide.<lang>.json` | Все тексты, FAQ и источники одним файлом — для будущего чат-бота |

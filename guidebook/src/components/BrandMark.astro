@@ -1,9 +1,21 @@
 ---
-// Neutral guidebook mark (not the bank logo — logo rights are still open): one girih star.
-import { star, cross, d } from '../lib/girih';
+// Hamkorbank mark, redrawn as a vector from the image the owner sent (27.10.2026).
+// Replace with the official SVG from the bank's brand files when available.
+const left = '41.9,23.4 51.7,23.4 39,78 29.2,78';
+const right = '61,22 70.8,22 58.1,76.6 48.3,76.6';
+const bar = '46.7,45 55.65,45 53.9,52.5 44.9,52.5';
 ---
 
-<svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
-  <path d={d(star(16, 16, 31))} fill="var(--mark-star, currentColor)"></path>
-  <path d={d(cross(16, 16, 14))} fill="var(--mark-heart, var(--g-saffron))"></path>
+<svg class="brand-mark" viewBox="0 0 100 100" aria-hidden="true">
+  <defs>
+    <mask id="hb-ring-gaps" maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="100">
+      <rect width="100" height="100" fill="#fff"></rect>
+      <polygon points={left} fill="#000" stroke="#000" stroke-width="7" stroke-linejoin="round"></polygon>
+      <polygon points={right} fill="#000" stroke="#000" stroke-width="7" stroke-linejoin="round"></polygon>
+    </mask>
+  </defs>
+  <circle cx="50" cy="50" r="33.5" fill="none" stroke="currentColor" stroke-width="8" mask="url(#hb-ring-gaps)"></circle>
+  <polygon points={left} fill="currentColor"></polygon>
+  <polygon points={right} fill="currentColor"></polygon>
+  <polygon points={bar} fill="currentColor"></polygon>
 </svg>
