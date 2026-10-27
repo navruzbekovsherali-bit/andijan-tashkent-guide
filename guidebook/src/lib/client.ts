@@ -546,6 +546,12 @@ function stopVideo(btn: HTMLButtonElement) {
 
 /* ---------- Bank reels: a vertical film that plays silently while on screen; sound on request ---------- */
 const REELS: Record<string, { src: string; poster: string; ru: [string, string, string]; en: [string, string, string] }> = {
+  history: {
+    src: 'video/history-reel.mp4',
+    poster: 'video/history-reel-poster.webp',
+    ru: ['35 лет Hamkor Bank', 'Всё началось в Андижане в 1991 году. История банка — за 30 секунд.', 'Видео Hamkor Bank'],
+    en: ['35 years of Hamkor Bank', 'It all began in Andijan in 1991. The bank’s story in 30 seconds.', 'Video by Hamkor Bank'],
+  },
   cards: {
     src: 'video/cards-reel.mp4',
     poster: 'video/cards-reel-poster.webp',
