@@ -361,6 +361,11 @@ function bindShell() {
 export function initSite() {
   // The curtain goes first: whatever fails below, the page must never stay covered.
   liftCover();
+  try {
+    recordVisit();
+  } catch (err) {
+    console.error(err);
+  }
   const aud = document.documentElement.dataset.audience;
   if (aud === 'local' || aud === 'expat') store.set('gb-audience', aud);
   const steps = [
@@ -440,12 +445,46 @@ function tables() {
   });
 }
 
-function cameFromHere() {
+/* ---------- Trail: the pages you opened in this tab, so "Назад" is one real step back ----------
+   The referrer can't be trusted for this (previews and some hosts hide it), so the site keeps its own list. */
+const TRAIL = 'gb-trail';
+
+function readTrail(): string[] {
   try {
-    return history.length > 1 && !!document.referrer && new URL(document.referrer).origin === location.origin;
+    return JSON.parse(sessionStorage.getItem(TRAIL) || '[]');
   } catch {
-    return false;
+    return [];
   }
+}
+
+function recordVisit() {
+  const prerendering = (document as Document & { prerendering?: boolean }).prerendering;
+  if (prerendering) {
+    // A page prepared in advance only counts once it is actually opened.
+    document.addEventListener('prerenderingchange', recordVisit, { once: true });
+    return;
+  }
+  const here = location.pathname;
+  const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+  let trail = readTrail();
+  if (nav?.type === 'back_forward') {
+    // Stepped back (or forward): drop everything after this page.
+    const at = trail.lastIndexOf(here);
+    trail = at >= 0 ? trail.slice(0, at + 1) : [here];
+  } else if (trail[trail.length - 1] !== here) {
+    trail.push(here);
+  }
+  try {
+    sessionStorage.setItem(TRAIL, JSON.stringify(trail.slice(-50)));
+  } catch {
+    /* without storage, "Назад" falls back to the parent page */
+  }
+}
+
+/** True when the previous step in this tab was a page of this site. */
+function cameFromHere() {
+  const trail = readTrail();
+  return history.length > 1 && trail.length > 1 && trail[trail.length - 1] === location.pathname;
 }
 
 /* ---------- City films: the photo is the poster, the film opens in its place ---------- */
@@ -455,10 +494,12 @@ function playVideo(btn: HTMLButtonElement) {
   const id = btn.dataset.play!;
   const lang = document.documentElement.lang || 'ru';
   const iframe = document.createElement('iframe');
-  iframe.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&playsinline=1&rel=0&modestbranding=1&hl=${lang}&cc_lang_pref=${lang}`;
+  iframe.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?playsinline=1&rel=0&modestbranding=1&hl=${lang}&cc_lang_pref=${lang}`;
   iframe.title = btn.getAttribute('aria-label') || 'Video';
   iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
   iframe.allowFullscreen = true;
+  // YouTube refuses to play without knowing which site embeds it; some hosts strip that by default.
+  iframe.referrerPolicy = 'strict-origin-when-cross-origin';
   iframe.addEventListener('load', () => frame.classList.add('is-loaded'), { once: true });
   const close = document.createElement('button');
   close.type = 'button';
@@ -466,6 +507,13 @@ function playVideo(btn: HTMLButtonElement) {
   close.dataset.stop = '';
   close.setAttribute('aria-label', lang === 'en' ? 'Close the video' : lang === 'uz' ? 'Videoni yopish' : 'Закрыть видео');
   close.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+  const out = document.createElement('a');
+  out.className = 'video-out';
+  out.href = `https://www.youtube.com/watch?v=${encodeURIComponent(id)}`;
+  out.target = '_blank';
+  out.rel = 'noopener';
+  out.textContent = lang === 'en' ? 'Not playing? Open on YouTube ↗' : lang === 'uz' ? 'Ochilmayaptimi? YouTube’da ochish ↗' : 'Не играет? Открыть на YouTube ↗';
+  frame.after(out);
   frame.append(iframe, close);
   frame.classList.add('is-playing');
   close.focus({ preventScroll: true });
@@ -475,6 +523,7 @@ function stopVideo(btn: HTMLButtonElement) {
   const frame = btn.closest<HTMLElement>('.photo-frame');
   if (!frame) return;
   frame.querySelector('iframe')?.remove();
+  if (frame.nextElementSibling?.classList.contains('video-out')) frame.nextElementSibling.remove();
   btn.remove();
   frame.classList.remove('is-playing', 'is-loaded');
   frame.querySelector<HTMLElement>('[data-play]')?.focus({ preventScroll: true });
@@ -860,6 +909,14 @@ function liftCover() {
 window.addEventListener('pageshow', (e) => {
   if (!e.persisted) return;
   document.documentElement.classList.remove('is-covering', 'is-covered', 'is-lifting');
+  if (!location.hash) window.scrollTo(0, 0);
+  const trail = readTrail();
+  const at = trail.lastIndexOf(location.pathname);
+  try {
+    sessionStorage.setItem(TRAIL, JSON.stringify(at >= 0 ? trail.slice(0, at + 1) : [...trail, location.pathname]));
+  } catch {
+    /* ignore */
+  }
 });
 
 /* ---------- Dock lens: a drop of glass under the current tab that flows to the one you press ---------- */

@@ -2494,3 +2494,11 @@ input[type='search']::-webkit-search-cancel-button {
     transition: none;
   }
 }
+
+.video-out {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: var(--t-small);
+  font-weight: 600;
+  color: var(--brand-ink);
+}

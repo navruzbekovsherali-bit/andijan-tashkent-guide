@@ -65,10 +65,9 @@ const here = Astro.url.pathname;
         }
         if (document.prerendering) document.addEventListener('prerenderingchange', takeCover, { once: true });
         else takeCover();
-        // A new page always opens at its top (some browsers carry the old scroll over);
-        // only "Back"/"Forward" and #anchors keep their place.
-        var nav = performance.getEntriesByType ? performance.getEntriesByType('navigation')[0] : null;
-        if (!location.hash && (!nav || nav.type === 'navigate')) {
+        // Every page opens at its top, also after "Назад" (the owner's rule); only #anchors keep their place.
+        try { history.scrollRestoration = 'manual'; } catch (e) {}
+        if (!location.hash) {
           var moved = false;
           var mark = function () { moved = true; };
           ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
