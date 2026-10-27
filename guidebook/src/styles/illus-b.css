@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Scroll-driven spot illustrations, set B: docs, family, mountains, phone, map
+   Scroll-driven spot illustrations, set B: docs, family, mountains, phone, map, badge
    Contract: the page sets --p (0 entering → ~.5 centred → 1 leaving) on each
    .illus and adds .is-on while it is visible. Story is driven by --p only;
    .is-on adds one calm idle loop. No JS → var(--p, 1) = final composition.
@@ -8,7 +8,7 @@
      --k  linear 0..1 inside that window,  --e  ease-out of --k
    ========================================================================== */
 
-:is(.illus-docs, .illus-family, .illus-mountains, .illus-phone, .illus-map) {
+:is(.illus-docs, .illus-family, .illus-mountains, .illus-phone, .illus-map, .illus-badge) {
   --pp: var(--p, 1);
   --b-line: var(--ink, #0e100f);
   --b-white: #ffffff;
@@ -26,7 +26,7 @@
   stroke-linejoin: round;
 }
 
-:is(.illus-docs, .illus-family, .illus-mountains, .illus-phone, .illus-map) * {
+:is(.illus-docs, .illus-family, .illus-mountains, .illus-phone, .illus-map, .illus-badge) * {
   --k: clamp(0, (var(--pp) - var(--a, 0)) / var(--w, 0.2), 1);
   --e: calc(var(--k) * (2 - var(--k)));
   transform-box: fill-box;
@@ -34,14 +34,14 @@
 }
 
 /* fills */
-:is(.illus-docs, .illus-family, .illus-mountains, .illus-phone, .illus-map) .b-w { fill: var(--b-white); }
-:is(.illus-docs, .illus-family, .illus-mountains, .illus-phone, .illus-map) .b-s { fill: var(--b-soft); }
-:is(.illus-docs, .illus-family, .illus-mountains, .illus-phone, .illus-map) .b-n { fill: var(--b-solid); }
-:is(.illus-docs, .illus-family, .illus-mountains, .illus-phone, .illus-map) .b-m { fill: var(--b-mint); }
-:is(.illus-docs, .illus-family, .illus-mountains, .illus-phone, .illus-map) .b-nos { stroke: none; }
+:is(.illus-docs, .illus-family, .illus-mountains, .illus-phone, .illus-map, .illus-badge) .b-w { fill: var(--b-white); }
+:is(.illus-docs, .illus-family, .illus-mountains, .illus-phone, .illus-map, .illus-badge) .b-s { fill: var(--b-soft); }
+:is(.illus-docs, .illus-family, .illus-mountains, .illus-phone, .illus-map, .illus-badge) .b-n { fill: var(--b-solid); }
+:is(.illus-docs, .illus-family, .illus-mountains, .illus-phone, .illus-map, .illus-badge) .b-m { fill: var(--b-mint); }
+:is(.illus-docs, .illus-family, .illus-mountains, .illus-phone, .illus-map, .illus-badge) .b-nos { stroke: none; }
 /* strokes that sit on mint keep the dark ink in both themes */
-:is(.illus-docs, .illus-family, .illus-mountains, .illus-phone, .illus-map) .b-k { stroke: var(--ink, #0e100f); }
-:is(.illus-docs, .illus-family, .illus-mountains, .illus-phone, .illus-map) .b-t {
+:is(.illus-docs, .illus-family, .illus-mountains, .illus-phone, .illus-map, .illus-badge) .b-k { stroke: var(--ink, #0e100f); }
+:is(.illus-docs, .illus-family, .illus-mountains, .illus-phone, .illus-map, .illus-badge) .b-t {
   fill: var(--b-line);
   stroke: none;
   font-family: inherit;
@@ -51,15 +51,15 @@
 }
 
 /* self-drawing lines (pathLength="1") */
-:is(.illus-docs, .illus-family, .illus-mountains, .illus-phone, .illus-map) .b-d {
+:is(.illus-docs, .illus-family, .illus-mountains, .illus-phone, .illus-map, .illus-badge) .b-d {
   stroke-dasharray: 1 2;
   stroke-dashoffset: calc(1 - var(--k));
   opacity: clamp(0, var(--k) * 40, 1);
 }
 
 /* dark grounds: invert the neutrals, keep mint */
-:is(.on-dark .illus-docs, .on-dark .illus-family, .on-dark .illus-mountains, .on-dark .illus-phone, .on-dark .illus-map,
-    .illus-docs.on-dark, .illus-family.on-dark, .illus-mountains.on-dark, .illus-phone.on-dark, .illus-map.on-dark) {
+:is(.on-dark .illus-docs, .on-dark .illus-family, .on-dark .illus-mountains, .on-dark .illus-phone, .on-dark .illus-map, .on-dark .illus-badge,
+    .illus-docs.on-dark, .illus-family.on-dark, .illus-mountains.on-dark, .illus-phone.on-dark, .illus-map.on-dark, .illus-badge.on-dark) {
   --b-line: #f2f5f3;
   --b-white: var(--night, #0b1f1d);
   --b-soft: rgba(242, 245, 243, 0.1);
@@ -189,7 +189,37 @@
 .illus-map .b-ring { --a: 0.74; --w: 0.06; stroke: var(--b-mint); opacity: 0; }
 .illus-map.is-on .b-ring { animation: illus-b-ripple 3s ease-out 0.6s infinite; }
 
+/* ---------- BADGE: lanyard draws down, the pass swings in and settles, reader and coffee, mint last ---------- */
+.illus-badge .bd-strap { stroke: var(--b-solid); stroke-width: 5; }
+.illus-badge .bd-sl { --a: 0; --w: 0.2; }
+.illus-badge .bd-sr { --a: 0.03; --w: 0.2; }
+.illus-badge .bd-swing {
+  --a: 0.14; --w: 0.4;
+  transform-origin: 50% 0;
+  transform: translateY(calc((1 - var(--e)) * -14px))
+    rotate(calc(18deg * (1 - var(--k)) * (1 - var(--k)) * cos(var(--k) * 520deg)));
+  opacity: clamp(0, var(--k) * 4, 1);
+}
+.illus-badge .bd-sway { transform-origin: 50% 0; }
+.illus-badge .bd-photo { --a: 0.34; --w: 0.12; opacity: var(--e); transform: scale(calc(0.85 + var(--e) * 0.15)); }
+.illus-badge .bd-l1 { --a: 0.4; --w: 0.08; }
+.illus-badge .bd-l2 { --a: 0.45; --w: 0.07; }
+.illus-badge .bd-wall { --a: 0.04; --w: 0.16; opacity: calc(clamp(0, var(--k) * 40, 1) * 0.3); }
+.illus-badge .bd-reader { --a: 0.08; --w: 0.2; opacity: var(--e); transform: translateX(calc((1 - var(--e)) * -22px)); }
+.illus-badge .bd-desk { --a: 0.2; --w: 0.16; }
+.illus-badge .bd-cup { --a: 0.26; --w: 0.18; opacity: var(--e); transform: translateY(calc((1 - var(--e)) * 18px)); }
+.illus-badge .bd-st1 { --a: 0.5; --w: 0.1; }
+.illus-badge .bd-st2 { --a: 0.54; --w: 0.1; }
+.illus-badge .bd-h { stroke-width: 1.75; }
+.illus-badge .bd-mark { --a: 0.6; --w: 0.1; opacity: var(--k); transform: scale(calc(0.4 + var(--e) * 0.6)); }
+.illus-badge .bd-led { --a: 0.68; --w: 0.06; opacity: var(--k); transform: scale(calc(0.5 + var(--e) * 0.5)); }
+.illus-badge.is-on .bd-sway { animation: illus-b-swing 5.2s ease-in-out infinite; }
+.illus-badge.is-on .bd-steam { animation: illus-b-steam 4s ease-in-out infinite; }
+.illus-badge.is-on .bd-led { animation: illus-b-blink 3.6s ease-in-out 1.2s infinite; }
+
 /* ---------- idle loops (only under .is-on) ---------- */
+@keyframes illus-b-swing { 0%, 100% { transform: rotate(-1.5deg); } 50% { transform: rotate(1.5deg); } }
+@keyframes illus-b-steam { 0%, 100% { transform: translateY(0); opacity: 1; } 50% { transform: translateY(-3px); opacity: 0.55; } }
 @keyframes illus-b-sway { 0%, 100% { transform: rotate(-2.5deg); } 50% { transform: rotate(2.5deg); } }
 @keyframes illus-b-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
 @keyframes illus-b-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
@@ -198,6 +228,6 @@
 @keyframes illus-b-ripple { 0% { opacity: 0.9; transform: scale(0.6); } 80%, 100% { opacity: 0; transform: scale(2.2); } }
 
 @media (prefers-reduced-motion: reduce) {
-  :is(.illus-docs, .illus-family, .illus-mountains, .illus-phone, .illus-map) { --pp: 1 !important; }
-  :is(.illus-docs, .illus-family, .illus-mountains, .illus-phone, .illus-map) * { animation: none !important; }
+  :is(.illus-docs, .illus-family, .illus-mountains, .illus-phone, .illus-map, .illus-badge) { --pp: 1 !important; }
+  :is(.illus-docs, .illus-family, .illus-mountains, .illus-phone, .illus-map, .illus-badge) * { animation: none !important; }
 }

@@ -20,11 +20,11 @@ export const SECTIONS: Record<SectionId, { title: Record<Lang, string>; icon: st
 };
 
 /** Animated illustration for each topic (src/components/illus/). */
-export type IllusName = 'plane' | 'car' | 'card' | 'money' | 'house' | 'docs' | 'family' | 'mountains' | 'phone' | 'map';
+export type IllusName = 'plane' | 'car' | 'card' | 'money' | 'house' | 'docs' | 'family' | 'mountains' | 'phone' | 'map' | 'badge';
 const SECTION_ILLUS: Record<SectionId, IllusName> = {
   start: 'docs',
   arrival: 'plane',
-  'first-days': 'docs',
+  'first-days': 'badge',
   work: 'money',
   living: 'house',
   family: 'family',
@@ -59,6 +59,9 @@ export const PAGE_PHOTO: Record<string, string> = {
   'leisure-andijan': 'andijan',
   uzbekistan: 'samarkand-2',
 };
+/** Pages whose lists are things to do: each item gets a tick that is remembered on this device. */
+export const CHECKLISTS = ['packing', 'arrival-72h', 'first-day-week', 'relocation-budget'];
+
 /** City videos from the owner's Notion guidebook (YouTube ids), played inline over the head photo. */
 export const PAGE_VIDEO: Record<string, string> = {
   samarkand: 'w0JULzjgUcs',
@@ -81,6 +84,12 @@ export const CITY_CARDS = [
 export const illusOf = (id: SectionId, slug?: string): IllusName => (slug && PAGE_ILLUS[slug]) || SECTION_ILLUS[id];
 
 export const SECTION_ORDER = Object.keys(SECTIONS) as SectionId[];
+
+/** Hub pages go in the order things happen to you; "about the bank" waits until the urgent things are done. */
+export const HUB_ORDER: Record<Audience, SectionId[]> = {
+  expat: ['arrival', 'first-days', 'living', 'work', 'help', 'family', 'start', 'country', 'travel'],
+  local: ['first-days', 'work', 'help', 'start', 'living', 'family', 'country', 'travel', 'arrival'],
+};
 
 /** Slug of an entry without the language folder. */
 export function slugOf(entry: GuideEntry): string {

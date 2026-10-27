@@ -1,0 +1,51 @@
+---
+/** Emergency numbers as big tap-to-call buttons: the first thing on the emergency page, one tap away in the menu. */
+import type { Lang } from '../lib/i18n';
+
+interface Props {
+  lang: Lang;
+  /** Compact: only 112 and a link to the full list (menu). */
+  compact?: boolean;
+  href?: string;
+}
+const { lang, compact = false, href } = Astro.props;
+const L = {
+  ru: { all: 'Единый номер', amb: 'Скорая', pol: 'Милиция', fire: 'Пожарные', gas: 'Газ', mchs: 'МЧС', title: 'Экстренные номера', more: 'Все номера', note: 'Нажмите, чтобы позвонить. Круглосуточно.' },
+  en: { all: 'Any emergency', amb: 'Ambulance', pol: 'Police', fire: 'Fire', gas: 'Gas leak', mchs: 'Rescue', title: 'Emergency numbers', more: 'All numbers', note: 'Tap to call. 24/7.' },
+  uz: { all: 'Yagona raqam', amb: 'Tez yordam', pol: 'Militsiya', fire: 'Oʻt oʻchirish', gas: 'Gaz', mchs: 'FVV', title: 'Favqulodda raqamlar', more: 'Barcha raqamlar', note: 'Qoʻngʻiroq uchun bosing. Kecha-kunduz.' },
+}[lang];
+const nums = [
+  ['112', L.all],
+  ['103', L.amb],
+  ['102', L.pol],
+  ['101', L.fire],
+  ['104', L.gas],
+  ['1050', L.mchs],
+];
+---
+
+{
+  compact ? (
+    <div class="sos sos-compact">
+      <a class="sos-main" href="tel:112">
+        <span class="sos-dot" aria-hidden="true" />
+        <span><b>112</b> {L.all}</span>
+      </a>
+      {href && <a class="sos-more" href={href}>{L.more}</a>}
+    </div>
+  ) : (
+    <section class="sos" aria-label={L.title}>
+      <p class="sos-note">{L.note}</p>
+      <ul>
+        {nums.map(([n, label], i) => (
+          <li>
+            <a class:list={['sos-btn', { 'is-main': i === 0 }]} href={`tel:${n}`}>
+              <b>{n}</b>
+              <span>{label}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}

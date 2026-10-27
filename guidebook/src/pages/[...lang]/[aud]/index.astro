@@ -4,7 +4,7 @@ import Guide from '../../../components/Guide.astro';
 import Illus from '../../../components/Illus.astro';
 import Icon from '../../../components/Icon.astro';
 import { LANGS, DEFAULT_LANG, t, url, type Lang } from '../../../lib/i18n';
-import { getPages, forAudience, groupBySection, SECTIONS, illusOf, type Audience } from '../../../lib/content';
+import { getPages, forAudience, groupBySection, SECTIONS, illusOf, HUB_ORDER, type Audience } from '../../../lib/content';
 
 export function getStaticPaths() {
   return LANGS.flatMap((lang) =>
@@ -17,7 +17,9 @@ export function getStaticPaths() {
 
 const { lang, aud } = Astro.props as { lang: Lang; aud: Audience };
 const tr = t(lang);
-const groups = groupBySection(forAudience(await getPages(lang), aud));
+const groups = groupBySection(forAudience(await getPages(lang), aud)).sort(
+  (a, b) => HUB_ORDER[aud].indexOf(a.id) - HUB_ORDER[aud].indexOf(b.id),
+);
 const title = aud === 'local' ? tr('local') : tr('expat');
 const lead = aud === 'local' ? tr('localLead') : tr('expatLead');
 const hello: Record<Audience, Record<Lang, string>> = {
@@ -42,6 +44,13 @@ const numbered = groups.map((g) => ({ ...g, steps: g.pages.map((p) => ({ p, n: +
     <div class="wrap">
       <h1>{title}</h1>
       <p class="lead">{lead}</p>
+      <div class="countdown" data-countdown data-today={tr('startToday')} data-past={tr('startPast')} data-days={tr('daysShort')}>
+        <label>
+          <span>{tr('startAsk')}</span>
+          <input type="date" />
+        </label>
+        <p class="countdown-out" aria-live="polite" hidden><b></b> <span>{tr('startLeft')}</span></p>
+      </div>
       <Guide name={tr('guideName')}>
         <p>{hello[aud][lang]}</p>
       </Guide>
@@ -60,7 +69,7 @@ const numbered = groups.map((g) => ({ ...g, steps: g.pages.map((p) => ({ p, n: +
           </div>
           <ol class="steps">
             {g.steps.map(({ p, n }) => (
-              <li>
+              <li class="reveal row-in" style={`--i:${n % 6}`}>
                 <a href={url(lang, `/guide/${p.slug}/`)}>
                   <span class="step-n">{String(n).padStart(2, '0')}</span>
                   <strong>{p.entry.data.title}</strong>

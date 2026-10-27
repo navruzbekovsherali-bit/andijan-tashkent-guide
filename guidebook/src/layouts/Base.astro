@@ -5,6 +5,7 @@ import '../styles/illus-b.css';
 import Icon from '../components/Icon.astro';
 import BrandMark from '../components/BrandMark.astro';
 import GuideFace from '../components/GuideFace.astro';
+import Sos from '../components/Sos.astro';
 import { LANGS, LANG_LABEL, t, url, type Lang } from '../lib/i18n';
 import { getPages, groupBySection, SECTIONS } from '../lib/content';
 
@@ -40,6 +41,8 @@ const here = Astro.url.pathname;
     {description && <meta name="description" content={description} />}
     <meta name="theme-color" content={dark ? '#0b1f1d' : '#f5f4f0'} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icons/apple-180.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="canonical" href={new URL(here, Astro.site)} />
     {LANGS.map((l) => <link rel="alternate" hreflang={l} href={new URL(url(l, path), Astro.site)} />)}
     <meta property="og:title" content={pageTitle} />
@@ -130,6 +133,7 @@ const here = Astro.url.pathname;
           <BrandMark />
           <span>Hamkor Bank<small>{tr('bankGuide')}</small></span>
         </a>
+        <p class="footer-mark" aria-hidden="true">Hamkor Bank</p>
         <nav class="footer-links">
           <a href={url(lang, '/#topics')}>{tr('topics')}</a>
           <a href={url(lang, '/faq/')}>{tr('faq')}</a>
@@ -170,6 +174,7 @@ const here = Astro.url.pathname;
           <button class="tb-icon" type="button" data-close aria-label={tr('close')}><Icon name="close" /></button>
         </div>
         <div class="sheet-body">
+          <Sos lang={lang} compact href={url(lang, '/guide/emergency/')} />
           <div class="seg three" role="group" aria-label={tr('audienceSwitch')}>
             <button type="button" data-aud="all">{tr('all')}</button>
             <button type="button" data-aud="local">{tr('localShort')}</button>

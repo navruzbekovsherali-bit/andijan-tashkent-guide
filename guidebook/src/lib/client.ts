@@ -293,6 +293,13 @@ function bindShell() {
     const opener = t.closest<HTMLElement>('[data-sheet]');
     if (opener) {
       openSheet(opener.dataset.sheet!);
+      // A quick chip opens search with its question already typed.
+      const q = opener.dataset.q;
+      const input = document.getElementById('search-input') as HTMLInputElement | null;
+      if (q && input) {
+        input.value = q;
+        loadIndex().then(() => search(q));
+      }
       return;
     }
     if (t.closest('[data-close]')) {
@@ -381,6 +388,11 @@ export function initSite() {
     phoneDemos,
     followingGuide,
     headerOnScroll,
+    heroFold,
+    cityDepth,
+    checklists,
+    countdown,
+    offline,
     dockLens,
     illustrationsOnScroll,
   ];
@@ -735,6 +747,147 @@ function headerOnScroll() {
     bar.classList.toggle('is-hidden', !busy && y > lastY && y > 200);
     lastY = y;
   });
+}
+
+/* ---------- Checklists: tick what is done; remembered on this device ---------- */
+const UI = {
+  ru: { done: 'Сделано', of: 'из', reset: 'Сбросить', mark: 'Отметить' },
+  en: { done: 'Done', of: 'of', reset: 'Reset', mark: 'Mark as done' },
+  uz: { done: 'Bajarildi', of: '/', reset: 'Tozalash', mark: 'Belgilash' },
+};
+function uiText() {
+  const l = document.documentElement.lang as keyof typeof UI;
+  return UI[l] ?? UI.ru;
+}
+
+function checklists() {
+  const article = document.querySelector<HTMLElement>('article[data-checklist]');
+  if (!article) return;
+  const key = `gb-check:${article.dataset.checklist}`;
+  const items = Array.from(article.querySelectorAll<HTMLLIElement>('.prose > ul > li, .prose > ol > li'));
+  if (!items.length) return;
+  const tx = uiText();
+  let done = new Set<number>((() => {
+    try {
+      return JSON.parse(store.get(key) || '[]') as number[];
+    } catch {
+      return [];
+    }
+  })());
+
+  const bar = document.createElement('div');
+  bar.className = 'check-bar';
+  bar.innerHTML = `<div class="check-meter"><span></span></div><p><b data-k="n"></b> <span data-k="t"></span></p><button type="button" class="check-reset">${tx.reset}</button>`;
+  article.querySelector('.prose')?.prepend(bar);
+  const meter = bar.querySelector<HTMLElement>('.check-meter span')!;
+
+  const paint = () => {
+    items.forEach((li, i) => {
+      const on = done.has(i);
+      li.classList.toggle('is-done', on);
+      li.querySelector('.check-btn')?.setAttribute('aria-checked', String(on));
+    });
+    bar.querySelector('[data-k="n"]')!.textContent = `${tx.done} ${done.size}`;
+    bar.querySelector('[data-k="t"]')!.textContent = `${tx.of} ${items.length}`;
+    meter.style.transform = `scaleX(${done.size / items.length})`;
+    bar.classList.toggle('is-complete', done.size === items.length);
+    store.set(key, JSON.stringify([...done]));
+  };
+
+  items.forEach((li, i) => {
+    li.classList.add('check-item');
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'check-btn';
+    btn.setAttribute('role', 'checkbox');
+    btn.setAttribute('aria-label', `${tx.mark}: ${(li.textContent || '').trim().slice(0, 60)}`);
+    btn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    btn.addEventListener('click', () => {
+      if (done.has(i)) done.delete(i);
+      else done.add(i);
+      paint();
+    });
+    li.prepend(btn);
+  });
+  bar.querySelector('.check-reset')!.addEventListener('click', () => {
+    done = new Set();
+    paint();
+  });
+  paint();
+}
+
+/* ---------- Days until the first working day ---------- */
+function countdown() {
+  const box = document.querySelector<HTMLElement>('[data-countdown]');
+  if (!box) return;
+  const input = box.querySelector<HTMLInputElement>('input[type="date"]')!;
+  const out = box.querySelector<HTMLElement>('.countdown-out')!;
+  const show = () => {
+    const v = input.value;
+    if (!v) {
+      out.hidden = true;
+      return;
+    }
+    store.set('gb-start', v);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const days = Math.round((new Date(`${v}T00:00:00`).getTime() - today.getTime()) / 86400000);
+    out.hidden = false;
+    const b = out.querySelector('b')!;
+    const s = out.querySelector('span')!;
+    s.hidden = days <= 0;
+    b.textContent = days > 0 ? `${days} ${box.dataset.days}` : days === 0 ? box.dataset.today! : box.dataset.past!;
+  };
+  input.value = store.get('gb-start') || '';
+  input.addEventListener('change', show);
+  show();
+}
+
+/* ---------- Offline: emergency numbers and the pages you opened work without a connection ---------- */
+function offline() {
+  if (!('serviceWorker' in navigator) || base() || location.protocol !== 'https:') return;
+  navigator.serviceWorker.register('/sw.js').catch(() => {
+    /* the site simply works online only */
+  });
+}
+
+/* ---------- First screen folds away as you scroll: the bank greets you, then makes room ---------- */
+function heroFold() {
+  const hero = document.querySelector<HTMLElement>('.hero');
+  if (!hero || reduceMotion()) return;
+  onScrollFrame(() => {
+    const p = clamp01(window.scrollY / (hero.offsetHeight * 0.7));
+    if (p >= 1 && hero.style.getPropertyValue('--hp') === '1') return;
+    hero.style.setProperty('--hp', p.toFixed(3));
+  });
+}
+
+/* ---------- City strip: photos drift against their cards as the strip moves, names drift the other way ---------- */
+function cityDepth() {
+  const strip = document.querySelector<HTMLElement>('.cities');
+  if (!strip || reduceMotion()) return;
+  const cards = Array.from(strip.querySelectorAll<HTMLElement>('.city'));
+  let ticking = false;
+  const update = () => {
+    ticking = false;
+    const box = strip.getBoundingClientRect();
+    const mid = box.left + box.width / 2;
+    for (const c of cards) {
+      const r = c.getBoundingClientRect();
+      if (r.right < box.left - 50 || r.left > box.right + 50) continue;
+      const d = Math.max(-1, Math.min(1, (r.left + r.width / 2 - mid) / box.width));
+      c.style.setProperty('--d', d.toFixed(3));
+    }
+  };
+  const on = () => {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(update);
+    }
+  };
+  strip.addEventListener('scroll', on, { passive: true });
+  window.addEventListener('resize', on);
+  update();
 }
 
 /* ---------- Topic illustrations play with the scroll (--p from 0 entering to 1 leaving) ---------- */

@@ -42,6 +42,22 @@ const faqPreview = pages.flatMap((p) => p.entry.data.faq.slice(0, 1).map((f) => 
     </div>
   </section>
 
+  <section class="quick">
+    <div class="wrap">
+      <button class="quick-search" type="button" data-sheet="search">
+        <Icon name="search" />
+        <span>{tr('quickSearch')}</span>
+      </button>
+      <ul class="quick-chips">
+        <li><a class="qchip sos-chip" href={url(lang, '/guide/emergency/')}><span class="sos-dot" aria-hidden="true" />{tr('emergency')}</a></li>
+        <li><a class="qchip" href={url(lang, '/guide/first-day-week/')}>{tr('qFirstDay')}</a></li>
+        <li><button class="qchip" type="button" data-sheet="search" data-q={tr('qSalaryQ')}>{tr('qSalary')}</button></li>
+        <li><button class="qchip" type="button" data-sheet="search" data-q={tr('qRegQ')}>{tr('qReg')}</button></li>
+        <li><button class="qchip" type="button" data-sheet="search" data-q="IMEI">IMEI</button></li>
+      </ul>
+    </div>
+  </section>
+
   <section class="block" id="topics">
     <div class="wrap">
       <div class="block-head">
@@ -80,7 +96,7 @@ const faqPreview = pages.flatMap((p) => p.entry.data.faq.slice(0, 1).map((f) => 
       {
         CITY_CARDS.map((c) => (
           <li>
-            <a class="city" href={url(lang, `/guide/${c.slug}/`)}>
+            <a class="city reveal" href={url(lang, `/guide/${c.slug}/`)}>
               <Photo id={c.photo} credit={false} sizes="(min-width: 900px) 30vw, 78vw" />
               {PAGE_VIDEO[c.slug] && (
                 <span class="city-video">

@@ -2502,3 +2502,576 @@ input[type='search']::-webkit-search-cancel-button {
   font-weight: 600;
   color: var(--brand-ink);
 }
+
+/* ---------- Home: ask first, then browse ---------- */
+.quick {
+  padding-top: 36px;
+}
+.quick-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 60px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--white, #fff);
+  box-shadow: inset 0 0 0 1px rgb(14 26 24 / 0.16), 0 10px 30px -18px rgb(10 46 42 / 0.4);
+  color: var(--ink-3);
+  font: inherit;
+  font-size: var(--t-ui);
+  text-align: left;
+  cursor: text;
+  transition: box-shadow 250ms var(--ease);
+}
+.quick-search span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.quick-search svg {
+  flex: none;
+  color: var(--ink);
+}
+.quick-search:hover {
+  box-shadow: inset 0 0 0 1.5px var(--ink), 0 10px 30px -18px rgb(10 46 42 / 0.4);
+}
+.quick-chips {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 0;
+}
+.qchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--paper-2);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--t-small);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 200ms, transform 200ms var(--ease);
+}
+.qchip:hover {
+  background: rgb(14 26 24 / 0.1);
+}
+.qchip:active {
+  transform: scale(0.96);
+}
+.sos-chip {
+  background: rgb(179 38 30 / 0.09);
+  color: var(--warn);
+}
+.sos-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--warn);
+  box-shadow: 0 0 0 0 rgb(179 38 30 / 0.5);
+  animation: sos-pulse 2.4s var(--ease) infinite;
+}
+@keyframes sos-pulse {
+  70% {
+    box-shadow: 0 0 0 7px rgb(179 38 30 / 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(179 38 30 / 0);
+  }
+}
+
+/* ---------- Emergency numbers ---------- */
+.sos ul {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+}
+.sos-note {
+  margin-bottom: 10px;
+  font-size: var(--t-small);
+  color: var(--ink-3);
+}
+.sos-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: var(--white, #fff);
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--ink);
+  text-decoration: none;
+  transition: transform 200ms var(--ease), box-shadow 200ms;
+}
+.sos-btn b {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.sos-btn span {
+  font-size: var(--t-small);
+  color: var(--ink-2);
+}
+.sos li:first-child {
+  grid-column: 1 / -1;
+}
+.sos-btn.is-main {
+  flex-direction: row;
+  align-items: baseline;
+  gap: 14px;
+  background: var(--warn);
+  box-shadow: none;
+  color: #fff;
+}
+.sos-btn.is-main b {
+  font-size: 2.5rem;
+}
+.sos-btn.is-main span {
+  color: rgb(255 255 255 / 0.88);
+}
+.sos-btn:active {
+  transform: scale(0.97);
+}
+.sos-compact {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.sos-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: rgb(179 38 30 / 0.09);
+  color: var(--warn);
+  font-weight: 600;
+  text-decoration: none;
+}
+.sos-main b {
+  font-size: 1.125rem;
+}
+.sos-more {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: var(--paper-2);
+  color: var(--ink);
+  font-size: var(--t-small);
+  font-weight: 600;
+  text-decoration: none;
+}
+.head-grid .sos {
+  order: -1;
+}
+@media (min-width: 900px) {
+  .head-grid .sos {
+    order: 0;
+  }
+}
+
+/* "Some details are being confirmed": a quiet line at the end, not an alarm at the top */
+.note-quiet {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 40px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  font-size: var(--t-small);
+  color: var(--ink-3);
+}
+.note-quiet svg {
+  flex: none;
+  margin-top: 3px;
+}
+
+/* FAQ: who a question is for, shown when both audiences are listed */
+.q-aud {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 9px;
+  border-radius: 999px;
+  background: var(--paper-2);
+  font-size: var(--t-label);
+  font-weight: 600;
+  color: var(--ink-2);
+  vertical-align: 2px;
+}
+html[data-view='local'] .q-aud,
+html[data-view='expat'] .q-aud {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sos-dot {
+    animation: none;
+  }
+}
+
+/* ---------- First screen: a sheet that folds away (driven by --hp, 0 → 1 while scrolling) ---------- */
+.hero {
+  border-radius: 0 0 32px 32px;
+}
+@media (min-width: 900px) {
+  .hero {
+    border-radius: 0 0 48px 48px;
+  }
+}
+.hero-in {
+  transform: translateY(calc(var(--hp, 0) * -48px)) scale(calc(1 - var(--hp, 0) * 0.05));
+  opacity: calc(1 - var(--hp, 0) * 0.75);
+  transform-origin: 50% 100%;
+}
+.hero-mark {
+  transform: scale(calc(1 - var(--hp, 0) * 0.35));
+  transform-origin: 0 100%;
+}
+
+/* ---------- City article: the photo leads, full width, opening like a train window ---------- */
+.city-hero .photo {
+  margin: 0;
+}
+.city-hero .photo-frame {
+  aspect-ratio: 4 / 5;
+  border-radius: 0 0 28px 28px;
+}
+.city-hero .photo-frame.is-playing {
+  aspect-ratio: 16 / 9;
+  margin-top: 84px;
+  border-radius: 20px;
+}
+.city-hero figcaption {
+  padding-inline: 16px;
+}
+.page-head.after-photo {
+  padding-top: 28px;
+}
+@media (min-width: 900px) {
+  .city-hero {
+    width: min(100% - 48px, 1320px);
+    margin: 96px auto 0;
+  }
+  .city-hero .photo-frame,
+  .city-hero .photo-frame.is-playing {
+    aspect-ratio: 21 / 9;
+    margin-top: 0;
+    border-radius: 28px;
+  }
+  .city-hero figcaption {
+    padding-inline: 4px;
+  }
+  .page-head.after-photo {
+    padding-top: 40px;
+  }
+}
+.js .city-hero .photo-frame {
+  animation: window-open 1100ms var(--ease) 80ms both;
+}
+.js .city-hero .photo-frame img {
+  animation: window-settle 1600ms var(--ease) 80ms both;
+}
+@keyframes window-open {
+  from {
+    clip-path: inset(10% 7% round 28px);
+  }
+  to {
+    clip-path: inset(0 round 0);
+  }
+}
+@keyframes window-settle {
+  from {
+    transform: scale(1.14);
+  }
+}
+
+/* city cards on home: open as they come in, then drift with the strip (--d, −1 … 1) */
+.js .city.reveal {
+  opacity: 1;
+  transform: none;
+  clip-path: inset(8% 6% round var(--radius));
+}
+.js .city.reveal.is-in {
+  clip-path: inset(0 round var(--radius));
+  transition: clip-path 1000ms var(--ease);
+}
+.city .photo-frame img {
+  transform: translateX(calc(var(--d, 0) * -7%)) scale(1.16);
+}
+.city:hover .photo-frame img {
+  transform: translateX(calc(var(--d, 0) * -7%)) scale(1.2);
+}
+.city-name {
+  translate: calc(var(--d, 0) * 14px) 0;
+}
+
+/* list rows rise in turn, never more than six at once */
+.js .reveal.row-in.is-in {
+  transition-delay: calc(var(--i, 0) * 45ms);
+}
+
+/* topic page: the topic's picture is the hero */
+.topic-head .illus-frame {
+  width: min(72vw, 320px);
+  justify-self: start;
+}
+
+/* topic cards answer the press with a spring */
+.topic-card:active {
+  transform: scale(0.97);
+  transition-duration: 120ms;
+}
+.topic-card {
+  transition: background-color 250ms, transform 450ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* footer: the bank's name, quietly, at the very end */
+.site-footer {
+  overflow: hidden;
+  /* runs on under the phone dock to the very bottom of the page */
+  margin-bottom: calc(-1 * (var(--dock-h) + 28px + env(safe-area-inset-bottom)));
+  padding-bottom: calc(var(--dock-h) + 22px + env(safe-area-inset-bottom));
+}
+@media (min-width: 960px) {
+  .site-footer {
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+}
+.footer-mark {
+  order: 10;
+  margin: 24px 0 -0.18em;
+  font-family: var(--font-mark);
+  font-size: clamp(3.4rem, 15vw, 11rem);
+  font-weight: 800;
+  letter-spacing: -0.06em;
+  line-height: 0.9;
+  white-space: nowrap;
+  color: rgb(255 255 255 / 0.07);
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-in,
+  .hero-mark {
+    transform: none;
+    opacity: 1;
+  }
+  .js .city-hero .photo-frame,
+  .js .city-hero .photo-frame img {
+    animation: none;
+  }
+  .js .city.reveal {
+    clip-path: none;
+  }
+  .city .photo-frame img,
+  .city-name {
+    transform: none;
+    translate: none;
+  }
+}
+.city .photo-frame img {
+  transition: transform 300ms var(--ease);
+}
+
+/* ---------- Checklists ---------- */
+.check-bar {
+  position: sticky;
+  top: 84px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 1.6em;
+  padding: 12px 12px 12px 18px;
+  border-radius: 999px;
+  background: rgb(245 244 240 / 0.86);
+  backdrop-filter: blur(16px) saturate(1.5);
+  box-shadow: inset 0 0 0 1px var(--line);
+  font-size: var(--t-small);
+}
+.check-bar p {
+  margin: 0 !important;
+  max-width: none !important;
+  white-space: nowrap;
+}
+.check-meter {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--paper-2);
+  overflow: hidden;
+}
+.check-meter span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--brand);
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  transition: transform 500ms var(--ease);
+}
+.check-reset {
+  border: 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-3);
+  font: inherit;
+  font-size: var(--t-label);
+  cursor: pointer;
+}
+.check-bar.is-complete {
+  box-shadow: inset 0 0 0 1.5px var(--brand);
+}
+.prose .check-item {
+  position: relative;
+  list-style: none;
+  padding-left: 44px;
+}
+.prose :is(ul, ol):has(> .check-item) {
+  padding-left: 0;
+}
+.check-btn {
+  position: absolute;
+  left: 0;
+  top: 0.15em;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--white, #fff);
+  box-shadow: inset 0 0 0 1.5px rgb(14 26 24 / 0.3);
+  color: transparent;
+  cursor: pointer;
+  transition: background-color 250ms, box-shadow 250ms, color 250ms, transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.check-btn::after {
+  content: '';
+  position: absolute;
+  inset: -7px;
+}
+.check-btn:active {
+  transform: scale(0.88);
+}
+.is-done > .check-btn {
+  background: var(--brand);
+  box-shadow: none;
+  color: #fff;
+}
+.prose .is-done {
+  color: var(--ink-3);
+}
+.prose .is-done > strong:first-of-type {
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+  text-decoration-color: rgb(14 26 24 / 0.35);
+}
+
+/* ---------- Countdown to the first day ---------- */
+.countdown {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 18px;
+  margin-top: 22px;
+  padding: 14px 18px;
+  border-radius: 20px;
+  background: var(--paper-2);
+}
+.countdown label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  font-size: var(--t-small);
+  font-weight: 600;
+}
+.countdown input {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--white, #fff);
+  box-shadow: inset 0 0 0 1px rgb(14 26 24 / 0.2);
+  font: inherit;
+  color: var(--ink);
+}
+.countdown-out {
+  margin: 0;
+  font-size: var(--t-small);
+  color: var(--ink-2);
+}
+.countdown-out b {
+  font-size: 1.5rem;
+  color: var(--brand-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Print: a clean sheet to take on the plane ---------- */
+@media print {
+  .topbar,
+  .dock,
+  .site-footer,
+  .guide-fab,
+  .curtain,
+  .sheet,
+  .toc,
+  .pager,
+  .read-progress,
+  .journey,
+  .check-reset,
+  .play,
+  .skip {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+    padding: 0;
+    font-size: 11pt;
+  }
+  .page-head {
+    padding-top: 0;
+  }
+  .summary {
+    background: none !important;
+    color: #000 !important;
+    border: 1px solid #000;
+  }
+  .check-bar {
+    position: static;
+    box-shadow: none;
+  }
+  .check-btn {
+    box-shadow: inset 0 0 0 1px #000;
+  }
+  .prose a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.8em;
+  }
+  .city-hero,
+  .illus-frame {
+    display: none;
+  }
+}

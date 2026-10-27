@@ -11,6 +11,16 @@ const tr = t(lang);
 const groups = groupBySection(await getPages(lang))
   .map((g) => ({ ...g, items: g.pages.flatMap((p) => p.entry.data.faq.map((f) => ({ ...f, p }))) }))
   .filter((g) => g.items.length > 0);
+// The questions people ask first, before the rest by topic.
+const TOP = ['first-day-week', 'salary-local', 'salary-expat', 'arrival-72h', 'work-time', 'sick-leave', 'emergency'];
+const pagesBySlug = new Map(groups.flatMap((g) => g.pages).map((p) => [p.slug, p]));
+const top = TOP.flatMap((s) => {
+  const p = pagesBySlug.get(s);
+  const f = p?.entry.data.faq[0];
+  return p && f ? [{ ...f, p }] : [];
+});
+const forWhom = (aud: string[]) => (aud.length === 2 ? '' : aud[0] === 'local' ? tr('localShort') : tr('expatShort'));
+const blocks = [{ id: 'top', title: tr('topQuestions'), items: top }, ...groups.map((g) => ({ id: g.id, title: SECTIONS[g.id].title[lang], items: g.items }))];
 ---
 
 <Base lang={lang} title={tr('faq')} description={tr('faqLead')} path="/faq/" current="faq" back={url(lang, '/')}>
@@ -34,14 +44,17 @@ const groups = groupBySection(await getPages(lang))
     <p class="search-hint" id="faq-empty" hidden>{tr('searchEmpty')}</p>
 
     {
-      groups.map((g) => (
-        <section class="faq-group">
-          <h2 class="section-title">{SECTIONS[g.id].title[lang]}</h2>
+      blocks.map((g) => (
+        <section class:list={['faq-group', { 'faq-top': g.id === 'top' }]}>
+          <h2 class="section-title">{g.title}</h2>
           <div class="faq-list">
             {g.items.map((f) => (
               <details class="faq-item" data-aud-list={f.p.entry.data.audience.join(' ')} data-q={`${f.q} ${f.a}`.toLowerCase()}>
                 <summary>
-                  <span>{f.q}</span>
+                  <span>
+                    {f.q}
+                    {forWhom(f.p.entry.data.audience) && <span class="q-aud">{forWhom(f.p.entry.data.audience)}</span>}
+                  </span>
                   <span class="plus" aria-hidden="true" />
                 </summary>
                 <div class="faq-a">

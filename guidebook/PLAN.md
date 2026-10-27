@@ -72,3 +72,11 @@ Claude работает как дирижёр. Помощников пишем �
 - Выбрать стиль из 2–3 вариантов.
 - Прислать данные для заготовок (список в `docs/decisions.md`).
 - Позже: название ссылки сайта и логотип (если можно использовать).
+
+### 27.10 — after the critic and art-director review
+- Urgent first: emergency numbers as tap-to-call buttons (top of the emergency page, in the menu, a chip on home); quick search line and question chips on home; FAQ opens with "asked most often", marks who each answer is for; salary articles named apart; hubs ordered by time (arrival → first days → living → work → help → about the bank).
+- "Being confirmed" note moved from an alarm at the top to a quiet line at the end.
+- Visual: city articles open with a full-width photo (train-window reveal) and inline video; first screen ends in a rounded sheet and folds away on scroll; city strip drifts with depth; list rows rise in turn; new Badge illustration for "first days"; bigger topic pictures; footer wordmark.
+- Useful: checklists with ticks saved on the device (packing, 72 hours, first week, budget); countdown to the first day on hubs; offline service worker + installable icon; print styles.
+- English: 20 key expat articles translated (src/content/guide/en/).
+- Still needed from the owner: office addresses (Tashkent, Andijan) and contacts for a "My contacts" card; HR to check facts flagged in docs/qa and the English legal wording.

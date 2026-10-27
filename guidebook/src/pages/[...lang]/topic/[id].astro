@@ -28,7 +28,7 @@ const next = index >= 0 && index < groups.length - 1 ? groups[index + 1] : undef
 
 <Base lang={lang} title={title} path={`/topic/${id}/`} current="topic" back={url(lang, '/#topics')}>
   <header class="page-head">
-    <div class="wrap head-grid">
+    <div class="wrap head-grid topic-head">
       <div>
         <p class="label"><a href={url(lang, '/#topics')}>{tr('topics')}</a> · ( {String(index + 1).padStart(2, '0')} )</p>
         <h1>{title}</h1>
@@ -42,12 +42,12 @@ const next = index >= 0 && index < groups.length - 1 ? groups[index + 1] : undef
     <ol class="steps">
       {
         pages.map((p, n) => (
-          <li>
+          <li class="reveal row-in" style={`--i:${n % 6}`}>
             <a href={url(lang, `/guide/${p.slug}/`)}>
               <span class="step-n">{String(n + 1).padStart(2, '0')}</span>
               <strong>{p.entry.data.title}</strong>
               <span class="step-lead">{p.entry.data.description}</span>
-              <span class="chip step-tag">{tag(p.entry.data.audience)}</span>
+              {p.entry.data.audience.length === 1 && <span class="chip step-tag">{tag(p.entry.data.audience)}</span>}
               <span class="round-arrow"><Icon name="arrow" size={16} /></span>
             </a>
           </li>

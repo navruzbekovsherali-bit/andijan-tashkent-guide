@@ -5,8 +5,9 @@ import Icon from '../../../components/Icon.astro';
 import Guide from '../../../components/Guide.astro';
 import Illus from '../../../components/Illus.astro';
 import Photo from '../../../components/Photo.astro';
+import Sos from '../../../components/Sos.astro';
 import { articles, LANGS, DEFAULT_LANG, t, url, type Lang } from '../../../lib/i18n';
-import { getPages, forAudience, readingMinutes, SECTIONS, SECTION_ORDER, illusOf, PAGE_PHOTO, PAGE_VIDEO } from '../../../lib/content';
+import { getPages, forAudience, readingMinutes, SECTIONS, SECTION_ORDER, illusOf, PAGE_PHOTO, PAGE_VIDEO, CHECKLISTS } from '../../../lib/content';
 
 export async function getStaticPaths() {
   const out = [];
@@ -40,11 +41,19 @@ const fmtDate = (d: Date) =>
   d.toLocaleDateString(lang === 'en' ? 'en-GB' : lang === 'uz' ? 'uz-UZ' : 'ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
 const hubAud = audience === 'local' ? 'local' : 'expat';
 const topicNo = String(SECTION_ORDER.indexOf(data.section) + 1).padStart(2, '0');
+const photoId = slug === 'emergency' ? undefined : PAGE_PHOTO[slug];
 ---
 
 <Base lang={lang} title={data.title} description={data.description} path={`/guide/${slug}/`} audience={audience} back={url(lang, `/topic/${data.section}/`)}>
   <div class="read-progress" aria-hidden="true"></div>
-  <header class="page-head">
+  {
+    photoId && (
+      <div class="city-hero">
+        <Photo id={photoId} class="city-photo" eager sizes="(min-width: 900px) 1320px, 100vw" video={PAGE_VIDEO[slug]} videoLabel={tr('watchVideo')} />
+      </div>
+    )
+  }
+  <header class:list={['page-head', { 'after-photo': photoId }]}>
     <div class="wrap head-grid">
       <div>
         <p class="label"><a href={url(lang, `/topic/${data.section}/`)}>( {topicNo} ) {section.title[lang]}</a></p>
@@ -63,21 +72,14 @@ const topicNo = String(SECTION_ORDER.indexOf(data.section) + 1).padStart(2, '0')
           )}
         </div>
       </div>
-      {PAGE_PHOTO[slug] ? <Photo id={PAGE_PHOTO[slug]} class="head-photo" eager video={PAGE_VIDEO[slug]} videoLabel={tr('watchVideo')} /> : <Illus name={illusOf(data.section, slug)} />}
+      {slug === 'emergency' ? <Sos lang={lang} /> : !photoId && <Illus name={illusOf(data.section, slug)} />}
     </div>
   </header>
 
   <div class="wrap">
     <div class="article-layout">
-      <article>
+      <article data-checklist={CHECKLISTS.includes(slug) ? slug : undefined}>
         {fallback && <p class="note">{tr('translationSoon')}</p>}
-        {data.needsConfirmation && (
-          <p class="note">
-            <Icon name="alert" size={20} />
-            <span>{tr('confirm')}</span>
-          </p>
-        )}
-
         {data.tldr.length > 0 && (
           <section class="summary" aria-labelledby="tldr">
             <h2 id="tldr">{tr('short')}</h2>
@@ -110,6 +112,13 @@ const topicNo = String(SECTION_ORDER.indexOf(data.section) + 1).padStart(2, '0')
               ))}
             </div>
           </section>
+        )}
+
+        {data.needsConfirmation && (
+          <p class="note-quiet">
+            <Icon name="info" size={18} />
+            <span>{tr('confirm')}</span>
+          </p>
         )}
 
         {data.sources.length > 0 && (
