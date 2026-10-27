@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Arrival film</title>
+<!--
+  "Arrival" film for the guidebook: landing → customs (declare the phone) → SIM card.
+  Every frame is a pure function of time: render(t) places everything, so the film can be
+  rendered frame by frame (render.cjs) and also played live in a browser (open with ?play).
+  Stage 1080×1920 (9:16). Language: ?lang=ru (default) or ?lang=en.
+-->
+<style>
+  @font-face { font-family: 'Onest'; src: url('../../node_modules/@fontsource-variable/onest/files/onest-cyrillic-wght-normal.woff2') format('woff2'); font-weight: 100 900; unicode-range: U+0400-04FF; }
+  @font-face { font-family: 'Onest'; src: url('../../node_modules/@fontsource-variable/onest/files/onest-latin-wght-normal.woff2') format('woff2'); font-weight: 100 900; }
+  @font-face { font-family: 'Manrope'; src: url('../../node_modules/@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2') format('woff2'); font-weight: 200 800; }
+  :root {
+    --paper: #f5f4f0; --paper-2: #ecebe6; --ink: #0e1a18; --ink-2: #4a524f; --ink-3: #6b726f;
+    --night: #0a2e2a; --brand: #1aa752; --brand-ink: #0b4a43; --red: #c8372d; --sky: #eaf1ee;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #000; }
+  .stage {
+    position: relative; width: 1080px; height: 1920px; overflow: hidden;
+    background: linear-gradient(180deg, var(--sky) 0%, #f3f5f1 55%, var(--paper) 62%);
+    font-family: 'Onest', system-ui, sans-serif; color: var(--ink);
+  }
+  .abs { position: absolute; left: 0; top: 0; }
+  svg { overflow: visible; }
+  .line { fill: none; stroke: var(--ink); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+  .fill-paper { fill: #fff; stroke: var(--ink); stroke-width: 6; stroke-linejoin: round; }
+
+  /* header */
+  .head { position: absolute; left: 64px; right: 64px; top: 64px; display: flex; align-items: center; gap: 18px; z-index: 20; }
+  .head svg { width: 54px; height: 54px; }
+  .head b { font-family: 'Manrope', 'Onest'; font-weight: 800; font-size: 34px; letter-spacing: -0.03em; }
+  .head span { margin-left: auto; font-size: 26px; font-weight: 600; color: var(--ink-3); letter-spacing: 0.04em; }
+  .segs { position: absolute; left: 64px; right: 64px; top: 150px; display: flex; gap: 14px; z-index: 20; }
+  .segs i { flex: 1; height: 8px; border-radius: 8px; background: rgb(14 26 24 / 0.12); overflow: hidden; }
+  .segs i b { display: block; height: 100%; background: var(--brand); transform-origin: 0 50%; transform: scaleX(0); border-radius: inherit; }
+
+  /* world */
+  .world { position: absolute; left: 0; top: 0; width: 3400px; height: 1920px; will-change: transform; }
+  .ground { position: absolute; left: 0; top: 1180px; width: 3400px; height: 740px; background: var(--paper); border-top: 6px solid var(--ink); }
+
+  /* captions */
+  .cap {
+    position: absolute; left: 56px; right: 56px; top: 1340px; padding: 52px 56px 58px;
+    border-radius: 48px; background: #fff; box-shadow: 0 30px 60px -30px rgb(10 46 42 / 0.35), inset 0 0 0 2px rgb(14 26 24 / 0.06);
+    z-index: 15;
+  }
+  .cap .k { display: inline-flex; align-items: center; gap: 14px; font-size: 30px; font-weight: 700; color: var(--brand-ink); letter-spacing: 0.02em; }
+  .cap .k i { display: inline-grid; place-items: center; min-width: 52px; height: 52px; padding: 0 12px; border-radius: 26px; background: var(--brand); color: #fff; font-style: normal; font-size: 28px; }
+  .cap h2 { margin: 22px 0 0; font-size: 76px; line-height: 1.04; font-weight: 700; letter-spacing: -0.035em; }
+  .cap p { margin: 20px 0 0; font-size: 38px; line-height: 1.4; color: var(--ink-2); }
+  .cap.red .k i { background: var(--red); }
+  .cap.red .k { color: var(--red); }
+
+  /* overlay cards */
+  .card {
+    position: absolute; left: 110px; width: 860px; top: 300px; padding: 56px 60px 170px;
+    border-radius: 44px; background: #fff; z-index: 18;
+    box-shadow: 0 60px 120px -40px rgb(10 46 42 / 0.55), inset 0 0 0 2px rgb(14 26 24 / 0.06);
+  }
+  .card small { display: block; font-size: 28px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+  .card h3 { margin: 12px 0 36px; font-size: 58px; letter-spacing: -0.03em; }
+  .row { display: grid; gap: 8px; padding: 26px 0; border-top: 3px solid var(--paper-2); }
+  .row label { font-size: 28px; color: var(--ink-3); font-weight: 600; }
+  .row div { font-size: 44px; font-weight: 650; min-height: 56px; white-space: nowrap; }
+  .row .tick { display: inline-block; width: 44px; height: 44px; margin-right: 14px; border-radius: 12px; border: 4px solid var(--ink); vertical-align: -6px; position: relative; }
+  .row .tick.on { background: var(--red); border-color: var(--red); }
+  .row .tick.on::after { content: ''; position: absolute; left: 11px; top: 3px; width: 12px; height: 22px; border: solid #fff; border-width: 0 6px 6px 0; transform: rotate(45deg); }
+  .caret { display: inline-block; width: 4px; height: 46px; margin-left: 4px; background: var(--ink); vertical-align: -6px; }
+  .stamp {
+    position: absolute; right: 54px; bottom: 44px; padding: 18px 30px; border: 8px solid var(--red); border-radius: 20px;
+    color: var(--red); font-weight: 800; font-size: 44px; letter-spacing: 0.06em; transform-origin: center;
+    background: rgb(255 255 255 / 0.6);
+  }
+
+  .phone {
+    position: absolute; left: 280px; top: 270px; width: 520px; height: 1020px; padding: 22px;
+    border-radius: 86px; background: #0b0f0e; z-index: 18;
+    box-shadow: 0 60px 120px -40px rgb(0 0 0 / 0.6), inset 0 0 0 3px rgb(255 255 255 / 0.12);
+  }
+  .phone .scr { position: relative; width: 100%; height: 100%; border-radius: 66px; background: #f6f7f9; overflow: hidden; }
+  .phone .island { position: absolute; left: 50%; top: 26px; width: 150px; height: 44px; margin-left: -75px; border-radius: 22px; background: #0b0f0e; z-index: 3; }
+  .phone .status { position: absolute; left: 48px; right: 48px; top: 30px; display: flex; justify-content: space-between; font-size: 30px; font-weight: 700; }
+  .bars { display: flex; align-items: flex-end; gap: 6px; height: 30px; }
+  .bars i { width: 9px; border-radius: 3px; background: #cfd3d8; }
+  .bars i:nth-child(1) { height: 30%; } .bars i:nth-child(2) { height: 55%; } .bars i:nth-child(3) { height: 78%; } .bars i:nth-child(4) { height: 100%; }
+  .bars i.on { background: #111418; }
+  .net { position: absolute; left: 0; right: 0; top: 260px; text-align: center; }
+  .net .big { font-size: 46px; font-weight: 750; letter-spacing: -0.02em; }
+  .net .sub { margin-top: 10px; font-size: 30px; color: #6b7280; }
+  .net .ok { display: inline-grid; place-items: center; width: 150px; height: 150px; margin-bottom: 30px; border-radius: 50%; background: var(--brand); color: #fff; }
+  .net .ok svg { width: 80px; }
+  .sms { position: absolute; left: 34px; right: 34px; top: 640px; padding: 26px 30px; border-radius: 30px; background: #fff; box-shadow: 0 16px 40px -18px rgb(0 0 0 / 0.35); font-size: 28px; line-height: 1.35; }
+  .sms b { display: block; font-size: 26px; color: #6b7280; margin-bottom: 6px; }
+  .tray { position: absolute; right: -10px; top: 330px; width: 22px; height: 150px; border-radius: 8px; background: #2a2f2e; z-index: 4; }
+  .simbig { position: absolute; width: 130px; height: 170px; border-radius: 16px 46px 16px 16px; background: #fff; box-shadow: 0 10px 30px -8px rgb(0 0 0 / 0.4), inset 0 0 0 4px var(--ink); z-index: 19; }
+  .simbig::after { content: ''; position: absolute; left: 30px; top: 50px; width: 70px; height: 70px; border-radius: 12px; background: linear-gradient(135deg, #e6c86a, #c9a43b); box-shadow: inset 0 0 0 3px rgb(0 0 0 / 0.25); }
+
+  /* final */
+  .final { position: absolute; inset: 0; z-index: 30; background: radial-gradient(70% 45% at 85% 5%, rgb(26 167 82 / 0.4), transparent 70%), var(--night); color: #f2f5f3; padding: 260px 80px 0; }
+  .final h2 { margin: 0 0 70px; font-size: 92px; line-height: 1.02; letter-spacing: -0.04em; font-weight: 750; }
+  .done { display: flex; align-items: flex-start; gap: 34px; margin-bottom: 54px; font-size: 50px; font-weight: 650; line-height: 1.2; }
+  .done .c { flex: none; display: grid; place-items: center; width: 84px; height: 84px; border-radius: 50%; background: var(--brand); }
+  .done .c svg { width: 46px; }
+  .done.next .c { background: transparent; box-shadow: inset 0 0 0 5px rgb(242 245 243 / 0.5); }
+  .done small { display: block; margin-top: 10px; font-size: 34px; font-weight: 500; color: #a9c2bc; }
+  .brand { position: absolute; left: 80px; right: 80px; bottom: 150px; display: flex; align-items: center; gap: 30px; }
+  .brand svg { width: 120px; height: 120px; }
+  .brand b { font-family: 'Manrope', 'Onest'; font-size: 78px; font-weight: 800; letter-spacing: -0.05em; color: #fff; line-height: 1; }
+  .brand span { display: block; margin-top: 10px; font-size: 34px; color: #a9c2bc; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <!-- header -->
+  <div class="head" id="head">
+    <svg viewBox="270 270 1390 1390"><circle cx="965" cy="965" r="616.5" fill="none" stroke="#1aa752" stroke-width="137" stroke-dasharray="1500 300 1500 572"/><polygon points="1215,476 1440,466 1125,1307 902,1307 1007,1023 880,1023 720,1480 495,1465 812,622 1033,622 928,908 1052,908" fill="#1aa752"/></svg>
+    <b>Hamkor Bank</b><span id="tag"></span>
+  </div>
+  <div class="segs" id="segs"><i><b></b></i><i><b></b></i><i><b></b></i></div>
+
+  <!-- the world the camera travels through -->
+  <div class="world" id="world">
+    <div class="ground"></div>
+
+    <!-- Scene A: sky, runway, terminal -->
+    <svg class="abs" id="cloud1" width="260" height="110" style="left:120px;top:380px"><path class="line" d="M30 90 h190 a40 40 0 0 0-20-70 a60 60 0 0 0-110-10 a45 45 0 0 0-60 80z" style="fill:#fff"/></svg>
+    <svg class="abs" id="cloud2" width="200" height="90" style="left:720px;top:290px"><path class="line" d="M24 74 h150 a32 32 0 0 0-16-56 a48 48 0 0 0-88-8 a36 36 0 0 0-46 64z" style="fill:#fff"/></svg>
+    <svg class="abs" width="1000" height="40" style="left:40px;top:1210px"><path d="M10 14 H990" stroke="#0e1a18" stroke-width="8" stroke-dasharray="70 46" stroke-linecap="round" opacity=".25"/></svg>
+    <!-- terminal -->
+    <svg class="abs" width="420" height="440" style="left:1000px;top:746px">
+      <path class="fill-paper" d="M10 434 V140 Q10 110 40 110 H380 Q410 110 410 140 V434" />
+      <path class="line" d="M10 200 H410" />
+      <path d="M40 220 H380 V330 H40z" fill="#dfe9e4" stroke="#0e1a18" stroke-width="6"/>
+      <path class="line" d="M125 220 V330 M210 220 V330 M295 220 V330" />
+      <rect x="150" y="350" width="120" height="84" rx="8" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <path class="line" d="M210 350 V434" />
+      <rect x="70" y="40" width="280" height="62" rx="14" fill="#0a2e2a"/>
+      <text x="210" y="82" text-anchor="middle" fill="#fff" font-size="30" font-weight="700" font-family="Onest" id="arrSign">ПРИЛЁТ</text>
+    </svg>
+    <!-- plane -->
+    <svg class="abs" id="plane" width="600" height="220" viewBox="0 0 600 220" style="transform-origin:300px 150px">
+      <path class="fill-paper" d="M40 130 Q20 130 18 112 Q20 96 60 92 L470 82 Q560 82 585 112 Q560 142 470 142 L60 142 Q40 142 40 130z" />
+      <path class="fill-paper" d="M70 94 L28 20 Q24 10 36 10 L80 10 L150 92z" />
+      <path d="M250 120 L330 120 L240 200 L200 200z" fill="#fff" stroke="#0e1a18" stroke-width="6" stroke-linejoin="round"/>
+      <path d="M60 128 H470" stroke="#1aa752" stroke-width="10" stroke-linecap="round"/>
+      <g fill="#0e1a18">
+        <circle cx="200" cy="104" r="7"/><circle cx="230" cy="104" r="7"/><circle cx="260" cy="104" r="7"/><circle cx="290" cy="104" r="7"/><circle cx="320" cy="104" r="7"/><circle cx="350" cy="104" r="7"/><circle cx="380" cy="104" r="7"/><circle cx="410" cy="104" r="7"/>
+      </g>
+      <path d="M520 96 Q548 98 562 110 L520 110z" fill="#0e1a18"/>
+      <g id="gear"><path class="line" d="M160 142 V172 M450 142 V172" /><circle cx="160" cy="182" r="12" fill="#0e1a18"/><circle cx="450" cy="182" r="12" fill="#0e1a18"/></g>
+    </svg>
+    <svg class="abs" id="puff" width="200" height="80"><g fill="#fff" stroke="#0e1a18" stroke-width="4"><circle cx="40" cy="50" r="18"/><circle cx="72" cy="42" r="24"/><circle cx="108" cy="50" r="16"/></g></svg>
+
+    <!-- Scene B: customs, two corridors -->
+    <svg class="abs" width="900" height="200" style="left:1680px;top:520px">
+      <path class="line" d="M120 0 V60 M780 0 V60"/>
+      <rect x="20" y="60" width="400" height="120" rx="20" fill="#1aa752" id="greenSign"/>
+      <rect x="480" y="60" width="400" height="120" rx="20" fill="#c8372d" id="redSign"/>
+      <text x="220" y="112" text-anchor="middle" fill="#fff" font-size="34" font-weight="800" font-family="Onest" id="gT1">ЗЕЛЁНЫЙ</text>
+      <text x="220" y="152" text-anchor="middle" fill="#fff" font-size="24" font-weight="600" font-family="Onest" id="gT2">нечего декларировать</text>
+      <text x="680" y="112" text-anchor="middle" fill="#fff" font-size="34" font-weight="800" font-family="Onest" id="rT1">КРАСНЫЙ</text>
+      <text x="680" y="152" text-anchor="middle" fill="#fff" font-size="24" font-weight="600" font-family="Onest" id="rT2">есть что декларировать</text>
+    </svg>
+    <!-- gates -->
+    <svg class="abs" id="gateG" width="300" height="440" style="left:1730px;top:746px"><path d="M20 434 V20 H280 V434" fill="none" stroke="#1aa752" stroke-width="16" stroke-linejoin="round"/><path d="M20 20 H280" stroke="#0e1a18" stroke-width="6"/></svg>
+    <svg class="abs" id="gateR" width="300" height="440" style="left:2140px;top:746px"><path d="M20 434 V20 H280 V434" fill="rgb(200 55 45 / .06)" stroke="#c8372d" stroke-width="16" stroke-linejoin="round"/><path d="M20 20 H280" stroke="#0e1a18" stroke-width="6"/></svg>
+    <!-- customs desk -->
+    <svg class="abs" width="300" height="320" style="left:2380px;top:866px">
+      <circle cx="150" cy="80" r="44" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <path d="M100 44 Q150 0 200 44 Z" fill="#0a2e2a"/>
+      <path d="M70 200 Q70 130 150 130 Q230 130 230 200" fill="#0a2e2a" stroke="#0e1a18" stroke-width="6"/>
+      <rect x="10" y="190" width="280" height="124" rx="16" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <rect x="40" y="220" width="90" height="16" rx="8" fill="#c8372d"/>
+    </svg>
+    <svg class="abs" id="think" width="200" height="200"><path class="fill-paper" d="M40 20 H160 Q184 20 184 44 V120 Q184 144 160 144 H96 L70 176 L72 144 H40 Q16 144 16 120 V44 Q16 20 40 20z"/><rect x="74" y="40" width="52" height="88" rx="12" fill="#fff" stroke="#0e1a18" stroke-width="6"/><circle cx="100" cy="114" r="5" fill="#0e1a18"/><text x="150" y="70" font-size="54" font-weight="800" fill="#c8372d" font-family="Onest">?</text></svg>
+
+    <!-- Scene C: SIM kiosk -->
+    <svg class="abs" width="420" height="560" style="left:2880px;top:626px">
+      <path class="line" d="M330 0 V250"/>
+      <circle cx="330" cy="80" r="74" fill="#1aa752" stroke="#0e1a18" stroke-width="6"/>
+      <text x="330" y="96" text-anchor="middle" fill="#fff" font-size="46" font-weight="800" font-family="Onest">SIM</text>
+      <circle cx="150" cy="300" r="44" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <path d="M108 290 Q120 250 150 252 Q190 250 194 296" fill="#0e1a18"/>
+      <path d="M70 420 Q70 350 150 350 Q230 350 230 420" fill="#1aa752" stroke="#0e1a18" stroke-width="6"/>
+      <rect x="10" y="400" width="400" height="154" rx="22" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <rect x="10" y="400" width="400" height="34" rx="16" fill="#0a2e2a"/>
+      <text x="210" y="510" text-anchor="middle" fill="#0e1a18" font-size="34" font-weight="700" font-family="Onest" id="kioskT">SIM-карты</text>
+    </svg>
+    <!-- passport & SIM travelling between hands and counter -->
+    <svg class="abs" id="passport" width="70" height="90"><rect x="4" y="4" width="62" height="82" rx="8" fill="#0a2e2a" stroke="#0e1a18" stroke-width="4"/><circle cx="35" cy="38" r="12" fill="none" stroke="#e6c86a" stroke-width="4"/></svg>
+    <svg class="abs" id="simSmall" width="60" height="76"><path d="M4 8 Q4 4 8 4 H40 L56 20 V68 Q56 72 52 72 H8 Q4 72 4 68z" fill="#fff" stroke="#0e1a18" stroke-width="4"/><rect x="16" y="26" width="28" height="28" rx="5" fill="#d8b44c"/></svg>
+
+    <!-- the traveller -->
+    <svg class="abs" id="person" width="240" height="330" viewBox="0 0 240 330">
+      <g id="bag">
+        <rect x="10" y="150" width="78" height="118" rx="14" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+        <path class="line" d="M30 150 V112 H68 V150"/>
+        <path d="M24 186 H74 M24 214 H74" stroke="#1aa752" stroke-width="6" stroke-linecap="round"/>
+        <circle cx="28" cy="278" r="9" fill="#0e1a18"/><circle cx="70" cy="278" r="9" fill="#0e1a18"/>
+      </g>
+      <g id="body">
+        <path id="legL" class="line" d="M150 230 L150 318" style="stroke-width:12;transform-origin:150px 230px"/>
+        <path id="legR" class="line" d="M166 230 L166 318" style="stroke-width:12;transform-origin:166px 230px"/>
+        <path d="M118 236 Q118 134 158 134 Q198 134 198 236 Z" fill="#0b4a43" stroke="#0e1a18" stroke-width="6" stroke-linejoin="round"/>
+        <path id="arm" class="line" d="M128 160 L96 196" style="stroke-width:12;transform-origin:128px 160px"/>
+        <circle cx="158" cy="92" r="38" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+        <path d="M122 84 Q130 46 162 50 Q194 52 196 86 Q178 70 150 74 Z" fill="#0e1a18"/>
+        <circle cx="172" cy="96" r="5" fill="#0e1a18"/>
+        <path class="line" d="M166 112 Q174 116 182 110" style="stroke-width:4"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- overlays -->
+  <div class="card" id="decl">
+    <small id="dK"></small>
+    <h3 id="dH"></h3>
+    <div class="row"><label id="dL1"></label><div><span class="tick" id="dTick"></span><span id="dV1"></span></div></div>
+    <div class="row"><label id="dL2"></label><div id="dV2"></div></div>
+    <div class="row"><label>IMEI</label><div id="dV3"></div></div>
+    <div class="stamp" id="stamp"></div>
+  </div>
+
+  <div class="phone" id="phone">
+    <div class="tray"></div>
+    <div class="scr">
+      <div class="island"></div>
+      <div class="status"><span id="opName">—</span><span class="bars" id="bars"><i></i><i></i><i></i><i></i></span></div>
+      <div class="net" id="net"></div>
+      <div class="sms" id="sms"><b id="smsFrom"></b><span id="smsText"></span></div>
+    </div>
+  </div>
+  <div class="simbig" id="simBig"></div>
+
+  <div class="cap" id="cap"><span class="k" id="capK"></span><h2 id="capH"></h2><p id="capP"></p></div>
+
+  <div class="final" id="final">
+    <h2 id="fH"></h2>
+    <div class="done" id="f1"><span class="c"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span id="f1t"></span></div>
+    <div class="done" id="f2"><span class="c"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span id="f2t"></span></div>
+    <div class="done next" id="f3"><span class="c"><svg viewBox="0 0 24 24"><path d="M6 12h12M13 7l5 5-5 5" fill="none" stroke="#f2f5f3" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span id="f3t"></span></div>
+    <div class="brand" id="fBrand">
+      <svg viewBox="270 270 1390 1390"><circle cx="965" cy="965" r="616.5" fill="none" stroke="#1aa752" stroke-width="137" stroke-dasharray="1500 300 1500 572"/><polygon points="1215,476 1440,466 1125,1307 902,1307 1007,1023 880,1023 720,1480 495,1465 812,622 1033,622 928,908 1052,908" fill="#1aa752"/></svg>
+      <div><b>Hamkor Bank</b><span id="fTag"></span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const TEXT = {
+  ru: {
+    tag: 'ГАЙДБУК', arr: 'ПРИЛЁТ', g1: 'ЗЕЛЁНЫЙ', g2: 'нечего декларировать', r1: 'КРАСНЫЙ', r2: 'есть что декларировать', kiosk: 'SIM-карты',
+    c0: ['Прилёт', 'Вы прилетели', 'Первые 15 минут в аэропорту — по шагам.'],
+    c1: ['Шаг 1 · Таможня', 'Красный коридор', 'Задекларируйте телефон. Без декларации регистрация IMEI обойдётся в 30% от его цены.'],
+    c2: ['Шаг 2 · Связь', 'Купите SIM-карту', 'Стойки операторов — прямо в аэропорту. Нужен загранпаспорт, укажите статус нерезидента.'],
+    dK: 'Таможенная декларация', dH: 'Что вы ввозите', dL1: 'Предмет', dV1: 'Мобильный телефон', dL2: 'Количество', dV2: '1 шт.', imei: '35 1234 •• 4821', stamp: 'ЗАДЕКЛАРИРОВАНО',
+    noNet: 'Нет сети', search: 'Поиск сети…', ok: 'Сеть подключена', okSub: 'Можно звонить и пользоваться интернетом', op: 'UZ', smsFrom: 'Оператор', sms: 'Добро пожаловать в Узбекистан!',
+    fH: 'Готово. Вы на связи', f1: 'Телефон задекларирован', f2: 'SIM-карта куплена', f3: ['Дальше: регистрация по месту пребывания', 'В течение 3 дней — в отеле её сделают за вас'], fTag: 'Гайдбук сотрудника',
+  },
+  en: {
+    tag: 'GUIDEBOOK', arr: 'ARRIVALS', g1: 'GREEN', g2: 'nothing to declare', r1: 'RED', r2: 'goods to declare', kiosk: 'SIM cards',
+    c0: ['Arrival', 'You have landed', 'Your first 15 minutes at the airport, step by step.'],
+    c1: ['Step 1 · Customs', 'Red channel', 'Declare your phone. Without a declaration, IMEI registration costs 30% of its price.'],
+    c2: ['Step 2 · Mobile', 'Buy a SIM card', 'Operator stands are right in the airport. Bring your passport and say you are a non-resident.'],
+    dK: 'Customs declaration', dH: 'What you bring in', dL1: 'Item', dV1: 'Mobile phone', dL2: 'Quantity', dV2: '1 pc.', imei: '35 1234 •• 4821', stamp: 'DECLARED',
+    noNet: 'No network', search: 'Searching…', ok: 'Connected', okSub: 'Calls and mobile data are ready', op: 'UZ', smsFrom: 'Operator', sms: 'Welcome to Uzbekistan!',
+    fH: 'Done. You are connected', f1: 'Phone declared', f2: 'SIM card bought', f3: ['Next: register your stay', 'Within 3 days — a hotel does it for you'], fTag: 'Employee guidebook',
+  },
+};
+const lang = new URLSearchParams(location.search).get('lang') === 'en' ? 'en' : 'ru';
+const T = TEXT[lang];
+document.documentElement.lang = lang;
+const $ = (id) => document.getElementById(id);
+$('tag').textContent = T.tag; $('arrSign').textContent = T.arr; $('kioskT').textContent = T.kiosk;
+$('gT1').textContent = T.g1; $('gT2').textContent = T.g2; $('rT1').textContent = T.r1; $('rT2').textContent = T.r2;
+$('dK').textContent = T.dK; $('dH').textContent = T.dH; $('dL1').textContent = T.dL1; $('dL2').textContent = T.dL2; $('stamp').textContent = T.stamp;
+$('fH').textContent = T.fH; $('f1t').textContent = T.f1; $('f2t').textContent = T.f2;
+$('f3t').innerHTML = `${T.f3[0]}<small>${T.f3[1]}</small>`; $('fTag').textContent = T.fTag;
+$('smsFrom').textContent = T.smsFrom; $('smsText').textContent = T.sms;
+
+// ---------- timeline helpers ----------
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const easeOut = (x) => 1 - Math.pow(1 - x, 3);
+const easeInOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const back = (x) => { const c = 1.6; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+/** Progress 0→1 between t0 and t1 with an easing. */
+const p = (t, t0, t1, e = easeInOut) => e(clamp((t - t0) / (t1 - t0)));
+/** Piecewise value: keys [[time, value], ...], eased between neighbours. */
+function key(t, keys, e = easeInOut) {
+  if (t <= keys[0][0]) return keys[0][1];
+  for (let i = 1; i < keys.length; i++) {
+    const [t1, v1] = keys[i]; const [t0, v0] = keys[i - 1];
+    if (t <= t1) return v0 + (v1 - v0) * e((t - t0) / (t1 - t0 || 1));
+  }
+  return keys[keys.length - 1][1];
+}
+const fade = (t, a, b, c, d) => Math.min(p(t, a, b, easeOut), 1 - p(t, c, d, easeInOut));
+const set = (el, css) => Object.assign((typeof el === 'string' ? $(el) : el).style, css);
+
+const DUR = 32;
+// The traveller's position along the floor (world x), with stops.
+const PX = [[0, 840], [4.4, 840], [7.0, 1580], [8.6, 1580], [10.0, 2140], [15.9, 2140], [18.4, 2820], [26, 2820]];
+function render(t) {
+  // ---- traveller ----
+  const x = key(t, PX);
+  const dx = key(t + 0.05, PX) - key(t - 0.05, PX);
+  const walking = Math.abs(dx) > 0.5;
+  const sw = walking ? Math.sin(t * 13) : 0;
+  set('person', { transform: `translate(${x - 150}px, ${1180 - 322 + (walking ? -Math.abs(sw) * 7 : 0)}px)`, opacity: p(t, 4.2, 4.8, easeOut) });
+  set('legL', { transform: `rotate(${sw * 20}deg)` });
+  set('legR', { transform: `rotate(${-sw * 20}deg)` });
+  const handing = Math.max(p(t, 18.4, 18.8) - p(t, 19.6, 20.0), 0);
+  set('arm', { transform: `rotate(${walking ? -sw * 10 : -handing * 70}deg)` });
+  set('bag', { transform: `rotate(${walking ? -6 : 0}deg)`, transformOrigin: '50px 278px' });
+
+  // ---- camera follows, after the landing ----
+  const cam = Math.max(0, Math.min(3400 - 1080, x - 520)) * p(t, 3.8, 6.0, easeInOut) + 0;
+  set('world', { transform: `translateX(${-cam}px)` });
+
+  // ---- plane: glide, touch down, roll to a stop ----
+  const px = key(t, [[0, -620], [3.0, 150], [4.2, 300]], (k) => k);
+  const py = key(t, [[0, 260], [3.0, 1180 - 196]], (k) => 1 - Math.pow(1 - k, 2));
+  const pr = key(t, [[0, 10], [2.6, 3], [3.05, 0]]);
+  set('plane', { transform: `translate(${px}px, ${t < 3 ? py : 1180 - 196}px) rotate(${pr}deg)` });
+  const puff = p(t, 3.0, 3.9, easeOut);
+  set('puff', { transform: `translate(${200 + puff * 60}px, ${1110 - puff * 10}px) scale(${0.4 + puff * 0.9})`, opacity: t < 3 ? 0 : 1 - puff });
+  set('cloud1', { transform: `translateX(${-t * 14}px)` });
+  set('cloud2', { transform: `translateX(${-t * 9}px)` });
+
+  // ---- customs: think, choose red ----
+  const think = fade(t, 7.1, 7.5, 8.6, 9.0);
+  set('think', { transform: `translate(${x - 40}px, ${700 - think * 30}px) scale(${0.7 + think * 0.3})`, opacity: think, transformOrigin: '70px 176px' });
+  const redPulse = t > 8.0 && t < 10.2 ? 0.5 + 0.5 * Math.sin((t - 8) * 9) : 0;
+  set('gateR', { filter: `drop-shadow(0 0 ${redPulse * 26}px rgb(200 55 45 / ${0.2 + redPulse * 0.6}))` });
+  set('gateG', { opacity: 1 - p(t, 8.0, 9.0) * 0.55 });
+  set('redSign', { opacity: 1 });
+  set('greenSign', { opacity: 1 - p(t, 8.0, 9.0) * 0.5 });
+
+  // ---- declaration card ----
+  const dIn = p(t, 10.2, 11.0, back); const dOut = p(t, 15.2, 15.8, easeInOut);
+  set('decl', { transform: `translateY(${(1 - dIn) * 1200 + dOut * -1400}px)`, opacity: t < 10.2 || t > 15.8 ? 0 : 1 });
+  const typ = (s, a, b) => s.slice(0, Math.round(clamp((t - a) / (b - a)) * s.length));
+  $('dTick').classList.toggle('on', t > 11.3);
+  $('dV1').innerHTML = typ(T.dV1, 11.4, 12.3) + (t > 11.4 && t < 12.4 ? '<i class="caret"></i>' : '');
+  $('dV2').innerHTML = typ(T.dV2, 12.5, 12.8) + (t > 12.4 && t < 12.9 ? '<i class="caret"></i>' : '');
+  $('dV3').innerHTML = typ(T.imei, 12.9, 13.8) + (t > 12.9 && t < 13.9 ? '<i class="caret"></i>' : '');
+  const st = p(t, 14.1, 14.45, easeOut);
+  set('stamp', { opacity: t < 14.1 ? 0 : 1, transform: `rotate(-9deg) scale(${1.9 - st * 0.9})` });
+  set('stage', { transform: t > 14.4 && t < 14.6 ? `translateY(${Math.sin((t - 14.4) * 90) * 6}px)` : 'none' });
+
+  // ---- passport over, SIM back ----
+  const pp = p(t, 18.6, 19.3);
+  set('passport', { transform: `translate(${2820 - 40 + pp * 170}px, ${1000 - Math.sin(pp * Math.PI) * 80}px)`, opacity: t > 18.5 && t < 19.6 ? 1 : 0 });
+  const sp = p(t, 19.5, 20.2);
+  set('simSmall', { transform: `translate(${2980 - sp * 170}px, ${1000 - Math.sin(sp * Math.PI) * 80}px) rotate(${sp * -20}deg)`, opacity: t > 19.4 && t < 20.4 ? 1 : 0 });
+
+  // ---- phone close-up: SIM in, bars fill, connected ----
+  const phIn = p(t, 20.3, 21.1, back); const phOut = p(t, 25.2, 25.8);
+  set('phone', { transform: `translateY(${(1 - phIn) * 1300 + phOut * -1400}px)`, opacity: t < 20.3 || t > 25.8 ? 0 : 1 });
+  const simIn = p(t, 21.2, 22.0);
+  set('simBig', { left: `${1030 - simIn * 230}px`, top: `${610 - simIn * 10 + phOut * -1400}px`, opacity: t < 21.0 || t > 22.05 ? 0 : 1 - p(t, 21.85, 22.05), transform: `rotate(${(1 - simIn) * 14}deg)` });
+  const bars = t < 22.2 ? 0 : Math.min(4, Math.floor((t - 22.2) / 0.28) + 1);
+  [...$('bars').children].forEach((b, i) => b.classList.toggle('on', i < bars));
+  $('opName').textContent = t > 22.2 ? T.op : '—';
+  const connected = t > 23.5;
+  $('net').innerHTML = connected
+    ? `<div class="ok" style="transform:scale(${back(p(t, 23.5, 24.0, (k) => k))})"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="big">${T.ok}</div><div class="sub">${T.okSub}</div>`
+    : `<div class="big" style="color:#9aa1a8">${t > 22.2 ? T.search : T.noNet}</div>`;
+  const sms = p(t, 24.2, 24.7, back);
+  set('sms', { transform: `translateY(${(1 - sms) * -60}px)`, opacity: t < 24.2 ? 0 : sms });
+
+  // ---- captions ----
+  const caps = [[T.c0, 0.3, 6.6, ''], [T.c1, 6.9, 15.8, 'red'], [T.c2, 16.1, 25.6, '']];
+  let shown = null;
+  for (const [c, a, b, cls] of caps) if (t >= a - 0.4 && t <= b + 0.4) shown = [c, a, b, cls];
+  if (shown) {
+    const [c, a, b, cls] = shown;
+    const n = caps.findIndex((k) => k[0] === c);
+    $('capK').innerHTML = n ? `<i>${n}</i>${c[0]}` : c[0];
+    $('capH').textContent = c[1]; $('capP').textContent = c[2];
+    $('cap').className = `cap ${cls}`;
+    const v = fade(t, a - 0.4, a + 0.2, b - 0.2, b + 0.4);
+    set('cap', { opacity: v, transform: `translateY(${(1 - v) * 60}px)` });
+  } else set('cap', { opacity: 0 });
+
+  // ---- progress segments ----
+  const segs = [[0, 6.8], [6.8, 16], [16, 25.8]];
+  [...$('segs').children].forEach((s, i) => (s.firstElementChild.style.transform = `scaleX(${clamp((t - segs[i][0]) / (segs[i][1] - segs[i][0]))})`));
+
+  // ---- final card ----
+  const fin = p(t, 25.8, 26.6, easeInOut);
+  set('final', { transform: `translateY(${(1 - fin) * 100}%)`, borderRadius: `${(1 - fin) * 80}px ${(1 - fin) * 80}px 0 0` });
+  const item = (id, a) => { const v = p(t, a, a + 0.5, easeOut); set(id, { opacity: v, transform: `translateX(${(1 - v) * -40}px)` }); set($(id).querySelector('.c'), { transform: `scale(${back(clamp((t - a - 0.1) / 0.45))})` }); };
+  set('fH', { opacity: p(t, 26.4, 26.9, easeOut), transform: `translateY(${(1 - p(t, 26.4, 26.9, easeOut)) * 30}px)` });
+  item('f1', 27.0); item('f2', 27.6); item('f3', 28.3);
+  const br = p(t, 29.3, 30.0, easeOut);
+  set('fBrand', { opacity: br, transform: `translateY(${(1 - br) * 40}px)` });
+}
+window.render = render;
+window.DUR = DUR;
+render(0);
+if (new URLSearchParams(location.search).has('play')) {
+  const t0 = performance.now();
+  const loop = () => { const t = ((performance.now() - t0) / 1000) % DUR; render(t); requestAnimationFrame(loop); };
+  loop();
+}
+</script>
+</body>
+</html>

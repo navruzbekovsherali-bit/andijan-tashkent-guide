@@ -33,6 +33,8 @@ This is the most important page for your first days. Follow the steps in order. 
 
 ## At the airport
 
+<div class="video-reel" data-reel="arrival"></div>
+
 1. **Declare your phone.** Go through the "red channel" and declare every device. At airports you can also do this online using a QR code. Keep all customs documents: you will need them to register the IMEI.
 2. **Check all IMEI numbers.** If your phone takes two SIM cards, or a SIM and an eSIM, it has two IMEI numbers, and you must register each one. To find the IMEI, dial `*#06#`.
 3. **Buy a SIM card.** Mobile operators (Beeline, Ucell, Mobiuz, Uztelecom) have desks right in the airport. A SIM card is issued only with your international passport. We recommend Ucell.

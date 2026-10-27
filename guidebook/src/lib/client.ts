@@ -545,7 +545,19 @@ function stopVideo(btn: HTMLButtonElement) {
 }
 
 /* ---------- Bank reels: a vertical film that plays silently while on screen; sound on request ---------- */
-const REELS: Record<string, { src: string; poster: string; ru: [string, string, string]; en: [string, string, string] }> = {
+const REELS: Record<
+  string,
+  { src: string; poster: string; srcEn?: string; posterEn?: string; silent?: boolean; ru: [string, string, string]; en: [string, string, string] }
+> = {
+  arrival: {
+    src: 'video/arrival-ru.mp4',
+    poster: 'video/arrival-ru-poster.webp',
+    srcEn: 'video/arrival-en.mp4',
+    posterEn: 'video/arrival-en-poster.webp',
+    silent: true,
+    ru: ['Прилёт: первые 15 минут', 'Таможня и SIM-карта — что делать сразу после посадки, за 30 секунд.', 'Анимация гайдбука'],
+    en: ['Arrival: the first 15 minutes', 'Customs and a SIM card — what to do right after landing, in 30 seconds.', 'Guidebook animation'],
+  },
   history: {
     src: 'video/history-reel.mp4',
     poster: 'video/history-reel-poster.webp',
@@ -569,10 +581,12 @@ function reels() {
     host.dataset.ready = '';
     const [title, lead, credit] = r[lang];
     const root = base() || '/';
+    const src = lang === 'en' && r.srcEn ? r.srcEn : r.src;
+    const poster = lang === 'en' && r.posterEn ? r.posterEn : r.poster;
     host.innerHTML = `
       <figure class="reel">
         <div class="reel-phone">
-          <video src="${root}${r.src}" poster="${root}${r.poster}" muted playsinline loop preload="none" aria-label="${escapeHtml(title)}"></video>
+          <video src="${root}${src}" poster="${root}${poster}" muted playsinline loop preload="none" aria-label="${escapeHtml(title)}"></video>
           <button type="button" class="reel-toggle" aria-label="${L.play}"><span class="reel-play"></span></button>
           <button type="button" class="reel-sound" aria-pressed="false" aria-label="${L.on}">
             <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path class="wave" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path class="mute" d="M16 9.5l5 5M21 9.5l-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
@@ -582,8 +596,9 @@ function reels() {
         <figcaption><strong>${escapeHtml(title)}</strong><span>${escapeHtml(lead)}</span><small>${escapeHtml(credit)}</small></figcaption>
       </figure>`;
     const fig = host.querySelector<HTMLElement>('.reel')!;
+    if (r.silent) host.querySelector('.reel-sound')?.remove();
     const video = host.querySelector('video')!;
-    const sound = host.querySelector<HTMLButtonElement>('.reel-sound')!;
+    const sound = host.querySelector<HTMLButtonElement>('.reel-sound');
     const toggle = host.querySelector<HTMLButtonElement>('.reel-toggle')!;
     const bar = host.querySelector<HTMLElement>('.reel-bar i')!;
     let userPaused = false;
@@ -603,10 +618,10 @@ function reels() {
         video.pause();
       }
     });
-    sound.addEventListener('click', () => {
+    sound?.addEventListener('click', () => {
       video.muted = !video.muted;
-      sound.setAttribute('aria-pressed', String(!video.muted));
-      sound.setAttribute('aria-label', video.muted ? L.on : L.off);
+      sound!.setAttribute('aria-pressed', String(!video.muted));
+      sound!.setAttribute('aria-label', video.muted ? L.on : L.off);
       fig.classList.toggle('has-sound', !video.muted);
       if (video.paused) video.play().catch(() => {});
     });
