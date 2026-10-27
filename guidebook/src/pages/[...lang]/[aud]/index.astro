@@ -1,10 +1,10 @@
 ---
 import Base from '../../../layouts/Base.astro';
 import Guide from '../../../components/Guide.astro';
-import Girih from '../../../components/Girih.astro';
+import Illus from '../../../components/Illus.astro';
 import Icon from '../../../components/Icon.astro';
 import { LANGS, DEFAULT_LANG, t, url, type Lang } from '../../../lib/i18n';
-import { getPages, forAudience, groupBySection, SECTIONS, glazeOf, type Audience } from '../../../lib/content';
+import { getPages, forAudience, groupBySection, SECTIONS, illusOf, type Audience } from '../../../lib/content';
 
 export function getStaticPaths() {
   return LANGS.flatMap((lang) =>
@@ -20,7 +20,6 @@ const tr = t(lang);
 const groups = groupBySection(forAudience(await getPages(lang), aud));
 const title = aud === 'local' ? tr('local') : tr('expat');
 const lead = aud === 'local' ? tr('localLead') : tr('expatLead');
-const field = aud === 'local' ? 'emerald' : 'mint';
 const hello: Record<Audience, Record<Lang, string>> = {
   local: {
     ru: 'Начните с «Первого дня и первой недели» — там весь план. Остальное открывайте, когда понадобится.',
@@ -38,44 +37,41 @@ let n = 0;
 const numbered = groups.map((g) => ({ ...g, steps: g.pages.map((p) => ({ p, n: ++n })) }));
 ---
 
-<Base lang={lang} title={title} description={lead} path={`/${aud}/`} audience={aud} current={aud} field={field}>
-  <header class="mast mast-hub" data-glaze={field}>
-    <Girih variant="rosette" class="mast-art" />
-    <div class="wrap mast-inner">
-      <h1 class="display">{title}</h1>
-      <p class="mast-lead">{lead}</p>
+<Base lang={lang} title={title} description={lead} path={`/${aud}/`} audience={aud} current={aud} back={url(lang, '/')}>
+  <header class="page-head">
+    <div class="wrap">
+      <h1>{title}</h1>
+      <p class="lead">{lead}</p>
+      <Guide name={tr('guideName')}>
+        <p>{hello[aud][lang]}</p>
+      </Guide>
     </div>
-    <Girih variant="band" class="mast-band" />
   </header>
 
   <div class="wrap">
-    <Guide name={tr('guideName')}>
-      <p>{hello[aud][lang]}</p>
-    </Guide>
+    {
+      numbered.map((g) => (
+        <section class="chapter" id={g.id}>
+          <div class="chapter-head">
+            <Illus name={illusOf(g.id)} />
+            <h2>
+              <a href={url(lang, `/topic/${g.id}/`)}>{SECTIONS[g.id].title[lang]}</a>
+            </h2>
+          </div>
+          <ol class="steps">
+            {g.steps.map(({ p, n }) => (
+              <li>
+                <a href={url(lang, `/guide/${p.slug}/`)}>
+                  <span class="step-n">{String(n).padStart(2, '0')}</span>
+                  <strong>{p.entry.data.title}</strong>
+                  <span class="step-lead">{p.entry.data.description}</span>
+                  <span class="round-arrow"><Icon name="arrow" size={16} /></span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ))
+    }
   </div>
-
-  {
-    numbered.map((g) => (
-      <section class="chapter" data-glaze={glazeOf(g.id)} id={g.id}>
-        <h2 class="chapter-head">
-          <span class="wrap">
-            {SECTIONS[g.id].title[lang]}
-            <span class="chapter-count">{g.steps.length}</span>
-          </span>
-        </h2>
-        <ol class="wrap steps">
-          {g.steps.map(({ p, n }) => (
-            <li>
-              <a href={url(lang, `/guide/${p.slug}/`)} data-glaze={glazeOf(g.id)}>
-                <span class="step-n">{String(n).padStart(2, '0')}</span>
-                <strong>{p.entry.data.title}</strong>
-                <span class="step-lead">{p.entry.data.description}</span>
-                <Icon name="arrow" />
-              </a>
-            </li>
-          ))}
-        </ol>
-      </section>
-    ))
-  }
 </Base>

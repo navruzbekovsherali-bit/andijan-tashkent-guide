@@ -1,0 +1,60 @@
+<svg class="illus illus-house" viewBox="0 0 320 220" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="hs-glow">
+      <stop class="gl-a" offset="0" />
+      <stop class="gl-b" offset="1" />
+    </radialGradient>
+  </defs>
+
+  <circle class="hs-glow" cx="160" cy="148" r="90" fill="url(#hs-glow)" />
+
+  <!-- fills fade in once the outline is drawn -->
+  <g class="hs-fill">
+    <path class="hs-wall" d="M104 186V120L160 76 216 120V186Z" />
+    <path class="nt" d="M88 128 160 66 232 128H218L160 80 102 128Z" />
+    <path class="hs-wall" d="M190 94V74H204V106Z" />
+  </g>
+
+  <!-- windows light up -->
+  <g class="hs-light">
+    <rect class="mt" x="116" y="136" width="24" height="24" />
+    <rect class="mt" x="180" y="136" width="24" height="24" />
+    <circle class="mt" cx="160" cy="106" r="6" />
+  </g>
+
+  <!-- the line drawing, driven by --p -->
+  <path class="hs-draw hs-d1" pathLength="1" d="M24 186H296" />
+  <path class="hs-draw hs-d2" pathLength="1" d="M104 186V120L160 76 216 120V186" />
+  <path class="hs-draw hs-d3" pathLength="1" d="M88 128 160 66 232 128H218L160 80 102 128Z" />
+  <path class="hs-draw hs-d3" pathLength="1" d="M190 92V74H204V104" />
+  <path class="hs-draw hs-d4" pathLength="1" d="M150 186V152H170V186" />
+  <path class="hs-draw hs-d4" pathLength="1" d="M116 136H140V160H116Z" />
+  <path class="hs-draw hs-d4" pathLength="1" d="M180 136H204V160H180Z" />
+  <path class="hs-draw hs-d5" pathLength="1" d="M128 136V160M116 148H140M192 136V160M180 148H204" />
+  <circle class="hs-draw hs-d5" pathLength="1" cx="160" cy="106" r="6" />
+  <circle class="hs-knob" cx="165" cy="170" r="1.6" />
+
+  <!-- tree -->
+  <path class="hs-draw hs-d2" pathLength="1" d="M60 186V150" />
+  <circle class="hs-draw hs-d3 hs-tree" pathLength="1" cx="60" cy="134" r="20" />
+
+  <!-- smoke -->
+  <g class="hs-smoke">
+    <circle class="hs-puff" cx="198" cy="62" r="3.5" />
+    <circle class="hs-puff hs-puff-2" cx="203" cy="50" r="4.5" />
+    <circle class="hs-puff hs-puff-3" cx="210" cy="37" r="5.5" />
+  </g>
+
+  <!-- the keys, handed over at the end -->
+  <g class="hs-keys">
+    <g class="hs-sway">
+      <g transform="translate(0 -12) rotate(-22 270 150)">
+        <circle class="fl" cx="252" cy="150" r="12" />
+        <circle class="nt" cx="248" cy="150" r="3.5" />
+        <path class="ln" d="M264 150H302M292 150V159M299 150V157" />
+        <path class="ln" d="M240 150Q232 152 230 160" />
+        <rect class="mt" x="224" y="160" width="11" height="17" rx="3" transform="rotate(22 230 160)" />
+      </g>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,42 @@
+<svg class="illus illus-card" viewBox="0 0 320 220" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="cd-well"><rect x="0" y="-60" width="320" height="252" /></clipPath>
+    <clipPath id="cd-face"><rect x="85" y="56" width="150" height="94" rx="10" /></clipPath>
+    <radialGradient id="cd-glow">
+      <stop class="gl-a" offset="0" />
+      <stop class="gl-b" offset="1" />
+    </radialGradient>
+  </defs>
+
+  <!-- soft mint glow behind the card once it is out -->
+  <circle class="cd-glow" cx="160" cy="98" r="96" fill="url(#cd-glow)" />
+
+  <!-- wallet: back panel -->
+  <rect class="fl cd-back" x="68" y="120" width="184" height="72" rx="10" />
+
+  <!-- the card, lifted out of the wallet by --p -->
+  <g clip-path="url(#cd-well)">
+    <g class="cd-mv">
+      <rect class="cd-body" x="85" y="56" width="150" height="94" rx="10" />
+      <rect class="cd-chip" x="101" y="80" width="24" height="18" rx="4" />
+      <path class="cd-chip-ln" d="M101 89H125M113 80V98" />
+      <rect class="mt" x="101" y="66" width="12" height="4" rx="2" />
+      <path class="cd-wave" d="M206 82a10 10 0 0 1 0 14M212 78a16 16 0 0 1 0 22M218 74a22 22 0 0 1 0 30" />
+      <path class="cd-num" d="M101 120H215" />
+      <path class="cd-name" d="M101 134H151" />
+      <g clip-path="url(#cd-face)">
+        <path class="cd-sheen" d="M85 40h26l-34 130h-26Z" />
+      </g>
+      <!-- tap-to-pay waves leaving the card -->
+      <g class="cd-tap">
+        <path class="cd-tap-1" d="M246 62a14 14 0 0 1 8 14" />
+        <path class="cd-tap-2" d="M250 50a26 26 0 0 1 16 26" />
+      </g>
+    </g>
+  </g>
+
+  <!-- wallet: front pocket with a thumb cut -->
+  <path class="fl" d="M60 148Q60 138 70 138H138Q160 156 182 138H250Q260 138 260 148V186Q260 196 250 196H70Q60 196 60 186Z" />
+  <path class="cd-stitch" d="M68 186V150M252 186V150M76 189H244" />
+  <circle class="nt" cx="160" cy="174" r="4" />
+</svg>

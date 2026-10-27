@@ -1,0 +1,15 @@
+---
+/** Picks the animated illustration for a topic. Missing drawings render nothing. */
+import type { IllusName } from '../lib/content';
+
+interface Props {
+  name: IllusName;
+  class?: string;
+}
+const { name, class: cls = '' } = Astro.props;
+const mods = import.meta.glob<{ default: unknown }>('./illus/*.astro', { eager: true });
+const file = `./illus/${name[0].toUpperCase()}${name.slice(1)}.astro`;
+const Drawing = mods[file]?.default as any;
+---
+
+{Drawing && <div class:list={['illus-frame', cls]} data-illus={name}><Drawing /></div>}

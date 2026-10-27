@@ -1,0 +1,82 @@
+---
+import Base from '../../../layouts/Base.astro';
+import Icon from '../../../components/Icon.astro';
+import Illus from '../../../components/Illus.astro';
+import { LANGS, DEFAULT_LANG, t, url, type Lang } from '../../../lib/i18n';
+import { getPages, groupBySection, SECTIONS, SECTION_ORDER, illusOf, type SectionId } from '../../../lib/content';
+
+export function getStaticPaths() {
+  return LANGS.flatMap((lang) =>
+    SECTION_ORDER.map((id) => ({
+      params: { lang: lang === DEFAULT_LANG ? undefined : lang, id },
+      props: { lang, id },
+    })),
+  );
+}
+
+const { lang, id } = Astro.props as { lang: Lang; id: SectionId };
+const tr = t(lang);
+const groups = groupBySection(await getPages(lang));
+const index = groups.findIndex((g) => g.id === id);
+const group = groups[index];
+const pages = group?.pages ?? [];
+const title = SECTIONS[id].title[lang];
+const tag = (aud: string[]) => (aud.length === 2 ? tr('both') : aud[0] === 'local' ? tr('localShort') : tr('expatShort'));
+const prev = index > 0 ? groups[index - 1] : undefined;
+const next = index >= 0 && index < groups.length - 1 ? groups[index + 1] : undefined;
+---
+
+<Base lang={lang} title={title} path={`/topic/${id}/`} current="topic" back={url(lang, '/#topics')}>
+  <header class="page-head">
+    <div class="wrap head-grid">
+      <div>
+        <p class="label"><a href={url(lang, '/#topics')}>{tr('topics')}</a> · ( {String(index + 1).padStart(2, '0')} )</p>
+        <h1>{title}</h1>
+        <p class="lead">{pages.length} {tr('pagesWord')}</p>
+      </div>
+      <Illus name={illusOf(id)} />
+    </div>
+  </header>
+
+  <div class="wrap">
+    <ol class="steps">
+      {
+        pages.map((p, n) => (
+          <li>
+            <a href={url(lang, `/guide/${p.slug}/`)}>
+              <span class="step-n">{String(n + 1).padStart(2, '0')}</span>
+              <strong>{p.entry.data.title}</strong>
+              <span class="step-lead">{p.entry.data.description}</span>
+              <span class="chip step-tag">{tag(p.entry.data.audience)}</span>
+              <span class="round-arrow"><Icon name="arrow" size={16} /></span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+
+    <nav class="pager" aria-label={`${tr('prev')} / ${tr('next')}`}>
+      {
+        prev ? (
+          <a class="prev" href={url(lang, `/topic/${prev.id}/`)}>
+            <span class="dir"><Icon name="back" size={14} />{tr('prev')}</span>
+            <strong>{SECTIONS[prev.id].title[lang]}</strong>
+          </a>
+        ) : (
+          <a class="prev" href={url(lang, '/#topics')}>
+            <span class="dir"><Icon name="back" size={14} />{tr('back')}</span>
+            <strong>{tr('topics')}</strong>
+          </a>
+        )
+      }
+      {
+        next && (
+          <a class="next" href={url(lang, `/topic/${next.id}/`)}>
+            <span class="dir">{tr('next')}<Icon name="arrow" size={14} /></span>
+            <strong>{SECTIONS[next.id].title[lang]}</strong>
+          </a>
+        )
+      }
+    </nav>
+  </div>
+</Base>

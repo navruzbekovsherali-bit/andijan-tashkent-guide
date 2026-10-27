@@ -46,7 +46,8 @@ It is the bank's own welcome: written by the adaptation team, checked against cu
 ## Brand Commitments
 
 - Bank name: Hamkorbank. Head office in Andijan.
-- Logo and palette supplied by the owner (27.10.2026): a white slanted "H" inside an open ring; ground from deep green-black (#0c201e) to glowing mint (#1de38a) with a corner light. The site's palette is built only from these greens plus white; red is kept solely for warnings.
+- Official logo supplied by the owner (27.10.2026): green (#1AA752) slanted "H" fused with an open ring, wordmark "Hamkor Bank" in dark green (#0B4A43).
+- Owner's standing preference (27.10.2026): no ornament or cultural patterns; the logo and the bank's name lead; calm, premium, readable, one consistent type family and a restrained palette, at the craft level of the owner's reference sites (vantra-studio, eezyinn, potadot, anfalova, sebg, gianlucaboccia, mosaic). Topic-specific animations (car, card, money…) are wanted. Navigation must always offer "Назад".
 - Voice: always the polite "вы", warm and clear. Logic first: what to do, when, where to go.
 - The adaptation specialist (Sherali) appears as a real human contact.
 - Owner references (behaviour, not looks): smooth page transitions, very readable category/button layout, scroll-driven map/route, drawings that "write themselves" on scroll, an on-screen guide character that explains, animated phone screens. See `docs/design-references.md`.

@@ -1,10 +1,12 @@
 ---
 import '../styles/global.css';
+import '../styles/illus-a.css';
+import '../styles/illus-b.css';
 import Icon from '../components/Icon.astro';
 import BrandMark from '../components/BrandMark.astro';
 import GuideFace from '../components/GuideFace.astro';
 import { LANGS, LANG_LABEL, t, url, type Lang } from '../lib/i18n';
-import { getPages, groupBySection, SECTIONS, glazeOf, type Glaze } from '../lib/content';
+import { getPages, groupBySection, SECTIONS } from '../lib/content';
 
 interface Props {
   lang: Lang;
@@ -14,12 +16,14 @@ interface Props {
   path: string;
   /** Current audience context, if the page belongs to one. */
   audience?: 'local' | 'expat' | 'both';
-  current?: 'home' | 'local' | 'expat' | 'faq' | 'page';
-  /** Glaze of the page's masthead; the header takes it on. */
-  field?: Glaze;
+  current?: 'home' | 'local' | 'expat' | 'faq' | 'topic' | 'page';
+  /** Where "Назад" leads when there is no history to go back to. Absent on the home page. */
+  back?: string;
+  /** The page opens on the dark brand field (home): the top bar starts light-on-dark. */
+  dark?: boolean;
 }
 
-const { lang, title, description, path, audience = 'both', current = 'page', field = 'night' } = Astro.props;
+const { lang, title, description, path, audience = 'both', current = 'page', back, dark = false } = Astro.props;
 const tr = t(lang);
 const pages = await getPages(lang);
 const groups = groupBySection(pages);
@@ -28,13 +32,13 @@ const here = Astro.url.pathname;
 ---
 
 <!doctype html>
-<html lang={lang} data-audience={audience} data-glaze={field}>
+<html lang={lang} data-audience={audience} class:list={[{ 'starts-dark': dark }]}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{pageTitle}</title>
     {description && <meta name="description" content={description} />}
-    <meta name="theme-color" content="#0c201e" data-field-color />
+    <meta name="theme-color" content={dark ? '#0b1f1d' : '#f5f4f0'} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="canonical" href={new URL(here, Astro.site)} />
     {LANGS.map((l) => <link rel="alternate" hreflang={l} href={new URL(url(l, path), Astro.site)} />)}
@@ -51,22 +55,18 @@ const here = Astro.url.pathname;
           var au = localStorage.getItem('gb-audience');
           if (au && d.dataset.audience === 'both') d.dataset.pref = au;
         } catch (e) {}
-        // Arriving through the tile cover: start covered, the client lifts the tiles off.
+        // Arriving behind the brand curtain: start covered, the client lifts it.
         function takeCover() {
           try {
-            var c = sessionStorage.getItem('gb-cover');
-            if (!c) return;
+            if (!sessionStorage.getItem('gb-cover')) return;
             sessionStorage.removeItem('gb-cover');
             d.classList.add('is-covered');
-            d.dataset.cover = c;
           } catch (e) {}
         }
         if (document.prerendering) document.addEventListener('prerenderingchange', takeCover, { once: true });
         else takeCover();
-        // History navigation keeps the browser's own cross-fade, with the old page receding.
         window.addEventListener('pagereveal', function (e) {
-          if (!e.viewTransition) return;
-          if (!d.classList.contains('is-covered')) return;
+          if (!e.viewTransition || !d.classList.contains('is-covered')) return;
           e.viewTransition.ready.catch(function () {});
           e.viewTransition.skipTransition();
         });
@@ -76,22 +76,28 @@ const here = Astro.url.pathname;
   <body>
     <a class="skip" href="#main">{tr('skip')}</a>
 
-    <header class="site-header">
-      <div class="wrap">
-        <a class="brand" href={url(lang, '/')}>
+    <header class="topbar">
+      <div class="topbar-in">
+        {
+          back && (
+            <a class="tb-back" href={back} data-back aria-label={tr('back')}>
+              <Icon name="back" size={20} />
+              <span>{tr('back')}</span>
+            </a>
+          )
+        }
+        <a class="brand" href={url(lang, '/')} aria-label="Hamkor Bank — главная">
           <BrandMark />
-          <span>Hamkorbank<small>{tr('siteShort')}</small></span>
+          <span class="brand-name">Hamkor Bank</span>
         </a>
-        <nav class="header-nav" aria-label={tr('menu')}>
-          <a href={url(lang, '/local/')} data-nav="local" data-glaze="emerald">{tr('localShort')}</a>
-          <a href={url(lang, '/expat/')} data-nav="expat" data-glaze="night">{tr('expatShort')}</a>
-          <a href={url(lang, '/faq/')} data-nav="faq" data-glaze="deep">{tr('faq')}</a>
-          <a href={url(lang, '/guide/contacts/')} data-nav="contacts">{tr('contacts')}</a>
+        <nav class="tb-nav" aria-label={tr('menu')}>
+          <a href={url(lang, '/#topics')}>{tr('topics')}</a>
+          <a href={url(lang, '/local/')} data-nav="local">{tr('localShort')}</a>
+          <a href={url(lang, '/expat/')} data-nav="expat">{tr('expatShort')}</a>
+          <a href={url(lang, '/faq/')} data-nav="faq">{tr('faq')}</a>
         </nav>
-        <div class="header-actions">
-          <button class="icon-btn" type="button" data-sheet="search" aria-label={tr('search')}><Icon name="search" /></button>
-          <button class="icon-btn" type="button" data-sheet="drawer" aria-label={tr('menu')}><Icon name="menu" /></button>
-        </div>
+        <button class="tb-icon" type="button" data-sheet="search" aria-label={tr('search')}><Icon name="search" /></button>
+        <button class="tb-icon tb-menu" type="button" data-sheet="drawer" aria-label={tr('menu')}><Icon name="menu" /></button>
       </div>
     </header>
 
@@ -100,19 +106,36 @@ const here = Astro.url.pathname;
     </main>
 
     <footer class="site-footer">
-      <div class="wrap">
-        <span>© Hamkorbank · {tr('siteShort')}</span>
-        <span>
-          <a href={url(lang, '/guide/emergency/')}>{tr('emergency')}</a>
+      <div class="wrap footer-in">
+        <a class="footer-brand" href={url(lang, '/')}>
+          <BrandMark />
+          <span>Hamkor Bank<small>{tr('bankGuide')}</small></span>
+        </a>
+        <nav class="footer-links">
+          <a href={url(lang, '/#topics')}>{tr('topics')}</a>
+          <a href={url(lang, '/faq/')}>{tr('faq')}</a>
           <a href={url(lang, '/guide/contacts/')}>{tr('contacts')}</a>
-        </span>
+          <a href={url(lang, '/guide/emergency/')}>{tr('emergency')}</a>
+        </nav>
       </div>
     </footer>
 
-    <!-- Dock: everything reachable with a thumb -->
+    <!-- Phone dock: back first, then home, search, menu -->
     <nav class="dock" aria-label={tr('menu')}>
-      <a href={url(lang, '/')} data-nav="home" data-glaze="night"><Icon name="home" /><span>{tr('home')}</span></a>
-      <a href={url(lang, '/faq/')} data-nav="faq" data-glaze="deep"><Icon name="question" /><span>{tr('faqShort')}</span></a>
+      {
+        back ? (
+          <a href={back} data-back>
+            <Icon name="back" />
+            <span>{tr('back')}</span>
+          </a>
+        ) : (
+          <a href={url(lang, '/faq/')} data-nav="faq">
+            <Icon name="question" />
+            <span>{tr('faqShort')}</span>
+          </a>
+        )
+      }
+      <a href={url(lang, '/')} data-nav="home"><Icon name="home" /><span>{tr('home')}</span></a>
       <button type="button" data-sheet="search"><Icon name="search" /><span>{tr('search')}</span></button>
       <button type="button" data-sheet="drawer"><Icon name="menu" /><span>{tr('menu')}</span></button>
     </nav>
@@ -124,7 +147,7 @@ const here = Astro.url.pathname;
         <div class="sheet-grip" aria-hidden="true"></div>
         <div class="sheet-head">
           <h2 id="drawer-title">{tr('allSections')}</h2>
-          <button class="icon-btn" type="button" data-close aria-label={tr('close')}><Icon name="close" /></button>
+          <button class="tb-icon" type="button" data-close aria-label={tr('close')}><Icon name="close" /></button>
         </div>
         <div class="sheet-body">
           <div class="seg" role="group" aria-label={tr('audienceSwitch')}>
@@ -132,15 +155,16 @@ const here = Astro.url.pathname;
             <button type="button" data-aud="expat">{tr('expatShort')}</button>
           </div>
           {
-            groups.map((g) => (
-              <section class="nav-group" data-glaze={glazeOf(g.id)}>
-                <h3 class="nav-group-title">{SECTIONS[g.id].title[lang]}</h3>
+            groups.map((g, i) => (
+              <section class="nav-group">
+                <h3 class="nav-group-title">
+                  <span class="num">{String(i + 1).padStart(2, '0')}</span>
+                  <a href={url(lang, `/topic/${g.id}/`)}>{SECTIONS[g.id].title[lang]}</a>
+                </h3>
                 <ul class="nav-list">
                   {g.pages.map((p) => (
                     <li data-aud-list={p.entry.data.audience.join(' ')}>
-                      <a href={url(lang, `/guide/${p.slug}/`)} data-glaze={glazeOf(g.id)}>
-                        {p.entry.data.title}
-                      </a>
+                      <a href={url(lang, `/guide/${p.slug}/`)}>{p.entry.data.title}</a>
                     </li>
                   ))}
                 </ul>
@@ -148,7 +172,7 @@ const here = Astro.url.pathname;
             ))
           }
           <div class="drawer-foot">
-            <a class="drawer-faq" href={url(lang, '/faq/')} data-glaze="deep">{tr('faq')}<Icon name="arrow" size={18} /></a>
+            <a class="pill pill-dark" href={url(lang, '/faq/')}>{tr('faq')}<span class="pill-arrow"><Icon name="arrow" size={16} /></span></a>
             <div>
               <p class="label">Язык · Language · Til</p>
               <div class="seg three">
@@ -167,7 +191,7 @@ const here = Astro.url.pathname;
         <div class="sheet-grip" aria-hidden="true"></div>
         <div class="sheet-head">
           <h2 id="search-title">{tr('search')}</h2>
-          <button class="icon-btn" type="button" data-close aria-label={tr('close')}><Icon name="close" /></button>
+          <button class="tb-icon" type="button" data-close aria-label={tr('close')}><Icon name="close" /></button>
         </div>
         <div class="sheet-body">
           <label class="search-field">
@@ -183,8 +207,8 @@ const here = Astro.url.pathname;
 
     <template id="guide-face-tpl"><GuideFace /></template>
 
-    <!-- Page-change cover: girih tiles, drawn by the client -->
-    <div class="cover" aria-hidden="true"></div>
+    <!-- Page change: the bank's dark curtain with its mark -->
+    <div class="curtain" aria-hidden="true"><div class="curtain-mark"><BrandMark /></div></div>
 
     <script>
       import { initSite } from '../lib/client';

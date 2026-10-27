@@ -1,0 +1,47 @@
+<svg class="illus illus-plane" viewBox="0 0 320 220" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="pl-glow">
+      <stop class="gl-a" offset="0" />
+      <stop class="gl-b" offset="1" />
+    </radialGradient>
+    <path id="pl-shape" d="M30 0C30-3.4 26-5 20-5L8-5-6-30-13-30-6-5-19-4.5-26-13-31-13-27-3Q-29 0-27 3L-31 13-26 13-19 4.5-6 5-13 30-6 30 8 5 20 5C26 5 30 3.4 30 0Z" />
+  </defs>
+
+  <!-- clouds seen from above, drifting slowly -->
+  <g class="pl-cloud pl-cloud-a">
+    <path class="fl" d="M34 66h46a10 10 0 0 0-6-18 14 14 0 0 0-26-4 10 10 0 0 0-14 22Z" />
+  </g>
+  <g class="pl-cloud pl-cloud-b">
+    <path class="fl" d="M226 48h40a9 9 0 0 0-5-16 12 12 0 0 0-23-3 9 9 0 0 0-12 19Z" />
+  </g>
+
+  <!-- the planned route, then the part already flown -->
+  <path class="pl-route" d="M15.7 157.5A170 170 0 0 1 292.5 155.1" />
+  <path class="pl-flown" pathLength="1" d="M15.7 157.5A170 170 0 0 1 292.5 155.1" />
+
+  <!-- origin -->
+  <path class="ln pl-ground" d="M4 166h24" />
+  <circle class="fl" cx="15.7" cy="157.5" r="5" />
+  <circle class="nt" cx="15.7" cy="157.5" r="1.8" />
+
+  <!-- destination pin -->
+  <g class="pl-pin">
+    <circle cx="292.5" cy="138" r="26" fill="url(#pl-glow)" />
+    <ellipse class="sf" cx="292.5" cy="157" rx="12" ry="3" />
+    <circle class="pl-pulse" cx="292.5" cy="157" r="9" />
+    <path class="pl-pin-body" d="M292.5 155C286.5 146.5 281.5 140.5 281.5 134.5a11 11 0 0 1 22 0c0 6-5 12-11 20.5Z" />
+    <circle class="mt" cx="292.5" cy="134.5" r="4" />
+  </g>
+
+  <!-- the plane: moved along the arc by --p -->
+  <g class="pl-mv">
+    <g class="pl-shadow"><g transform="rotate(90)"><use class="sf" href="#pl-shape" /></g></g>
+    <g class="pl-bob">
+      <g transform="rotate(90)">
+        <use class="fl" href="#pl-shape" />
+        <path class="ln" d="M-14 0H14" />
+        <path class="pl-cockpit" d="M22-2.6Q26 0 22 2.6" />
+      </g>
+    </g>
+  </g>
+</svg>

@@ -1,26 +1,21 @@
 ---
 import Base from '../layouts/Base.astro';
-import Guide from '../components/Guide.astro';
-import Girih from '../components/Girih.astro';
 import Icon from '../components/Icon.astro';
+import Illus from '../components/Illus.astro';
 ---
 
-<Base lang="ru" title="Страница не найдена" path="/" current="page" field="pine">
-  <header class="mast mast-hub" data-glaze="pine">
-    <Girih variant="rosette" class="mast-art" />
-    <div class="wrap mast-inner">
-      <h1 class="display">Такой страницы нет</h1>
-      <p class="mast-lead">Возможно, ссылка устарела или в ней опечатка.</p>
+<Base lang="ru" title="Страница не найдена" path="/" current="page" back="/">
+  <header class="page-head">
+    <div class="wrap head-grid">
+      <div>
+        <h1>Такой страницы нет</h1>
+        <p class="lead">Возможно, ссылка устарела или в ней опечатка. Найдите нужное через поиск или начните с главной.</p>
+        <div class="meta-row">
+          <a class="pill pill-dark" href="/">На главную<span class="pill-arrow"><Icon name="arrow" size={16} /></span></a>
+          <button class="pill pill-light" type="button" data-sheet="search">Поиск<span class="pill-arrow"><Icon name="search" size={16} /></span></button>
+        </div>
+      </div>
+      <Illus name="map" />
     </div>
-    <Girih variant="band" class="mast-band" />
   </header>
-  <div class="wrap">
-    <Guide name="Гид">
-      <p>Попробуйте поиск — он ищет по всем страницам и частым вопросам. Или начните с главной.</p>
-    </Guide>
-    <p class="after-faq">
-      <a class="btn" href="/" data-glaze="night">На главную <Icon name="arrow" size={18} /></a>
-      <button class="btn ghost" type="button" data-sheet="search"><Icon name="search" size={18} /> Поиск</button>
-    </p>
-  </div>
 </Base>

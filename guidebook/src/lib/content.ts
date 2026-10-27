@@ -19,10 +19,35 @@ export const SECTIONS: Record<SectionId, { title: Record<Lang, string>; icon: st
   help: { title: { ru: 'Помощь и контакты', en: 'Help and contacts', uz: 'Yordam va kontaktlar' }, icon: 'phone', line: 4 },
 };
 
-/** Glaze colour of each route line (see the --g-* tokens in global.css). */
-export const GLAZES = ['night', 'teal', 'emerald', 'mint', 'pine', 'deep'] as const;
-export type Glaze = (typeof GLAZES)[number];
-export const glazeOf = (id: SectionId): Glaze => GLAZES[(SECTIONS[id].line - 1) % GLAZES.length];
+/** Animated illustration for each topic (src/components/illus/). */
+export type IllusName = 'plane' | 'car' | 'card' | 'money' | 'house' | 'docs' | 'family' | 'mountains' | 'phone' | 'map';
+const SECTION_ILLUS: Record<SectionId, IllusName> = {
+  start: 'docs',
+  arrival: 'plane',
+  'first-days': 'docs',
+  work: 'money',
+  living: 'house',
+  family: 'family',
+  country: 'map',
+  travel: 'mountains',
+  help: 'phone',
+};
+// Pages whose subject has its own picture: the car page gets the car, the card page the card.
+const PAGE_ILLUS: Record<string, IllusName> = {
+  'car-import': 'car',
+  transport: 'car',
+  'bank-card': 'card',
+  apps: 'phone',
+  'relocation-budget': 'money',
+  'salary-local': 'money',
+  'salary-expat': 'money',
+  limits: 'card',
+  'business-trips': 'plane',
+  packing: 'plane',
+  tashkent: 'map',
+  andijan: 'map',
+};
+export const illusOf = (id: SectionId, slug?: string): IllusName => (slug && PAGE_ILLUS[slug]) || SECTION_ILLUS[id];
 
 export const SECTION_ORDER = Object.keys(SECTIONS) as SectionId[];
 

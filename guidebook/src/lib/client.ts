@@ -1,5 +1,3 @@
-import { tiling } from './girih';
-
 /* Client behaviour: sheets, audience filter, search, style preview, motion.
    Runs once per page load; page-to-page motion is native cross-document view transitions. */
 
@@ -251,7 +249,7 @@ function callouts() {
 
 function markCurrentNav() {
   const here = location.pathname;
-  document.querySelectorAll<HTMLAnchorElement>('.nav-list a, .dock a, .header-nav a').forEach((a) => {
+  document.querySelectorAll<HTMLAnchorElement>('.nav-list a, .dock a, .tb-nav a').forEach((a) => {
     const href = new URL(a.href).pathname;
     const isHome = href === '/' || /^\/(en|uz)\/$/.test(href);
     const match = isHome ? here === href : here.startsWith(href);
@@ -283,6 +281,13 @@ function bindShell() {
       const aud = audBtn.dataset.aud as 'local' | 'expat';
       store.set('gb-audience', aud);
       applyAudience(aud);
+      return;
+    }
+    // "Назад" returns to the page you came from; with no history on this site it opens the parent.
+    const backLink = t.closest<HTMLAnchorElement>('[data-back]');
+    if (backLink && cameFromHere()) {
+      e.preventDefault();
+      history.back();
       return;
     }
     const door = t.closest<HTMLAnchorElement>('[data-choose]');
@@ -324,10 +329,16 @@ export function initSite() {
   phoneDemos();
   followingGuide();
   headerOnScroll();
-  mastParallax();
-  bandsOnScroll();
-  wordsReveal();
+  illustrationsOnScroll();
   liftCover();
+}
+
+function cameFromHere() {
+  try {
+    return history.length > 1 && !!document.referrer && new URL(document.referrer).origin === location.origin;
+  } catch {
+    return false;
+  }
 }
 
 /* ---------- Animated phone demos (illustrative screens, marked as examples) ---------- */
@@ -511,43 +522,41 @@ function onScrollFrame(fn: () => void) {
   fn();
 }
 
-/* ---------- Header: steps aside while reading down, returns on the way up ---------- */
+/* ---------- Top bar: turns light once you leave the dark first screen; hides while reading down ---------- */
 function headerOnScroll() {
-  const header = document.querySelector<HTMLElement>('.site-header');
-  if (!header) return;
+  const bar = document.querySelector<HTMLElement>('.topbar');
+  if (!bar) return;
+  const hero = document.querySelector<HTMLElement>('.hero');
+  const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
   let lastY = window.scrollY;
-  const mast = document.querySelector<HTMLElement>('.mast');
-  const meta = document.querySelector<HTMLMetaElement>('meta[data-field-color]');
-  const fieldColor = getComputedStyle(header).backgroundColor;
   onScrollFrame(() => {
     const y = window.scrollY;
-    const past = mast ? y > mast.offsetTop + mast.offsetHeight - header.offsetHeight : y > 24;
-    if (past !== header.classList.contains('is-scrolled')) {
-      header.classList.toggle('is-scrolled', past);
-      meta?.setAttribute('content', past ? '#ffffff' : fieldColor);
+    const past = hero ? y > hero.offsetHeight - 80 : true;
+    if (past !== bar.classList.contains('is-scrolled')) {
+      bar.classList.toggle('is-scrolled', past);
+      if (hero) meta?.setAttribute('content', past ? '#f5f4f0' : '#0b1f1d');
     }
     if (Math.abs(y - lastY) < 8) return;
-    const busy = document.querySelector('.sheet[data-open]') || header.matches(':focus-within');
-    header.classList.toggle('is-hidden', !busy && y > lastY && y > 160);
+    const busy = document.querySelector('.sheet[data-open]') || bar.matches(':focus-within');
+    bar.classList.toggle('is-hidden', !busy && y > lastY && y > 200);
     lastY = y;
   });
 }
 
-/* ---------- Statement that "reads itself": words light up as it crosses the screen ---------- */
-function wordsReveal() {
-  const els = Array.from(document.querySelectorAll<HTMLElement>('[data-words]:not([data-split])'));
-  if (!els.length) return;
-  for (const el of els) {
-    el.dataset.split = '';
-    const words = (el.textContent || '').trim().split(/\s+/);
-    el.style.setProperty('--n', String(words.length));
-    el.innerHTML = words.map((w, i) => `<span class="w" style="--i:${i}">${escapeHtml(w)}</span>`).join(' ');
-  }
+/* ---------- Topic illustrations play with the scroll (--p from 0 entering to 1 leaving) ---------- */
+function illustrationsOnScroll() {
+  const items = Array.from(document.querySelectorAll<SVGElement>('.illus'));
+  if (!items.length || reduceMotion()) return;
+  const io = new IntersectionObserver((es) => es.forEach((e) => e.target.classList.toggle('is-on', e.isIntersecting)));
+  items.forEach((el) => io.observe(el));
   onScrollFrame(() => {
     const vh = window.innerHeight;
-    for (const el of els) {
-      const top = el.getBoundingClientRect().top;
-      el.style.setProperty('--p', clamp01((vh * 0.9 - top) / (vh * 0.55)).toFixed(3));
+    for (const el of items) {
+      const r = el.getBoundingClientRect();
+      if (r.bottom < -50 || r.top > vh + 50) continue;
+      // Reaches the finished picture a little above the centre of the screen, and stays there.
+      const p = clamp01((vh - r.top) / (vh * 0.75 + r.height * 0.5));
+      el.style.setProperty('--p', p.toFixed(3));
     }
   });
 }
@@ -668,31 +677,8 @@ function followingGuide() {
   });
 }
 
-/* ---------- Page change: girih tiles close over the page from your tap, then lift off ---------- */
-const COVER_S = 84; // tile size, px
-const COVER_SPREAD = 220; // ms between the first and the last tile
-const COVER_IN = 360;
-
-function drawCover(glaze: string, ox: number, oy: number) {
-  const cover = document.querySelector<HTMLElement>('.cover');
-  if (!cover) return null;
-  const w = window.innerWidth;
-  const h = window.innerHeight;
-  const far = Math.hypot(Math.max(ox, w - ox), Math.max(oy, h - oy)) || 1;
-  cover.dataset.glaze = glaze;
-  cover.innerHTML =
-    `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">` +
-    tiling(w, h, COVER_S)
-      .map((t) => {
-        const ring = (Math.round(t.x / COVER_S) + Math.round(t.y / COVER_S)) % 3 === 0;
-        const fill = t.kind === 'cross' ? 'var(--field)' : ring ? 'var(--tile-alt)' : 'var(--tile-star)';
-        const delay = Math.round((Math.hypot(t.x - ox, t.y - oy) / far) * COVER_SPREAD);
-        return `<path class="c-tile" d="${t.path}" fill="${fill}" style="--d:${delay}"/>`;
-      })
-      .join('') +
-    '</svg>';
-  return cover;
-}
+/* ---------- Page change: the bank's curtain rises over the page, the next page lifts it away ---------- */
+const CURTAIN_IN = 480;
 
 function coverAndGo(e: MouseEvent, link: HTMLAnchorElement) {
   if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
@@ -702,21 +688,17 @@ function coverAndGo(e: MouseEvent, link: HTMLAnchorElement) {
   if (to.pathname === location.pathname && to.search === location.search) return; // anchor on this page
   if (reduceMotion()) return;
   e.preventDefault();
-  const glaze = link.dataset.glaze || link.closest<HTMLElement>('[data-glaze]')?.dataset.glaze || 'night';
-  const x = e.clientX || window.innerWidth / 2;
-  const y = e.clientY || window.innerHeight / 2;
   closeSheets();
-  drawCover(glaze, x, y);
   try {
-    sessionStorage.setItem('gb-cover', glaze);
+    sessionStorage.setItem('gb-cover', '1');
   } catch {
-    /* the next page simply appears without its tiles */
+    /* the next page simply appears without the curtain */
   }
   document.documentElement.classList.add('is-covering');
-  window.setTimeout(() => (location.href = link.href), COVER_IN + COVER_SPREAD - 20);
+  window.setTimeout(() => (location.href = link.href), CURTAIN_IN);
 }
 
-/** On arrival under the cover (set by the head script), lift the tiles off from the top. */
+/** On arrival behind the curtain (set by the head script), lift it away. */
 function liftCover() {
   const root = document.documentElement;
   if ((document as Document & { prerendering?: boolean }).prerendering) {
@@ -724,14 +706,10 @@ function liftCover() {
     return;
   }
   if (!root.classList.contains('is-covered')) return;
-  const cover = drawCover(root.dataset.cover || 'night', window.innerWidth / 2, 0);
   requestAnimationFrame(() => {
     root.classList.remove('is-covered');
     root.classList.add('is-lifting');
-    window.setTimeout(() => {
-      root.classList.remove('is-lifting');
-      if (cover) cover.innerHTML = '';
-    }, 520 + COVER_SPREAD + 60);
+    window.setTimeout(() => root.classList.remove('is-lifting'), 620);
   });
 }
 
@@ -739,30 +717,4 @@ function liftCover() {
 window.addEventListener('pageshow', (e) => {
   if (!e.persisted) return;
   document.documentElement.classList.remove('is-covering', 'is-covered', 'is-lifting');
-  const cover = document.querySelector('.cover');
-  if (cover) cover.innerHTML = '';
 });
-
-/* ---------- Masthead pattern drifts slower than the page ---------- */
-function mastParallax() {
-  const art = document.querySelector<HTMLElement>('.mast-art');
-  const mast = art?.closest<HTMLElement>('.mast');
-  if (!art || !mast || reduceMotion()) return;
-  onScrollFrame(() => {
-    const y = window.scrollY;
-    if (y <= mast.offsetHeight) art.style.setProperty('--sy', (y * 0.35).toFixed(1));
-  });
-}
-
-/* ---------- Tile bands set themselves, tile by tile, as they scroll into view ---------- */
-function bandsOnScroll() {
-  const bands = Array.from(document.querySelectorAll<SVGElement>('.girih-band'));
-  if (!bands.length || reduceMotion()) return;
-  onScrollFrame(() => {
-    const vh = window.innerHeight;
-    for (const b of bands) {
-      const top = b.getBoundingClientRect().top;
-      b.style.setProperty('--p', clamp01((vh - top) / (vh * 0.45)).toFixed(3));
-    }
-  });
-}

@@ -1,0 +1,325 @@
+/* ==========================================================================
+   Scroll-driven spot illustrations, set A: plane, car, card, money, house.
+   Contract: the site sets --p (0 entering, 0.5 centred, 1 leaving) on each
+   .illus and adds .is-on while visible. Without --p the final state shows.
+   Palette: --ink lines, --paper-2 soft fills, white, --night solids,
+   --mint small highlights only.
+   ========================================================================== */
+
+/* ---------- shared tokens (scoped per illustration) ---------- */
+:is(.illus-plane, .illus-car, .illus-card, .illus-money, .illus-house) {
+  --i-ink: var(--ink, #0e100f);
+  --i-fill: #fff;
+  --i-soft: var(--paper-2, #ecebe6);
+  --i-night: var(--night, #0b1f1d);
+  --i-mint: var(--mint, #1de38a);
+  --i-face: #fff; /* light marks drawn on night solids */
+  --i-t: var(--p, 1);
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* On dark cards the ink turns light and white fills sink into the night. */
+.on-dark :is(.illus-plane, .illus-car, .illus-card, .illus-money, .illus-house) {
+  --i-ink: #f2f5f3;
+  --i-fill: var(--night, #0b1f1d);
+  --i-soft: rgba(242, 245, 243, 0.1);
+}
+
+/* Every moving part in this set is placed in viewBox units from 0 0,
+   whatever the site's global transform-box defaults are. */
+:is(.illus-plane, .illus-car, .illus-card, .illus-money, .illus-house) * {
+  transform-box: view-box;
+  transform-origin: 0 0;
+}
+
+:is(.illus-plane, .illus-car, .illus-card, .illus-money, .illus-house) .ln {
+  fill: none;
+  stroke: var(--i-ink);
+  stroke-width: 2;
+}
+:is(.illus-plane, .illus-car, .illus-card, .illus-money, .illus-house) .fl {
+  fill: var(--i-fill);
+  stroke: var(--i-ink);
+  stroke-width: 2;
+}
+:is(.illus-plane, .illus-car, .illus-card, .illus-money, .illus-house) .sf {
+  fill: var(--i-soft);
+  stroke: none;
+}
+:is(.illus-plane, .illus-car, .illus-card, .illus-money, .illus-house) .nt {
+  fill: var(--i-night);
+  stroke: none;
+}
+.on-dark :is(.illus-plane, .illus-car, .illus-card, .illus-money, .illus-house) .nt {
+  stroke: var(--i-ink);
+  stroke-width: 2;
+}
+:is(.illus-plane, .illus-car, .illus-card, .illus-money, .illus-house) .mt {
+  fill: var(--i-mint);
+  stroke: none;
+}
+:is(.illus-plane, .illus-card, .illus-house) .gl-a {
+  stop-color: var(--i-mint);
+  stop-opacity: 0.22;
+}
+:is(.illus-plane, .illus-card, .illus-house) .gl-b {
+  stop-color: var(--i-mint);
+  stop-opacity: 0;
+}
+
+/* ==========================================================================
+   PLANE: flies the arc from origin to a pin; the flown part of the route
+   turns from dotted to solid behind it, then the destination pin drops in.
+   ========================================================================== */
+.illus-plane {
+  --s: clamp(0, (var(--i-t) - 0.06) / 0.6, 1);
+  --e: calc(var(--s) * var(--s) * (3 - 2 * var(--s)));
+  --pin: clamp(0, (var(--s) - 0.72) / 0.28, 1);
+}
+.illus-plane .pl-cloud-a { transform: translateX(calc(10px - 22px * var(--i-t))); }
+.illus-plane .pl-cloud-b { transform: translateX(calc(8px - 14px * var(--i-t))); }
+.illus-plane .pl-route {
+  stroke: var(--i-ink);
+  stroke-width: 2;
+  stroke-dasharray: 0.01 7;
+  opacity: 0.45;
+}
+.illus-plane .pl-flown {
+  stroke: var(--i-ink);
+  stroke-width: 2;
+  stroke-dasharray: 1 2;
+  stroke-dashoffset: calc(1 - var(--e) * 0.7615);
+}
+.illus-plane .pl-mv {
+  transform: translate(155px, 255px) rotate(calc(-145deg + 83deg * var(--e))) translateX(170px) scale(0.82);
+}
+.illus-plane .pl-shadow {
+  transform: translateX(calc(-13px * min(1, var(--s) * 3) * (1 - 0.4 * var(--s))))
+    scale(0.92);
+}
+.illus-plane .pl-cockpit { stroke: var(--i-ink); stroke-width: 2; }
+.illus-plane .pl-pin {
+  opacity: var(--pin);
+  transform: translateY(calc((1 - var(--pin)) * -14px));
+}
+.illus-plane .pl-pin-body { fill: var(--i-night); stroke: none; }
+.on-dark .illus-plane .pl-pin-body { stroke: var(--i-ink); stroke-width: 2; }
+.illus-plane .pl-pulse {
+  fill: none;
+  stroke: var(--i-mint);
+  stroke-width: 2;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.illus-plane.is-on .pl-bob { animation: illus-a-bob 3.6s ease-in-out infinite alternate; }
+.illus-plane.is-on .pl-pulse { animation: illus-a-pulse 3.2s cubic-bezier(0.16, 1, 0.3, 1) 0.6s infinite; }
+
+/* ==========================================================================
+   CAR: drives in from the left, wheels turning with distance, and eases to
+   a stop beside the parking sign. Speed lines fade as it slows.
+   ========================================================================== */
+.illus-car {
+  --s: clamp(0, (var(--i-t) - 0.05) / 0.6, 1);
+  --e: calc(1 - (1 - var(--s)) * (1 - var(--s)) * (1 - var(--s)));
+}
+.illus-car .car-lane {
+  stroke: var(--i-ink);
+  stroke-width: 2;
+  stroke-dasharray: 10 14;
+  opacity: 0.25;
+}
+.illus-car .car-p { stroke: var(--i-mint); stroke-width: 2.5; }
+.illus-car .car-mv { transform: translate(calc(-172px + 252px * var(--e)), 186px); }
+.illus-car .car-wheel {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: rotate(calc(1031deg * var(--e)));
+}
+.illus-car .car-hub { fill: none; stroke: var(--i-face); stroke-width: 2; opacity: 0.85; }
+.illus-car .car-spoke { stroke: var(--i-face); stroke-width: 2; }
+.on-dark .illus-car .car-hub,
+.on-dark .illus-car .car-spoke { stroke: var(--i-ink); }
+.illus-car .car-speed {
+  opacity: calc((1 - var(--s)) * (1 - var(--s)) * min(1, var(--s) * 10));
+}
+.illus-car .car-puffs { opacity: clamp(0, (var(--s) - 0.9) * 10, 1); }
+.illus-car .car-puff {
+  fill: none;
+  stroke: var(--i-ink);
+  stroke-width: 2;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.illus-car.is-on .car-puff { animation: illus-a-puff-l 3.4s ease-out infinite; }
+.illus-car.is-on .car-puff-2 { animation-delay: 1.7s; }
+.illus-car.is-on .car-idle { animation: illus-a-idle 1.8s ease-in-out infinite alternate; }
+
+/* ==========================================================================
+   CARD: rises out of the wallet, tilts, a sheen sweeps across it, then
+   tap-to-pay waves appear.
+   ========================================================================== */
+.illus-card {
+  --s: clamp(0, (var(--i-t) - 0.05) / 0.62, 1);
+  --r: clamp(0, var(--s) / 0.62, 1);
+  --re: calc(1 - (1 - var(--r)) * (1 - var(--r)) * (1 - var(--r)));
+  --tl: clamp(0, (var(--s) - 0.3) / 0.45, 1);
+  --sh: clamp(0, (var(--s) - 0.5) / 0.4, 1);
+  --tap: clamp(0, (var(--s) - 0.82) / 0.18, 1);
+}
+.illus-card .cd-back { fill: var(--i-soft); }
+.illus-card .cd-mv {
+  transform-origin: 160px 112px;
+  transform: translateY(calc(104px * (1 - var(--re)))) rotate(calc(-7deg * var(--tl)));
+}
+.illus-card .cd-body { fill: var(--i-night); stroke: var(--i-ink); stroke-width: 2; }
+.on-dark .illus-card .cd-body { stroke: var(--i-ink); }
+.illus-card .cd-chip { fill: var(--i-soft); }
+.illus-card .cd-chip-ln { stroke: var(--i-night); stroke-width: 1.5; }
+.on-dark .illus-card .cd-chip { fill: #f2f5f3; }
+.illus-card .cd-wave { stroke: var(--i-face); stroke-width: 2; opacity: 0.8; }
+.illus-card .cd-num { stroke: var(--i-face); stroke-width: 2; stroke-dasharray: 22 8; opacity: 0.55; }
+.illus-card .cd-name { stroke: var(--i-face); stroke-width: 2; opacity: 0.3; }
+.illus-card .cd-sheen {
+  fill: #fff;
+  opacity: 0.14;
+  transform: translateX(calc(-40px + 230px * var(--sh)));
+}
+.illus-card .cd-tap { opacity: var(--tap); }
+.illus-card .cd-tap path { stroke: var(--i-mint); stroke-width: 2.5; }
+.illus-card .cd-glow { opacity: var(--tap); }
+.illus-card .cd-stitch { stroke: var(--i-ink); stroke-width: 1.5; stroke-dasharray: 3 5; opacity: 0.3; }
+.illus-card.is-on .cd-tap-1 { animation: illus-a-blink 2.8s ease-in-out infinite; }
+.illus-card.is-on .cd-tap-2 { animation: illus-a-blink 2.8s ease-in-out 0.35s infinite; }
+
+/* ==========================================================================
+   MONEY: notes slide in, then coins are counted onto three growing stacks,
+   then the trend line draws itself to a mint point.
+   ========================================================================== */
+.illus-money {
+  --s: clamp(0, (var(--i-t) - 0.04) / 0.62, 1);
+  --n: clamp(0, var(--s) / 0.28, 1);
+  --ne: calc(1 - (1 - var(--n)) * (1 - var(--n)));
+  --cs: clamp(0, (var(--s) - 0.18) / 0.6, 1);
+  --tr: clamp(0, (var(--s) - 0.72) / 0.28, 1);
+}
+.illus-money .mn-note { opacity: var(--n); }
+.illus-money .mn-note-back { transform: translateX(calc(-44px * (1 - var(--ne)))); }
+.illus-money .mn-note-front { transform: translateX(calc(-30px * (1 - var(--ne)))); }
+.illus-money .mn-inner { fill: none; stroke: var(--i-ink); stroke-width: 1.5; opacity: 0.25; }
+.illus-money .mn-coin {
+  --c: clamp(0, var(--cs) * 15 - var(--k), 1);
+  fill: var(--i-fill);
+  stroke: var(--i-ink);
+  stroke-width: 2;
+  opacity: var(--c);
+  transform: translateY(calc(-22px * (1 - var(--c)) * (1 - var(--c))));
+}
+.illus-money .mn-coin-top { fill: var(--i-mint); }
+.illus-money .mn-trend {
+  stroke: var(--i-ink);
+  stroke-width: 2;
+  stroke-dasharray: 1 2;
+  stroke-dashoffset: calc(1 - var(--tr));
+}
+.illus-money .mn-dots { opacity: clamp(0, (var(--tr) - 0.6) / 0.4, 1); }
+.illus-money .mn-pulse {
+  fill: none;
+  stroke: var(--i-mint);
+  stroke-width: 2;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.illus-money.is-on .mn-pulse { animation: illus-a-pulse 3s cubic-bezier(0.16, 1, 0.3, 1) infinite; }
+
+/* ==========================================================================
+   HOUSE: the outline draws itself, walls and roof fill in, the windows
+   light up mint, smoke rises and the keys drop in.
+   ========================================================================== */
+.illus-house {
+  --s: clamp(0, (var(--i-t) - 0.04) / 0.62, 1);
+  --d: clamp(0, var(--s) / 0.5, 1);
+  --f: clamp(0, (var(--s) - 0.4) / 0.2, 1);
+  --w: clamp(0, (var(--s) - 0.58) / 0.14, 1);
+  --sm: clamp(0, (var(--s) - 0.7) / 0.2, 1);
+  --ky: clamp(0, (var(--s) - 0.8) / 0.2, 1);
+}
+.illus-house .hs-draw {
+  fill: none;
+  stroke: var(--i-ink);
+  stroke-width: 2;
+  stroke-dasharray: 1 2;
+  stroke-dashoffset: calc(1 - var(--q));
+}
+.illus-house .hs-d1 { --q: clamp(0, var(--d) / 0.4, 1); }
+.illus-house .hs-d2 { --q: clamp(0, (var(--d) - 0.1) / 0.45, 1); }
+.illus-house .hs-d3 { --q: clamp(0, (var(--d) - 0.3) / 0.45, 1); }
+.illus-house .hs-d4 { --q: clamp(0, (var(--d) - 0.5) / 0.4, 1); }
+.illus-house .hs-d5 { --q: clamp(0, (var(--d) - 0.7) / 0.3, 1); }
+.illus-house .hs-tree { fill: var(--i-soft); fill-opacity: var(--f); }
+.illus-house .hs-fill { opacity: var(--f); }
+.illus-house .hs-wall { fill: var(--i-fill); }
+.illus-house .hs-knob { fill: var(--i-ink); opacity: var(--f); }
+.illus-house .hs-light { opacity: var(--w); }
+.illus-house .hs-glow { opacity: calc(var(--w) * 0.9); }
+.illus-house .hs-smoke { opacity: var(--sm); transform: translateY(calc(8px * (1 - var(--sm)))); }
+.illus-house .hs-puff { fill: none; stroke: var(--i-ink); stroke-width: 2; opacity: 0.35; }
+.illus-house .hs-keys {
+  opacity: var(--ky);
+  transform: translateY(calc(-18px * (1 - var(--ky))));
+}
+.illus-house .hs-sway { transform-origin: 270px 138px; }
+.illus-house.is-on .hs-puff { animation: illus-a-rise 4.2s ease-in-out infinite; }
+.illus-house.is-on .hs-puff-2 { animation-delay: 1.4s; }
+.illus-house.is-on .hs-puff-3 { animation-delay: 2.8s; }
+.illus-house.is-on .hs-sway { animation: illus-a-sway 4s ease-in-out infinite alternate; }
+
+/* ---------- idle loops (only while visible, all calm) ---------- */
+@keyframes illus-a-bob {
+  from { transform: translateX(0); }
+  to { transform: translateX(2px); }
+}
+@keyframes illus-a-pulse {
+  0% { opacity: 0.7; transform: scale(0.7); }
+  70%, 100% { opacity: 0; transform: scale(2); }
+}
+@keyframes illus-a-puff-l {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.6); }
+  25% { opacity: 0.35; }
+  100% { opacity: 0; transform: translate(-14px, -8px) scale(1.2); }
+}
+@keyframes illus-a-idle {
+  from { transform: translateY(0); }
+  to { transform: translateY(0.6px); }
+}
+@keyframes illus-a-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+@keyframes illus-a-rise {
+  0% { opacity: 0; transform: translate(0, 4px); }
+  35% { opacity: 0.4; }
+  100% { opacity: 0; transform: translate(4px, -10px); }
+}
+@keyframes illus-a-sway {
+  from { transform: rotate(-3deg); }
+  to { transform: rotate(3deg); }
+}
+
+/* ---------- reduced motion: final composed state, no loops ---------- */
+@media (prefers-reduced-motion: reduce) {
+  :is(.illus-plane, .illus-car, .illus-card, .illus-money, .illus-house) {
+    --i-t: 1;
+  }
+  :is(.illus-plane, .illus-car, .illus-card, .illus-money, .illus-house) * {
+    animation: none !important;
+  }
+}

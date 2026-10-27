@@ -3,8 +3,7 @@ import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
 import { langPaths } from '../../lib/paths';
 import { t, url, type Lang } from '../../lib/i18n';
-import { getPages, groupBySection, SECTIONS, glazeOf } from '../../lib/content';
-import Girih from '../../components/Girih.astro';
+import { getPages, groupBySection, SECTIONS } from '../../lib/content';
 
 export const getStaticPaths = langPaths;
 const { lang } = Astro.props as { lang: Lang };
@@ -14,14 +13,12 @@ const groups = groupBySection(await getPages(lang))
   .filter((g) => g.items.length > 0);
 ---
 
-<Base lang={lang} title={tr('faq')} description={tr('faqLead')} path="/faq/" current="faq" field="deep">
-  <header class="mast mast-hub" data-glaze="deep">
-    <Girih variant="rosette" class="mast-art" />
-    <div class="wrap mast-inner">
-      <h1 class="display">{tr('faq')}</h1>
-      <p class="mast-lead">{tr('faqLead')}</p>
+<Base lang={lang} title={tr('faq')} description={tr('faqLead')} path="/faq/" current="faq" back={url(lang, '/')}>
+  <header class="page-head">
+    <div class="wrap">
+      <h1>{tr('faq')}</h1>
+      <p class="lead">{tr('faqLead')}</p>
     </div>
-    <Girih variant="band" class="mast-band" />
   </header>
   <div class="wrap">
     <label class="search-field faq-filter">
@@ -33,18 +30,18 @@ const groups = groupBySection(await getPages(lang))
 
     {
       groups.map((g) => (
-        <section class="faq-group" data-glaze={glazeOf(g.id)}>
+        <section class="faq-group">
           <h2 class="section-title">{SECTIONS[g.id].title[lang]}</h2>
           <div class="faq-list">
             {g.items.map((f) => (
               <details class="faq-item" data-aud-list={f.p.entry.data.audience.join(' ')} data-q={`${f.q} ${f.a}`.toLowerCase()}>
                 <summary>
                   <span>{f.q}</span>
-                  <Icon name="chevron" />
+                  <span class="plus" aria-hidden="true" />
                 </summary>
                 <div class="faq-a">
                   <p>{f.a}</p>
-                  <a class="faq-src" href={url(lang, `/guide/${f.p.slug}/`)} data-glaze={glazeOf(g.id)}>
+                  <a class="text-link" href={url(lang, `/guide/${f.p.slug}/`)}>
                     {f.p.entry.data.title} <Icon name="arrow" size={16} />
                   </a>
                 </div>
