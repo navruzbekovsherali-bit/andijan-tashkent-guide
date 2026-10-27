@@ -19,6 +19,11 @@ export const SECTIONS: Record<SectionId, { title: Record<Lang, string>; icon: st
   help: { title: { ru: 'Помощь и контакты', en: 'Help and contacts', uz: 'Yordam va kontaktlar' }, icon: 'phone', line: 4 },
 };
 
+/** Glaze colour of each route line (see the --g-* tokens in global.css). */
+export const GLAZES = ['cobalt', 'turquoise', 'malachite', 'saffron', 'pomegranate', 'lapis'] as const;
+export type Glaze = (typeof GLAZES)[number];
+export const glazeOf = (id: SectionId): Glaze => GLAZES[(SECTIONS[id].line - 1) % GLAZES.length];
+
 export const SECTION_ORDER = Object.keys(SECTIONS) as SectionId[];
 
 /** Slug of an entry without the language folder. */

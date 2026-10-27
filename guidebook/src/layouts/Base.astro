@@ -2,8 +2,9 @@
 import '../styles/global.css';
 import Icon from '../components/Icon.astro';
 import BrandMark from '../components/BrandMark.astro';
+import GuideFace from '../components/GuideFace.astro';
 import { LANGS, LANG_LABEL, t, url, type Lang } from '../lib/i18n';
-import { getPages, groupBySection, SECTIONS } from '../lib/content';
+import { getPages, groupBySection, SECTIONS, glazeOf, type Glaze } from '../lib/content';
 
 interface Props {
   lang: Lang;
@@ -14,9 +15,11 @@ interface Props {
   /** Current audience context, if the page belongs to one. */
   audience?: 'local' | 'expat' | 'both';
   current?: 'home' | 'local' | 'expat' | 'faq' | 'page';
+  /** Glaze of the page's masthead; the header takes it on. */
+  field?: Glaze;
 }
 
-const { lang, title, description, path, audience = 'both', current = 'page' } = Astro.props;
+const { lang, title, description, path, audience = 'both', current = 'page', field = 'cobalt' } = Astro.props;
 const tr = t(lang);
 const pages = await getPages(lang);
 const groups = groupBySection(pages);
@@ -25,51 +28,47 @@ const here = Astro.url.pathname;
 ---
 
 <!doctype html>
-<html lang={lang} data-theme="document" data-audience={audience}>
+<html lang={lang} data-audience={audience} data-glaze={field}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{pageTitle}</title>
     {description && <meta name="description" content={description} />}
-    <meta name="theme-color" content="#edf1ec" />
+    <meta name="theme-color" content="#1b3a9e" data-field-color />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="canonical" href={new URL(here, Astro.site)} />
     {LANGS.map((l) => <link rel="alternate" hreflang={l} href={new URL(url(l, path), Astro.site)} />)}
     <meta property="og:title" content={pageTitle} />
     {description && <meta property="og:description" content={description} />}
+    <script type="speculationrules" is:inline>
+      { "prerender": [{ "where": { "href_matches": "/*" }, "eagerness": "moderate" }] }
+    </script>
     <script is:inline>
       (function () {
         var d = document.documentElement;
         d.classList.add('js');
         try {
-          var th = localStorage.getItem('gb-theme');
-          if (th) d.dataset.theme = th;
           var au = localStorage.getItem('gb-audience');
           if (au && d.dataset.audience === 'both') d.dataset.pref = au;
         } catch (e) {}
-        // Page transition direction: back (history or "previous") wipes down, forward wipes up.
-        window.addEventListener('pagereveal', function (e) {
-          if (!e.viewTransition || !e.viewTransition.types) return;
-          var back = false;
+        // Arriving through the tile cover: start covered, the client lifts the tiles off.
+        function takeCover() {
           try {
-            var a = window.navigation && navigation.activation;
-            if (a && a.navigationType === 'traverse' && a.from && a.entry) back = a.entry.index < a.from.index;
-            if (sessionStorage.getItem('gb-dir') === 'back') back = true;
-            sessionStorage.removeItem('gb-dir');
-          } catch (err) {}
-          e.viewTransition.types.add(back ? 'back' : 'forward');
-          // Back on a list: only the item you came from carries its title home.
-          var from = a && a.from && a.from.url;
-          if (!from) return;
-          var path = new URL(from).pathname;
-          document.querySelectorAll('[data-vt]').forEach(function (el) {
-            var link = el.closest('a');
-            if (!link || link.pathname !== path) return;
-            el.style.viewTransitionName = el.dataset.vt;
-            e.viewTransition.finished.then(function () {
-              el.style.viewTransitionName = '';
-            });
-          });
+            var c = sessionStorage.getItem('gb-cover');
+            if (!c) return;
+            sessionStorage.removeItem('gb-cover');
+            d.classList.add('is-covered');
+            d.dataset.cover = c;
+          } catch (e) {}
+        }
+        if (document.prerendering) document.addEventListener('prerenderingchange', takeCover, { once: true });
+        else takeCover();
+        // History navigation keeps the browser's own cross-fade, with the old page receding.
+        window.addEventListener('pagereveal', function (e) {
+          if (!e.viewTransition) return;
+          if (!d.classList.contains('is-covered')) return;
+          e.viewTransition.ready.catch(function () {});
+          e.viewTransition.skipTransition();
         });
       })();
     </script>
@@ -84,18 +83,11 @@ const here = Astro.url.pathname;
           <span>Hamkorbank<small>{tr('siteShort')}</small></span>
         </a>
         <nav class="header-nav" aria-label={tr('menu')}>
-          <a href={url(lang, '/local/')} data-nav="local">{tr('localShort')}</a>
-          <a href={url(lang, '/expat/')} data-nav="expat">{tr('expatShort')}</a>
-          <a href={url(lang, '/faq/')} data-nav="faq">{tr('faq')}</a>
+          <a href={url(lang, '/local/')} data-nav="local" data-glaze="malachite">{tr('localShort')}</a>
+          <a href={url(lang, '/expat/')} data-nav="expat" data-glaze="cobalt">{tr('expatShort')}</a>
+          <a href={url(lang, '/faq/')} data-nav="faq" data-glaze="lapis">{tr('faq')}</a>
           <a href={url(lang, '/guide/contacts/')} data-nav="contacts">{tr('contacts')}</a>
         </nav>
-        <!-- Preview-only: compare the three design worlds -->
-        <div class="style-switch" role="group" aria-label={tr('styleNote')}>
-          <span><Icon name="palette" size={16} /></span>
-          <button type="button" data-theme-set="document" title="Документ">A</button>
-          <button type="button" data-theme-set="route" title="Маршрут">B</button>
-          <button type="button" data-theme-set="notebook" title="Тетрадь">C</button>
-        </div>
         <div class="header-actions">
           <button class="icon-btn" type="button" data-sheet="search" aria-label={tr('search')}><Icon name="search" /></button>
           <button class="icon-btn" type="button" data-sheet="drawer" aria-label={tr('menu')}><Icon name="menu" /></button>
@@ -111,18 +103,18 @@ const here = Astro.url.pathname;
       <div class="wrap">
         <span>© Hamkorbank · {tr('siteShort')}</span>
         <span>
-          <a href={url(lang, '/guide/emergency/')}>{tr('emergency')}</a> ·
+          <a href={url(lang, '/guide/emergency/')}>{tr('emergency')}</a>
           <a href={url(lang, '/guide/contacts/')}>{tr('contacts')}</a>
         </span>
       </div>
     </footer>
 
-    <!-- Bottom bar: everything reachable with a thumb -->
-    <nav class="bottom-bar" aria-label={tr('menu')}>
-      <a href={url(lang, '/')} data-nav="home"><Icon name="home" /><span>{tr('home')}</span></a>
-      <a href={url(lang, '/faq/')} data-nav="faq"><Icon name="question" /><span>{tr('faqShort')}</span></a>
+    <!-- Dock: everything reachable with a thumb -->
+    <nav class="dock" aria-label={tr('menu')}>
+      <a href={url(lang, '/')} data-nav="home" data-glaze="cobalt"><Icon name="home" /><span>{tr('home')}</span></a>
+      <a href={url(lang, '/faq/')} data-nav="faq" data-glaze="lapis"><Icon name="question" /><span>{tr('faqShort')}</span></a>
       <button type="button" data-sheet="search"><Icon name="search" /><span>{tr('search')}</span></button>
-      <button type="button" data-sheet="drawer" class="is-primary"><Icon name="menu" /><span>{tr('menu')}</span></button>
+      <button type="button" data-sheet="drawer"><Icon name="menu" /><span>{tr('menu')}</span></button>
     </nav>
 
     <!-- Drawer -->
@@ -141,15 +133,14 @@ const here = Astro.url.pathname;
           </div>
           {
             groups.map((g) => (
-              <section class="nav-group" style={`--line: var(--line-${SECTIONS[g.id].line})`}>
-                <h3 class="nav-group-title">
-                  <span class="dot" />
-                  {SECTIONS[g.id].title[lang]}
-                </h3>
+              <section class="nav-group" data-glaze={glazeOf(g.id)}>
+                <h3 class="nav-group-title">{SECTIONS[g.id].title[lang]}</h3>
                 <ul class="nav-list">
                   {g.pages.map((p) => (
                     <li data-aud-list={p.entry.data.audience.join(' ')}>
-                      <a href={url(lang, `/guide/${p.slug}/`)}>{p.entry.data.title}</a>
+                      <a href={url(lang, `/guide/${p.slug}/`)} data-glaze={glazeOf(g.id)}>
+                        {p.entry.data.title}
+                      </a>
                     </li>
                   ))}
                 </ul>
@@ -157,9 +148,7 @@ const here = Astro.url.pathname;
             ))
           }
           <div class="drawer-foot">
-            <ul class="nav-list">
-              <li><a href={url(lang, '/faq/')}>{tr('faq')}</a></li>
-            </ul>
+            <a class="drawer-faq" href={url(lang, '/faq/')} data-glaze="lapis">{tr('faq')}<Icon name="arrow" size={18} /></a>
             <div>
               <p class="label">Язык · Language · Til</p>
               <div class="seg three">
@@ -192,6 +181,10 @@ const here = Astro.url.pathname;
       </div>
     </div>
 
+    <template id="guide-face-tpl"><GuideFace /></template>
+
+    <!-- Page-change cover: girih tiles, drawn by the client -->
+    <div class="cover" aria-hidden="true"></div>
 
     <script>
       import { initSite } from '../lib/client';

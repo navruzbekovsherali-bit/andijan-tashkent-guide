@@ -1,0 +1,71 @@
+---
+/**
+ * A field of star-and-cross girih, shown the way a tile-maker builds it:
+ * construction grid, compass circles, strapwork lines, then glazed tiles that fill
+ * outward from a focus point. Motion lives in global.css (.girih) and lib/client.ts.
+ */
+import { tiling } from '../lib/girih';
+
+interface Props {
+  /** "hero": construction lines over the whole field, tiles near the focus.
+      "band": one glazed row, no construction (chapter mastheads). */
+  variant?: 'hero' | 'band';
+  class?: string;
+}
+const { variant = 'hero', class: cls = '' } = Astro.props;
+
+const hero = variant === 'hero';
+const W = hero ? 400 : 480;
+const H = hero ? 520 : 72;
+const s = hero ? 100 : 48;
+const fx = hero ? 300 : 0;
+const fy = hero ? 150 : 36;
+const tiles = tiling(W, H, s, hero ? 0 : 0, hero ? 0 : 36);
+const reach = hero ? 250 : Infinity;
+
+// Glaze for each tile: stars turquoise with a saffron heart, crosses white; band alternates.
+const glaze = (kind: string, i: number, dist: number) => {
+  if (!hero) return kind === 'star' ? 'var(--band-star)' : 'var(--band-cross)';
+  if (kind === 'cross') return 'var(--tile-cross)';
+  return dist < 70 ? 'var(--tile-heart)' : i % 3 === 0 ? 'var(--tile-alt)' : 'var(--tile-star)';
+};
+const placed = tiles.map((t, i) => {
+  const dist = Math.hypot(t.x - fx, t.y - fy);
+  return { ...t, dist, fill: dist < reach ? glaze(t.kind, i, dist) : null, delay: (dist / 400).toFixed(2) };
+});
+const lattice = hero
+  ? [
+      ...Array.from({ length: Math.ceil(W / s) + 1 }, (_, i) => `M${i * s} 0V${H}`),
+      ...Array.from({ length: Math.ceil(H / s) + 1 }, (_, j) => `M0 ${j * s}H${W}`),
+      ...Array.from({ length: Math.ceil((W + H) / s) + 1 }, (_, k) => `M${k * s} 0L${k * s - H} ${H}`),
+      ...Array.from({ length: Math.ceil((W + H) / s) + 1 }, (_, k) => `M${k * s - H} 0L${k * s} ${H}`),
+    ].join('')
+  : '';
+---
+
+<svg class:list={['girih', `girih-${variant}`, cls]} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio={hero ? 'xMaxYMin slice' : 'xMidYMid slice'} aria-hidden="true" data-girih={variant}>
+  {
+    hero && (
+      <g class="g-cons">
+        <path class="g-grid" d={lattice} pathLength="1" />
+        {placed
+          .filter((t) => t.kind === 'star')
+          .map((t) => (
+            <circle class="g-compass" cx={t.x} cy={t.y} r={s / 2} pathLength="1" style={`--d:${t.delay}`} />
+          ))}
+      </g>
+    )
+  }
+  <g class="g-tiles">
+    {placed.filter((t) => t.fill).map((t) => <path class={`g-tile g-${t.kind}`} d={t.path} fill={t.fill} style={`--d:${t.delay}`} />)}
+  </g>
+  {
+    hero && (
+      <g class="g-lines">
+        {placed.map((t) => (
+          <path d={t.path} pathLength="1" style={`--d:${t.delay}`} />
+        ))}
+      </g>
+    )
+  }
+</svg>

@@ -2,9 +2,10 @@
 import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
 import Guide from '../../components/Guide.astro';
+import Girih from '../../components/Girih.astro';
 import { langPaths } from '../../lib/paths';
 import { t, url, type Lang } from '../../lib/i18n';
-import { getPages, SECTIONS } from '../../lib/content';
+import { getPages, glazeOf } from '../../lib/content';
 
 export const getStaticPaths = langPaths;
 const { lang } = Astro.props as { lang: Lang };
@@ -15,95 +16,72 @@ const bySlug = new Map(pages.map((p) => [p.slug, p]));
 const popularSlugs = ['arrival-72h', 'first-day-week', 'work-time', 'salary-expat', 'relocation-budget', 'emergency'];
 const popular = popularSlugs.map((s) => bySlug.get(s)).filter((p): p is NonNullable<typeof p> => Boolean(p));
 const faqPreview = pages.flatMap((p) => p.entry.data.faq.slice(0, 1).map((f) => ({ ...f, slug: p.slug }))).slice(0, 5);
-const words = tr('heroTitle').split(' ');
-const last = words.pop();
 ---
 
-<Base lang={lang} title={tr('siteName')} description={tr('heroLead')} path="/" current="home">
-  <section class="hero">
-    <div class="wrap">
-      <h1>{words.join(' ')} <span class="mark">{last}</span></h1>
-      <p class="hero-lead">{tr('heroLead')}</p>
-      <!-- Two lines (local, expat) that draw with the scroll; a rider marks how far you are -->
-      <svg class="hero-art" data-scrub viewBox="0 0 360 260" fill="none" aria-hidden="true">
-        <path d="M20 220 C 90 220, 80 120, 160 120 S 250 40, 330 40" stroke="var(--line-2)" stroke-width="6" stroke-linecap="round" class="track-ghost"></path>
-        <path d="M20 240 C 120 240, 140 180, 220 180 S 300 150, 340 110" stroke="var(--line-1)" stroke-width="6" stroke-linecap="round" class="track-ghost"></path>
-        <path d="M20 220 C 90 220, 80 120, 160 120 S 250 40, 330 40" stroke="var(--line-2)" stroke-width="6" stroke-linecap="round" data-track="a"></path>
-        <path d="M20 240 C 120 240, 140 180, 220 180 S 300 150, 340 110" stroke="var(--line-1)" stroke-width="6" stroke-linecap="round" data-track="b"></path>
-        <circle class="stop is-reached" cx="20" cy="220" r="9" fill="var(--paper)" stroke="var(--line-2)" stroke-width="5"></circle>
-        <circle class="stop" data-at="0.5" cx="160" cy="120" r="9" fill="var(--paper)" stroke="var(--line-2)" stroke-width="5"></circle>
-        <circle class="stop end" data-at="0.99" cx="330" cy="40" r="11" fill="var(--line-2)"></circle>
-        <circle class="stop" data-at="0.6" cx="220" cy="180" r="9" fill="var(--paper)" stroke="var(--line-1)" stroke-width="5"></circle>
-        <circle class="stop end" data-at="0.99" cx="340" cy="110" r="11" fill="var(--line-1)"></circle>
-        <circle class="rider" data-rider="a" r="6" fill="var(--ink)"></circle>
-        <circle class="rider" data-rider="b" r="6" fill="var(--ink)"></circle>
-      </svg>
-      <Guide name={tr('guideName')}>
-        <p>{tr('guideHello')}</p>
-      </Guide>
+<Base lang={lang} title={tr('siteName')} description={tr('heroLead')} path="/" current="home" field="cobalt">
+  <section class="mast mast-home" data-glaze="cobalt">
+    <Girih variant="hero" class="mast-art" />
+    <div class="wrap mast-inner">
+      <h1 class="display">{tr('heroTitle')}</h1>
+      <p class="mast-lead">{tr('heroLead')}</p>
+      <div class="doors">
+        <a class="door" href={url(lang, '/local/')} data-choose="local" data-glaze="malachite">
+          <span class="door-title">{tr('local')}</span>
+          <span class="door-lead">{tr('localLead')}</span>
+          <Icon name="arrow" />
+        </a>
+        <a class="door" href={url(lang, '/expat/')} data-choose="expat" data-glaze="saffron">
+          <span class="door-title">{tr('expat')}</span>
+          <span class="door-lead">{tr('expatLead')}</span>
+          <Icon name="arrow" />
+        </a>
+      </div>
     </div>
   </section>
 
   <div class="wrap">
-    <h2 class="visually-hidden">{tr('chooseTitle')}</h2>
-    <div class="choose">
-      <a class="door reveal" data-spot href={url(lang, '/local/')} data-choose="local">
-        <div>
-          <h2 style="view-transition-name: aud-local">{tr('local')}</h2>
-          <p>{tr('localLead')}</p>
-        </div>
-        <span class="go"><Icon name="arrow" /></span>
-      </a>
-      <a class="door reveal" data-spot href={url(lang, '/expat/')} data-choose="expat">
-        <div>
-          <h2 style="view-transition-name: aud-expat">{tr('expat')}</h2>
-          <p>{tr('expatLead')}</p>
-        </div>
-        <span class="go"><Icon name="arrow" /></span>
-      </a>
-    </div>
+    <Guide name={tr('guideName')}>
+      <p>{tr('guideHello')}</p>
+    </Guide>
 
     <p class="statement" data-words>{tr('manifest')}</p>
 
     <h2 class="block-title">{tr('popular')}</h2>
-    <ul class="quick">
+    <ol class="rows">
       {
         popular.map((p) => (
-          <li class="reveal">
-            <a href={url(lang, `/guide/${p.slug}/`)}>
-              <span class="q-ico" style={`--line: var(--line-${SECTIONS[p.entry.data.section].line})`}>
-                <Icon name={SECTIONS[p.entry.data.section].icon} />
-              </span>
-              <span>
-                <strong>{p.entry.data.title}</strong>
-                <span class="d">{p.entry.data.description}</span>
-              </span>
-              <Icon name="chevron" />
+          <li data-glaze={glazeOf(p.entry.data.section)}>
+            <a href={url(lang, `/guide/${p.slug}/`)} data-glaze={glazeOf(p.entry.data.section)}>
+              <strong>{p.entry.data.title}</strong>
+              <span class="row-lead">{p.entry.data.description}</span>
+              <Icon name="arrow" />
             </a>
           </li>
         ))
       }
-    </ul>
+    </ol>
 
     <h2 class="block-title">{tr('faq')}</h2>
     <div class="faq-list">
       {
         faqPreview.map((f) => (
-          <details class="faq-item reveal">
+          <details class="faq-item">
             <summary>
               <span>{f.q}</span>
               <Icon name="chevron" />
             </summary>
             <div class="faq-a">
               <p>{f.a}</p>
-              <a class="faq-src" href={url(lang, `/guide/${f.slug}/`)}>{bySlug.get(f.slug)?.entry.data.title} →</a>
+              <a class="faq-src" href={url(lang, `/guide/${f.slug}/`)}>
+                {bySlug.get(f.slug)?.entry.data.title} <Icon name="arrow" size={16} />
+              </a>
             </div>
           </details>
         ))
       }
     </div>
-    <p style="margin-top: var(--space-4)">
-      <a class="btn ghost" href={url(lang, '/faq/')}>{tr('faq')} <Icon name="arrow" size={18} /></a>
+    <p class="after-faq">
+      <a class="btn" href={url(lang, '/faq/')} data-glaze="lapis">{tr('faq')} <Icon name="arrow" size={18} /></a>
     </p>
   </div>
 </Base>

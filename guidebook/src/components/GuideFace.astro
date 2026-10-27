@@ -1,0 +1,19 @@
+---
+// The guide's face: one eight-point girih star with eyes. Its final form is still the owner's choice.
+import { star, d } from '../lib/girih';
+const body = d(star(24, 24, 46));
+const heart = d(star(24, 24, 30));
+---
+
+<svg class="guide-face" viewBox="0 0 48 48" aria-hidden="true">
+  <path class="gf-body" d={body} fill="var(--guide-1)"></path>
+  <path class="gf-heart" d={heart} fill="var(--guide-2)"></path>
+  <g class="look">
+    <g class="eyes">
+      <circle cx="18.6" cy="23.5" r="3.7" fill="#fff"></circle>
+      <circle cx="29.4" cy="23.5" r="3.7" fill="#fff"></circle>
+      <circle cx="19.1" cy="24.1" r="1.9" fill="var(--ink)"></circle>
+      <circle cx="29.9" cy="24.1" r="1.9" fill="var(--ink)"></circle>
+    </g>
+  </g>
+</svg>

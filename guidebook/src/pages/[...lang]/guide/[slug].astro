@@ -3,8 +3,9 @@ import { render } from 'astro:content';
 import Base from '../../../layouts/Base.astro';
 import Icon from '../../../components/Icon.astro';
 import Guide from '../../../components/Guide.astro';
+import Girih from '../../../components/Girih.astro';
 import { LANGS, DEFAULT_LANG, t, url, type Lang } from '../../../lib/i18n';
-import { getPages, forAudience, readingMinutes, SECTIONS } from '../../../lib/content';
+import { getPages, forAudience, readingMinutes, SECTIONS, glazeOf } from '../../../lib/content';
 
 export async function getStaticPaths() {
   const out = [];
@@ -37,44 +38,47 @@ const next = i >= 0 && i < line.length - 1 ? line[i + 1] : undefined;
 const fmtDate = (d: Date) =>
   d.toLocaleDateString(lang === 'en' ? 'en-GB' : lang === 'uz' ? 'uz-UZ' : 'ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
 const hubAud = audience === 'local' ? 'local' : 'expat';
+const glaze = glazeOf(data.section);
 ---
 
-<Base lang={lang} title={data.title} description={data.description} path={`/guide/${slug}/`} audience={audience}>
+<Base lang={lang} title={data.title} description={data.description} path={`/guide/${slug}/`} audience={audience} field={glaze}>
   <div class="read-progress" aria-hidden="true"></div>
-  <div class="wrap" style={`--line: var(--line-${section.line})`}>
-    <nav class="crumbs" aria-label="breadcrumbs">
-      <a href={url(lang, '/')}>{tr('home')}</a>
-      <span class="sep">/</span>
-      <a href={url(lang, `/${hubAud}/`)}><span class="line-dot"></span>{section.title[lang]}</a>
-    </nav>
+  <header class="mast mast-article" data-glaze={glaze}>
+    <Girih variant="hero" class="mast-art" />
+    <div class="wrap mast-inner">
+      <nav class="crumbs" aria-label="breadcrumbs">
+        <a href={url(lang, '/')} data-glaze="cobalt">{tr('home')}</a>
+        <span class="sep" aria-hidden="true">/</span>
+        <a href={url(lang, `/${hubAud}/#${data.section}`)} data-glaze={hubAud === 'local' ? 'malachite' : 'saffron'}>{section.title[lang]}</a>
+      </nav>
+      <h1 class="display">{data.title}</h1>
+      <p class="mast-lead">{data.description}</p>
+      <div class="meta-row">
+        <span class="chip">
+          {data.audience.length === 2 ? tr('both') : data.audience[0] === 'local' ? tr('localShort') : tr('expatShort')}
+        </span>
+        <span class="chip"><Icon name="clock" size={14} />{readingMinutes(entry.body)} {tr('minutes')}</span>
+        {data.checked && (
+          <span class="chip stamp">
+            <Icon name="check" size={14} />
+            {tr('checked')} {fmtDate(data.checked)}
+          </span>
+        )}
+      </div>
+    </div>
+    <Girih variant="band" class="mast-band" />
+  </header>
 
+  <div class="wrap">
     <div class="article-layout">
       <article>
-        <header class="article-head">
-          <h1 style={`view-transition-name: t-${slug}`}>{data.title}</h1>
-          <p class="lead">{data.description}</p>
-          <div class="meta-row">
-            {data.audience.length === 2 ? (
-              <span class="chip">{tr('both')}</span>
-            ) : (
-              <span class="chip">{data.audience[0] === 'local' ? tr('localShort') : tr('expatShort')}</span>
-            )}
-            <span class="chip"><Icon name="clock" size={14} />{readingMinutes(entry.body)} {tr('minutes')}</span>
-            {data.checked && (
-              <span class="stamp">
-                <Icon name="check" size={14} />
-                {tr('checked')} {fmtDate(data.checked)}
-              </span>
-            )}
-          </div>
-          {fallback && <p class="fallback-note">{tr('translationSoon')}</p>}
-          {data.needsConfirmation && (
-            <p class="confirm-note">
-              <Icon name="alert" size={20} />
-              <span>{tr('confirm')}</span>
-            </p>
-          )}
-        </header>
+        {fallback && <p class="note">{tr('translationSoon')}</p>}
+        {data.needsConfirmation && (
+          <p class="note is-warn">
+            <Icon name="alert" size={20} />
+            <span>{tr('confirm')}</span>
+          </p>
+        )}
 
         {data.tldr.length > 0 && (
           <Guide name={tr('short')}>
@@ -121,23 +125,6 @@ const hubAud = audience === 'local' ? 'local' : 'expat';
             </ul>
           </footer>
         )}
-
-        <nav class="pager" aria-label={`${tr('prev')} / ${tr('next')}`}>
-          {prev ? (
-            <a class="prev" href={url(lang, `/guide/${prev.slug}/`)}>
-              <small><Icon name="back" size={16} />{tr('prev')}</small>
-              <strong>{prev.entry.data.title}</strong>
-            </a>
-          ) : (
-            <span />
-          )}
-          {next && (
-            <a class="next" href={url(lang, `/guide/${next.slug}/`)}>
-              <small>{tr('next')}<Icon name="arrow" size={16} /></small>
-              <strong>{next.entry.data.title}</strong>
-            </a>
-          )}
-        </nav>
       </article>
 
       {toc.length > 1 && (
@@ -154,4 +141,24 @@ const hubAud = audience === 'local' ? 'local' : 'expat';
       )}
     </div>
   </div>
+
+  <nav class="pager" aria-label={`${tr('prev')} / ${tr('next')}`}>
+    {next && (
+      <a class="next" href={url(lang, `/guide/${next.slug}/`)} data-glaze={glazeOf(next.entry.data.section)}>
+        <span class="wrap">
+          <small>{tr('next')}</small>
+          <strong>{next.entry.data.title}</strong>
+          <Icon name="arrow" size={28} />
+        </span>
+      </a>
+    )}
+    {prev && (
+      <a class="prev" href={url(lang, `/guide/${prev.slug}/`)} data-glaze={glazeOf(prev.entry.data.section)}>
+        <span class="wrap">
+          <small><Icon name="back" size={16} />{tr('prev')}</small>
+          <strong>{prev.entry.data.title}</strong>
+        </span>
+      </a>
+    )}
+  </nav>
 </Base>

@@ -1,3 +1,5 @@
+import { tiling } from './girih';
+
 /* Client behaviour: sheets, audience filter, search, style preview, motion.
    Runs once per page load; page-to-page motion is native cross-document view transitions. */
 
@@ -75,18 +77,6 @@ function applyAudience(aud: 'local' | 'expat') {
     const visible = g.querySelectorAll('li:not([hidden])').length > 0;
     (g as HTMLElement).hidden = !visible;
   });
-}
-
-/* ---------- Style preview ---------- */
-function applyTheme(theme: string) {
-  document.documentElement.dataset.theme = theme;
-  store.set('gb-theme', theme);
-  document.querySelectorAll<HTMLButtonElement>('[data-theme-set]').forEach((b) => {
-    b.setAttribute('aria-pressed', String(b.dataset.themeSet === theme));
-  });
-  const meta = document.querySelector('meta[name="theme-color"]');
-  meta?.setAttribute('content', getComputedStyle(document.documentElement).getPropertyValue('--ground').trim());
-  drawStrokes();
 }
 
 /* ---------- Search ---------- */
@@ -198,24 +188,12 @@ function reveal() {
         if (!e.isIntersecting) continue;
         const el = e.target as HTMLElement;
         el.classList.add('is-in');
-        if (el.classList.contains('stamp')) el.classList.add('is-landing');
-        if (el.classList.contains('draw')) el.classList.add('is-drawn');
         io!.unobserve(el);
       }
     },
     { rootMargin: '0px 0px -8% 0px', threshold: 0.15 },
   );
-  document.querySelectorAll('.reveal, .stamp, .draw').forEach((el) => io!.observe(el));
-}
-
-function drawStrokes() {
-  document.querySelectorAll<SVGPathElement>('.draw path').forEach((p) => {
-    try {
-      p.style.setProperty('--len', String(Math.ceil(p.getTotalLength()) + 2));
-    } catch {
-      /* hidden svg */
-    }
-  });
+  document.querySelectorAll('.reveal').forEach((el) => io!.observe(el));
 }
 
 /** Route rail on hub pages and the table of contents fill as the reader moves down. */
@@ -307,27 +285,10 @@ function bindShell() {
       applyAudience(aud);
       return;
     }
-    const themeBtn = t.closest<HTMLButtonElement>('[data-theme-set]');
-    if (themeBtn) {
-      applyTheme(themeBtn.dataset.themeSet!);
-      return;
-    }
-    // Only the tapped list item gets a transition name, so one title morphs instead of forty.
-    const named = t.closest('a')?.querySelector<HTMLElement>('[data-vt]');
-    if (named) {
-      document.querySelectorAll<HTMLElement>('[data-vt]').forEach((el) => (el.style.viewTransitionName = ''));
-      named.style.viewTransitionName = named.dataset.vt!;
-    }
     const door = t.closest<HTMLAnchorElement>('[data-choose]');
     if (door) store.set('gb-audience', door.dataset.choose!);
-    // Going back up the route: the next page wipes in from the top instead of the bottom.
-    if (t.closest('.pager .prev, .crumbs a')) {
-      try {
-        sessionStorage.setItem('gb-dir', 'back');
-      } catch {
-        /* the wipe just keeps its default direction */
-      }
-    }
+    const link = t.closest<HTMLAnchorElement>('a[href]');
+    if (link && !e.defaultPrevented) coverAndGo(e as MouseEvent, link);
   });
 
   document.addEventListener('keydown', (e) => {
@@ -355,19 +316,17 @@ export function initSite() {
   const aud = document.documentElement.dataset.audience;
   if (aud === 'local' || aud === 'expat') store.set('gb-audience', aud);
   applyAudience(currentAudience());
-  applyTheme(store.get('gb-theme') || 'document');
   markCurrentNav();
   callouts();
-  drawStrokes();
   reveal();
   cleanupProgress = progress();
   journeyRail();
   phoneDemos();
   followingGuide();
   headerOnScroll();
-  scrubArt();
+  mastParallax();
   wordsReveal();
-  spotlight();
+  liftCover();
 }
 
 /* ---------- Animated phone demos (illustrative screens, marked as examples) ---------- */
@@ -556,53 +515,20 @@ function headerOnScroll() {
   const header = document.querySelector<HTMLElement>('.site-header');
   if (!header) return;
   let lastY = window.scrollY;
+  const mast = document.querySelector<HTMLElement>('.mast');
+  const meta = document.querySelector<HTMLMetaElement>('meta[data-field-color]');
+  const fieldColor = getComputedStyle(header).backgroundColor;
   onScrollFrame(() => {
     const y = window.scrollY;
-    header.classList.toggle('is-scrolled', y > 24);
+    const past = mast ? y > mast.offsetTop + mast.offsetHeight - header.offsetHeight : y > 24;
+    if (past !== header.classList.contains('is-scrolled')) {
+      header.classList.toggle('is-scrolled', past);
+      meta?.setAttribute('content', past ? '#ffffff' : fieldColor);
+    }
     if (Math.abs(y - lastY) < 8) return;
     const busy = document.querySelector('.sheet[data-open]') || header.matches(':focus-within');
     header.classList.toggle('is-hidden', !busy && y > lastY && y > 160);
     lastY = y;
-  });
-}
-
-/* ---------- Home: the two lines draw with the scroll, riders show how far you are ---------- */
-function scrubArt() {
-  document.querySelectorAll<SVGSVGElement>('[data-scrub]').forEach((svg) => {
-    const tracks = Array.from(svg.querySelectorAll<SVGPathElement>('[data-track]')).map((path) => ({
-      path,
-      len: path.getTotalLength(),
-      rider: svg.querySelector<SVGCircleElement>(`[data-rider="${path.dataset.track}"]`),
-    }));
-    const stops = Array.from(svg.querySelectorAll<SVGElement>('[data-at]'));
-    tracks.forEach((t) => (t.path.style.strokeDasharray = String(t.len)));
-
-    const FLOOR = 0.3; // share of the line drawn on arrival; scrolling draws the rest
-    let intro = reduceMotion() ? 1 : 0;
-    const draw = () => {
-      const top = svg.getBoundingClientRect().top + window.scrollY;
-      const travel = Math.max(window.innerHeight * 0.5, top - window.innerHeight * 0.12);
-      const p = reduceMotion() ? 1 : clamp01(FLOOR * intro + (1 - FLOOR) * clamp01(window.scrollY / travel));
-      for (const t of tracks) {
-        t.path.style.strokeDashoffset = String(t.len * (1 - p));
-        const pt = t.path.getPointAtLength(t.len * p);
-        t.rider?.setAttribute('cx', pt.x.toFixed(1));
-        t.rider?.setAttribute('cy', pt.y.toFixed(1));
-      }
-      stops.forEach((s) => s.classList.toggle('is-reached', p >= Number(s.dataset.at)));
-      svg.classList.toggle('is-done', p >= 0.99);
-    };
-    if (!reduceMotion()) {
-      const start = performance.now();
-      const step = (now: number) => {
-        const k = clamp01((now - start) / 1100);
-        intro = k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2;
-        draw();
-        if (k < 1) requestAnimationFrame(step);
-      };
-      requestAnimationFrame(step);
-    }
-    onScrollFrame(draw);
   });
 }
 
@@ -625,20 +551,8 @@ function wordsReveal() {
   });
 }
 
-/* ---------- Doors: a soft light follows the pointer (desktop only) ---------- */
-function spotlight() {
-  if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-  document.querySelectorAll<HTMLElement>('[data-spot]').forEach((el) => {
-    el.addEventListener('pointermove', (e) => {
-      const r = el.getBoundingClientRect();
-      el.style.setProperty('--mx', `${e.clientX - r.left}px`);
-      el.style.setProperty('--my', `${e.clientY - r.top}px`);
-    });
-  });
-}
-
 /* ---------- Guide that follows the reader ----------
-   Shows reading progress as a ring, knows which section you are in, looks the way you
+   Its heart fills with glaze as you read, it knows which section you are in, looks the way you
    scroll, nudges you at "Важно" notes and offers the next step near the end. */
 const GUIDE_TEXT = {
   ru: { name: 'Гид', next: 'Следующий шаг', now: 'Сейчас', of: 'из', important: 'Здесь важное — прочитайте внимательно.', open: 'Подсказка гида' },
@@ -646,7 +560,6 @@ const GUIDE_TEXT = {
   uz: { name: 'Yoʻlboshchi', next: 'Keyingi qadam', now: 'Hozir', of: '/', important: 'Bu yerda muhim maʼlumot bor.', open: 'Yoʻlboshchi' },
 };
 
-const GUIDE_FACE = `<svg class="face" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="20" cy="15" r="6.5"/><path d="M9 33c1.5-6 6-9 11-9s9.5 3 11 9"/><g class="look"><path class="eyes" d="M17.5 15.5h.01M22.5 15.5h.01"/></g><path d="M17.8 18.4c1.3 1 3.1 1 4.4 0"/></svg>`;
 
 function followingGuide() {
   const next = document.querySelector<HTMLAnchorElement>('.pager .next');
@@ -666,9 +579,9 @@ function followingGuide() {
       <a data-k="next" href="${next.getAttribute('href')}"><small>${tx.next}</small>${escapeHtml(title)}</a>
     </div>
     <button type="button" class="guide-fab-btn" aria-expanded="false" aria-controls="guide-fab-bubble" aria-label="${tx.open}">
-      <svg class="ring" viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="28"/><circle class="ring-fill" cx="30" cy="30" r="28" pathLength="1"/></svg>
-      ${GUIDE_FACE}
     </button>`;
+  const face = (document.getElementById('guide-face-tpl') as HTMLTemplateElement | null)?.content.cloneNode(true);
+  if (face) fab.querySelector('.guide-fab-btn')!.append(face);
   document.body.append(fab);
   const btn = fab.querySelector<HTMLButtonElement>('.guide-fab-btn')!;
   const label = fab.querySelector<HTMLElement>('[data-k="label"]')!;
@@ -751,5 +664,91 @@ function followingGuide() {
       nudged = true;
       say('next', 6000);
     }
+  });
+}
+
+/* ---------- Page change: girih tiles close over the page from your tap, then lift off ---------- */
+const COVER_S = 84; // tile size, px
+const COVER_SPREAD = 220; // ms between the first and the last tile
+const COVER_IN = 360;
+
+function drawCover(glaze: string, ox: number, oy: number) {
+  const cover = document.querySelector<HTMLElement>('.cover');
+  if (!cover) return null;
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  const far = Math.hypot(Math.max(ox, w - ox), Math.max(oy, h - oy)) || 1;
+  cover.dataset.glaze = glaze;
+  cover.innerHTML =
+    `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">` +
+    tiling(w, h, COVER_S)
+      .map((t) => {
+        const ring = (Math.round(t.x / COVER_S) + Math.round(t.y / COVER_S)) % 3 === 0;
+        const fill = t.kind === 'cross' ? 'var(--field)' : ring ? 'var(--tile-alt)' : 'var(--tile-star)';
+        const delay = Math.round((Math.hypot(t.x - ox, t.y - oy) / far) * COVER_SPREAD);
+        return `<path class="c-tile" d="${t.path}" fill="${fill}" style="--d:${delay}"/>`;
+      })
+      .join('') +
+    '</svg>';
+  return cover;
+}
+
+function coverAndGo(e: MouseEvent, link: HTMLAnchorElement) {
+  if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  if ((link.target && link.target !== '_self') || link.hasAttribute('download')) return;
+  if (link.origin !== location.origin) return;
+  const to = new URL(link.href);
+  if (to.pathname === location.pathname && to.search === location.search) return; // anchor on this page
+  if (reduceMotion()) return;
+  e.preventDefault();
+  const glaze = link.dataset.glaze || link.closest<HTMLElement>('[data-glaze]')?.dataset.glaze || 'cobalt';
+  const x = e.clientX || window.innerWidth / 2;
+  const y = e.clientY || window.innerHeight / 2;
+  closeSheets();
+  drawCover(glaze, x, y);
+  try {
+    sessionStorage.setItem('gb-cover', glaze);
+  } catch {
+    /* the next page simply appears without its tiles */
+  }
+  document.documentElement.classList.add('is-covering');
+  window.setTimeout(() => (location.href = link.href), COVER_IN + COVER_SPREAD - 20);
+}
+
+/** On arrival under the cover (set by the head script), lift the tiles off from the top. */
+function liftCover() {
+  const root = document.documentElement;
+  if ((document as Document & { prerendering?: boolean }).prerendering) {
+    document.addEventListener('prerenderingchange', liftCover, { once: true });
+    return;
+  }
+  if (!root.classList.contains('is-covered')) return;
+  const cover = drawCover(root.dataset.cover || 'cobalt', window.innerWidth / 2, 0);
+  requestAnimationFrame(() => {
+    root.classList.remove('is-covered');
+    root.classList.add('is-lifting');
+    window.setTimeout(() => {
+      root.classList.remove('is-lifting');
+      if (cover) cover.innerHTML = '';
+    }, 520 + COVER_SPREAD + 60);
+  });
+}
+
+// Back from the bfcache: the page we left was still covered.
+window.addEventListener('pageshow', (e) => {
+  if (!e.persisted) return;
+  document.documentElement.classList.remove('is-covering', 'is-covered', 'is-lifting');
+  const cover = document.querySelector('.cover');
+  if (cover) cover.innerHTML = '';
+});
+
+/* ---------- Masthead pattern drifts slower than the page ---------- */
+function mastParallax() {
+  const art = document.querySelector<HTMLElement>('.mast-art');
+  const mast = art?.closest<HTMLElement>('.mast');
+  if (!art || !mast || reduceMotion()) return;
+  onScrollFrame(() => {
+    const y = window.scrollY;
+    if (y <= mast.offsetHeight) art.style.setProperty('--sy', (y * 0.35).toFixed(1));
   });
 }
