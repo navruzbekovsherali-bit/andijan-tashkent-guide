@@ -108,7 +108,7 @@ const here = Astro.url.pathname;
             </a>
           )
         }
-        <a class="brand" href={url(lang, '/')} aria-label="Hamkor Bank — главная">
+        <a class="brand" href={url(lang, '/')} aria-label={`Hamkor Bank — ${tr('home')}`}>
           <BrandMark />
           <span class="brand-name">Hamkor Bank</span>
         </a>

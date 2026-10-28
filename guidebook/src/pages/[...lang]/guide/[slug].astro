@@ -49,7 +49,7 @@ const photoId = slug === 'emergency' ? undefined : PAGE_PHOTO[slug];
   {
     photoId && (
       <div class="city-hero">
-        <Photo id={photoId} class="city-photo" eager sizes="(min-width: 900px) 1320px, 100vw" video={PAGE_VIDEO[slug]} videoLabel={tr('watchVideo')} />
+        <Photo id={photoId} class="city-photo" eager sizes="(min-width: 900px) 1320px, 100vw" video={PAGE_VIDEO[slug]} videoLabel={tr('watchVideo')} lang={lang} />
       </div>
     )
   }

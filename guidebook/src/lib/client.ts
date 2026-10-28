@@ -264,9 +264,9 @@ function progress() {
 function callouts() {
   document.querySelectorAll('.prose blockquote').forEach((q) => {
     const lead = (q.querySelector('p > strong:first-child')?.textContent || '').toLowerCase();
-    if (/важно|внимание|important/.test(lead)) q.classList.add('is-warn');
-    else if (/совет|лайфхак|tip/.test(lead)) q.classList.add('is-tip');
-    else if (/уточните|hr/.test(lead)) q.classList.add('is-hr');
+    if (/важно|внимание|important|muhim|diqqat/.test(lead)) q.classList.add('is-warn');
+    else if (/совет|лайфхак|tip|maslahat/.test(lead)) q.classList.add('is-tip');
+    else if (/уточните|hr|check|aniqlang/.test(lead)) q.classList.add('is-hr');
   });
 }
 
@@ -454,7 +454,7 @@ function tables() {
     wrap.className = 'table-scroll';
     wrap.tabIndex = 0;
     wrap.setAttribute('role', 'region');
-    wrap.setAttribute('aria-label', t.querySelector('th')?.textContent || 'Таблица');
+    wrap.setAttribute('aria-label', t.querySelector('th')?.textContent || { ru: 'Таблица', en: 'Table', uz: 'Jadval' }[pageLang()]);
     t.replaceWith(wrap);
     wrap.append(t);
   });
@@ -547,7 +547,18 @@ function stopVideo(btn: HTMLButtonElement) {
 /* ---------- Bank reels: a vertical film that plays silently while on screen; sound on request ---------- */
 const REELS: Record<
   string,
-  { src: string; poster: string; srcEn?: string; posterEn?: string; silent?: boolean; ru: [string, string, string]; en: [string, string, string] }
+  {
+    src: string;
+    poster: string;
+    srcEn?: string;
+    posterEn?: string;
+    srcUz?: string;
+    posterUz?: string;
+    silent?: boolean;
+    ru: [string, string, string];
+    en: [string, string, string];
+    uz: [string, string, string];
+  }
 > = {
   hotel: {
     src: 'video/hotel-ru.mp4',
@@ -556,6 +567,7 @@ const REELS: Record<
     posterEn: 'video/hotel-en-poster.webp',
     ru: ['Отель и регистрация', 'Из аэропорта в отель, регистрация на ресепшене и талон — за 30 секунд.', 'Анимация гайдбука'],
     en: ['Hotel and registration', 'From the airport to the hotel, registration at reception and the slip — in 30 seconds.', 'Guidebook animation'],
+    uz: ['Mehmonxona va roʻyxatdan oʻtish', 'Aeroportdan mehmonxonaga, resepshnda roʻyxatdan oʻtish va talon — 30 soniyada.', 'Qoʻllanma animatsiyasi'],
   },
   arrival: {
     src: 'video/arrival-ru.mp4',
@@ -564,37 +576,40 @@ const REELS: Record<
     posterEn: 'video/arrival-en-poster.webp',
     ru: ['Прилёт: первые 15 минут', 'Таможня и SIM-карта — что делать сразу после посадки, за 30 секунд.', 'Анимация гайдбука'],
     en: ['Arrival: the first 15 minutes', 'Customs and a SIM card — what to do right after landing, in 30 seconds.', 'Guidebook animation'],
+    uz: ['Yetib kelish: dastlabki 15 daqiqa', 'Bojxona va SIM-karta — qoʻngandan keyin darhol nima qilish kerak, 30 soniyada.', 'Qoʻllanma animatsiyasi'],
   },
   history: {
     src: 'video/history-reel.mp4',
     poster: 'video/history-reel-poster.webp',
     ru: ['35 лет Hamkor Bank', 'Всё началось в Андижане в 1991 году. История банка — за 30 секунд.', 'Видео Hamkor Bank'],
     en: ['35 years of Hamkor Bank', 'It all began in Andijan in 1991. The bank’s story in 30 seconds.', 'Video by Hamkor Bank'],
+    uz: ['Hamkor Bankga 35 yil', 'Hammasi 1991-yilda Andijonda boshlangan. Bank tarixi — 30 soniyada.', 'Hamkor Bank videosi'],
   },
   cards: {
     src: 'video/cards-reel.mp4',
     poster: 'video/cards-reel-poster.webp',
     ru: ['Карты Hamkor Bank', 'VISA в сумах, HUMO и кредитная карта — коротко, за 20 секунд.', 'Видео Hamkor Bank'],
     en: ['Hamkor Bank cards', 'VISA in sums, HUMO and the credit card — in 20 seconds.', 'Video by Hamkor Bank'],
+    uz: ['Hamkor Bank kartalari', 'Soʻmdagi VISA, HUMO va kredit karta — qisqacha, 20 soniyada.', 'Hamkor Bank videosi'],
   },
 };
 
-/** Guidebook animations (video-src/arrival): RU and EN files, with original music (music.py). */
-const FILMS: Record<string, [[string, string], [string, string]]> = {
-  apartment: [['Квартира: регистрация', 'Документы и заявка на emehmon.uz — за 25 секунд.'], ['Flat: registration', 'Documents and an application on emehmon.uz — in 25 seconds.']],
-  imei: [['Регистрация IMEI', '*#06#, заявка на uzimei.uz и проверка статуса — за 30 секунд.'], ['IMEI registration', '*#06#, an application on uzimei.uz and the status check — in 30 seconds.']],
-  firstday: [['Первый день в офисе', 'От 08:30 до вечера: пропуск, документы, рабочее место.'], ['Your first day at the office', 'From 08:30 to the evening: pass, paperwork, your desk.']],
-  card: [['Карта для зарплаты', 'Документы, визит в отделение на 10–15 минут и карта.'], ['Your salary card', 'Documents, a 10–15 minute branch visit, and the card.']],
-  sickleave: [['Если заболели', 'Кому сообщить, электронный больничный и кто платит.'], ['If you fall ill', 'Who to tell, the electronic sick note and who pays.']],
-  metro: [['Метро Ташкента', 'Карта Atto, турникет и поезд — за 25 секунд.'], ['Tashkent metro', 'The Atto card, the turnstile and the train — in 25 seconds.']],
-  permit: [['Разрешение на работу', 'Что делает HR, что нужно от вас и зачем ПИНФЛ.'], ['Work permit', 'What HR does, what you need to do, and why PINFL matters.']],
-  salary: [['Когда приходит зарплата', 'Даты выплат для экспатов и местных сотрудников.'], ['When salary arrives', 'Pay dates for expats and local hires.']],
-  packing: [['Что взять с собой', 'Ручная кладь, аптечка, одежда и таможня — за 25 секунд.'], ['What to pack', 'Hand luggage, medicines, clothes and customs — in 25 seconds.']],
-  emergency: [['Экстренная ситуация', '112, что сказать оператору и прямые номера служб.'], ['In an emergency', '112, what to tell the operator, and the direct numbers.']],
-  phrases: [['Пара слов по-узбекски', 'Приветствие, рынок и такси — с переводом.'], ['A few words in Uzbek', 'A greeting, the market and a taxi — with translations.']],
-  cities: [['Путешествие по Узбекистану', 'Ташкент, Самарканд, Бухара, Хива и Андижан на одной карте.'], ['Travelling around Uzbekistan', 'Tashkent, Samarkand, Bukhara, Khiva and Andijan on one map.']],
+/** Guidebook animations (video-src/arrival): RU, EN and UZ titles, with original music (music.py). */
+const FILMS: Record<string, [[string, string], [string, string], [string, string]]> = {
+  apartment: [['Квартира: регистрация', 'Документы и заявка на emehmon.uz — за 25 секунд.'], ['Flat: registration', 'Documents and an application on emehmon.uz — in 25 seconds.'], ['Kvartira: roʻyxatdan oʻtish', 'Hujjatlar va emehmon.uz’dagi ariza — 25 soniyada.']],
+  imei: [['Регистрация IMEI', '*#06#, заявка на uzimei.uz и проверка статуса — за 30 секунд.'], ['IMEI registration', '*#06#, an application on uzimei.uz and the status check — in 30 seconds.'], ['IMEI roʻyxatdan oʻtkazish', '*#06#, uzimei.uz’dagi ariza va holatni tekshirish — 30 soniyada.']],
+  firstday: [['Первый день в офисе', 'От 08:30 до вечера: пропуск, документы, рабочее место.'], ['Your first day at the office', 'From 08:30 to the evening: pass, paperwork, your desk.'], ['Ofisdagi birinchi kun', '08:30 dan kechgacha: ruxsatnoma, hujjatlar, ish joyi.']],
+  card: [['Карта для зарплаты', 'Документы, визит в отделение на 10–15 минут и карта.'], ['Your salary card', 'Documents, a 10–15 minute branch visit, and the card.'], ['Maosh kartasi', 'Hujjatlar, filialga 10–15 daqiqalik tashrif va karta.']],
+  sickleave: [['Если заболели', 'Кому сообщить, электронный больничный и кто платит.'], ['If you fall ill', 'Who to tell, the electronic sick note and who pays.'], ['Agar kasal boʻlsangiz', 'Kimga xabar berish, elektron kasallik varaqasi va kim toʻlaydi.']],
+  metro: [['Метро Ташкента', 'Карта Atto, турникет и поезд — за 25 секунд.'], ['Tashkent metro', 'The Atto card, the turnstile and the train — in 25 seconds.'], ['Toshkent metrosi', 'Atto kartasi, turniket va poyezd — 25 soniyada.']],
+  permit: [['Разрешение на работу', 'Что делает HR, что нужно от вас и зачем ПИНФЛ.'], ['Work permit', 'What HR does, what you need to do, and why PINFL matters.'], ['Ishlash uchun ruxsatnoma', 'HR nima qiladi, sizdan nima kerak va JShShIR nima uchun kerak.']],
+  salary: [['Когда приходит зарплата', 'Даты выплат для экспатов и местных сотрудников.'], ['When salary arrives', 'Pay dates for expats and local hires.'], ['Maosh qachon tushadi', 'Ekspatlar va mahalliy xodimlar uchun toʻlov sanalari.']],
+  packing: [['Что взять с собой', 'Ручная кладь, аптечка, одежда и таможня — за 25 секунд.'], ['What to pack', 'Hand luggage, medicines, clothes and customs — in 25 seconds.'], ['Oʻzingiz bilan nima olish kerak', 'Qoʻl yuki, dori qutisi, kiyim va bojxona — 25 soniyada.']],
+  emergency: [['Экстренная ситуация', '112, что сказать оператору и прямые номера служб.'], ['In an emergency', '112, what to tell the operator, and the direct numbers.'], ['Favqulodda vaziyat', '112, operatorga nima deyish va xizmatlarning toʻgʻridan-toʻgʻri raqamlari.']],
+  phrases: [['Пара слов по-узбекски', 'Приветствие, рынок и такси — с переводом.'], ['A few words in Uzbek', 'A greeting, the market and a taxi — with translations.'], ['Bir necha oʻzbekcha soʻz', 'Salomlashish, bozor va taksi — tarjimasi bilan.']],
+  cities: [['Путешествие по Узбекистану', 'Ташкент, Самарканд, Бухара, Хива и Андижан на одной карте.'], ['Travelling around Uzbekistan', 'Tashkent, Samarkand, Bukhara, Khiva and Andijan on one map.'], ['Oʻzbekiston boʻylab sayohat', 'Toshkent, Samarqand, Buxoro, Xiva va Andijon bitta xaritada.']],
 };
-for (const [name, [ru, en]] of Object.entries(FILMS)) {
+for (const [name, [ru, en, uz]] of Object.entries(FILMS)) {
   REELS[name] = {
     src: `video/${name}-ru.mp4`,
     poster: `video/${name}-ru-poster.webp`,
@@ -602,20 +617,31 @@ for (const [name, [ru, en]] of Object.entries(FILMS)) {
     posterEn: `video/${name}-en-poster.webp`,
     ru: [ru[0], ru[1], 'Анимация гайдбука'],
     en: [en[0], en[1], 'Guidebook animation'],
+    uz: [uz[0], uz[1], 'Qoʻllanma animatsiyasi'],
   };
 }
 
+/** The page language, for client-side strings. */
+function pageLang(): 'ru' | 'en' | 'uz' {
+  const l = document.documentElement.lang;
+  return l === 'en' || l === 'uz' ? l : 'ru';
+}
+
 function reels() {
-  const lang = document.documentElement.lang === 'en' ? 'en' : 'ru';
-  const L = lang === 'en' ? { on: 'Turn sound on', off: 'Turn sound off', play: 'Play', pause: 'Pause' } : { on: 'Включить звук', off: 'Выключить звук', play: 'Смотреть', pause: 'Пауза' };
+  const lang = pageLang();
+  const L = {
+    ru: { on: 'Включить звук', off: 'Выключить звук', play: 'Смотреть', pause: 'Пауза' },
+    en: { on: 'Turn sound on', off: 'Turn sound off', play: 'Play', pause: 'Pause' },
+    uz: { on: 'Ovozni yoqish', off: 'Ovozni oʻchirish', play: 'Koʻrish', pause: 'Pauza' },
+  }[lang];
   document.querySelectorAll<HTMLElement>('.video-reel:not([data-ready])').forEach((host) => {
     const r = REELS[host.dataset.reel || ''];
     if (!r) return;
     host.dataset.ready = '';
     const [title, lead, credit] = r[lang];
     const root = base() || '/';
-    const src = lang === 'en' && r.srcEn ? r.srcEn : r.src;
-    const poster = lang === 'en' && r.posterEn ? r.posterEn : r.poster;
+    const src = (lang === 'en' ? r.srcEn : lang === 'uz' ? r.srcUz : undefined) ?? r.src;
+    const poster = (lang === 'en' ? r.posterEn : lang === 'uz' ? r.posterUz : undefined) ?? r.poster;
     host.innerHTML = `
       <figure class="reel">
         <div class="reel-phone">
@@ -704,11 +730,16 @@ const DEMO_TEXT = {
     taxi: { title: 'Example: ordering a taxi', steps: ['Open Yandex Go and say where you are going', 'Pick a tariff — the price shows straight away', 'Tap “Order” and wait for the car'], from: 'From', here: 'You are here', to: 'To', dest: 'Work', eco: 'Economy', comf: 'Comfort', order: 'Order', coming: 'Car on the way', min: 'min', car: 'White Cobalt · 01 A 123 BC' },
     bank: { title: 'Example: setting up the bank app', steps: ['Download the Hamkorbank app', 'Sign up with your card', 'Set a PIN and fingerprint login'], get: 'Get', open: 'Open', card: 'Card number', next: 'Next', pin: 'Choose a PIN', touch: 'Fingerprint login', done: 'Done', added: 'Card added' },
   },
+  uz: {
+    note: 'Ekran shartli, raqamlar oʻylab topilgan.',
+    imei: { title: 'Misol: IMEI’ni qanday tekshirish', steps: ['*#06# ni tering — telefon IMEI’ni koʻrsatadi', 'Barcha IMEI’larni yozib oling (ular ikkita boʻlishi mumkin)', '*1170# ni tering — roʻyxat holati keladi'], status: 'Holat: roʻyxatdan oʻtgan' },
+    taxi: { title: 'Misol: taksini qanday chaqirish', steps: ['Yandex Go’ni oching va qayerga borishni koʻrsating', 'Tarifni tanlang — narx darhol koʻrinadi', '«Buyurtma berish»ni bosing va mashinani kuting'], from: 'Qayerdan', here: 'Siz shu yerdasiz', to: 'Qayerga', dest: 'Ish', eco: 'Ekonom', comf: 'Komfort', order: 'Buyurtma berish', coming: 'Mashina kelmoqda', min: 'daq', car: 'Oq Cobalt · 01 A 123 BC' },
+    bank: { title: 'Misol: bank ilovasini sozlash', steps: ['Hamkorbank ilovasini yuklab oling', 'Karta orqali roʻyxatdan oʻting', 'PIN-kod va barmoq izi bilan kirishni oʻrnating'], get: 'Oʻrnatish', open: 'Ochish', card: 'Karta raqami', next: 'Keyingi', pin: 'PIN-kod oʻylab toping', touch: 'Barmoq izi bilan kirish', done: 'Tayyor', added: 'Karta qoʻshildi' },
+  },
 };
 
 function demoFor(name: string): Demo | undefined {
-  const l = document.documentElement.lang === 'en' ? 'en' : 'ru';
-  const T = DEMO_TEXT[l];
+  const T = DEMO_TEXT[pageLang()];
   if (name === 'imei') {
     return {
       ...T.imei,

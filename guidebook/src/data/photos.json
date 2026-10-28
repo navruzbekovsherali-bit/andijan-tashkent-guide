@@ -7,7 +7,15 @@
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
     "source": "https://commons.wikimedia.org/wiki/File:%D0%A1%D0%B0%D0%BC%D0%B0%D1%80%D0%BA%D0%B0%D0%BD%D0%B4._%D0%9F%D0%BB%D0%BE%D1%89%D0%B0%D0%B4%D1%8C-%D0%A0%D0%B5%D0%B3%D0%B8%D1%81%D1%82%D0%B0%D0%BD.jpg",
     "width": 1600,
-    "height": 1067
+    "height": 1067,
+    "en": {
+      "caption": "Registan, Samarkand",
+      "alt": "Registan Square in Samarkand at blue hour: three lit madrasahs"
+    },
+    "uz": {
+      "caption": "Registon, Samarqand",
+      "alt": "Moviy soatdagi Samarqanddagi Registon maydoni: chiroqlar yoqilgan uchta madrasa"
+    }
   },
   "samarkand-2": {
     "alt": "Купола мавзолеев ансамбля Шахи-Зинда в Самарканде",
@@ -17,7 +25,15 @@
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
     "source": "https://commons.wikimedia.org/wiki/File:Shah-i-Zinda,_Samarkand_(Shohi-Zinda_majmuasi,_%D0%A8%D0%B0%D1%85%D0%B8_%D0%97%D0%B8%D0%BD%D0%B4%D0%B0).jpg",
     "width": 1600,
-    "height": 1067
+    "height": 1067,
+    "en": {
+      "caption": "Shah-i-Zinda, Samarkand",
+      "alt": "Domes of the Shah-i-Zinda mausoleums in Samarkand"
+    },
+    "uz": {
+      "caption": "Shohi Zinda, Samarqand",
+      "alt": "Samarqanddagi Shohi Zinda ansambli maqbaralarining gumbazlari"
+    }
   },
   "bukhara": {
     "alt": "Ансамбль Пои-Калян в Бухаре: мечеть, минарет Калян и двор с деревом",
@@ -27,7 +43,15 @@
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
     "source": "https://commons.wikimedia.org/wiki/File:Po-i-Kalyan_in_Bukhara.jpg",
     "width": 1600,
-    "height": 1067
+    "height": 1067,
+    "en": {
+      "caption": "Po-i-Kalyan, Bukhara",
+      "alt": "The Po-i-Kalyan ensemble in Bukhara: the mosque, the Kalyan minaret and a courtyard with a tree"
+    },
+    "uz": {
+      "caption": "Poi Kalon, Buxoro",
+      "alt": "Buxorodagi Poi Kalon ansambli: masjid, Kalon minorasi va daraxtli hovli"
+    }
   },
   "khiva": {
     "alt": "Башни крепости Куня-Арк с бирюзовой плиткой, Ичан-Кала в Хиве",
@@ -37,7 +61,15 @@
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
     "source": "https://commons.wikimedia.org/wiki/File:Konya_Ark_towers_(%D0%A6%D0%B8%D1%82%D0%B0%D0%B4%D0%B5%D0%BB%D1%8C_%D0%9A%D1%83%D0%BD%D1%8F-%D0%90%D1%80%D0%BA,_Ko%CA%BBhna_ark),_Itchan_Kala,_Khiva.jpg",
     "width": 1600,
-    "height": 1067
+    "height": 1067,
+    "en": {
+      "caption": "Kunya-Ark, Khiva",
+      "alt": "Towers of the Kunya-Ark fortress with turquoise tiles, Itchan Kala in Khiva"
+    },
+    "uz": {
+      "caption": "Koʻhna Ark, Xiva",
+      "alt": "Feruza koshinli Koʻhna Ark qalʼasi minoralari, Xivadagi Ichan qalʼa"
+    }
   },
   "tashkent": {
     "alt": "Портал мечети в комплексе Хазрати Имам в Ташкенте",
@@ -47,7 +79,15 @@
     "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
     "source": "https://commons.wikimedia.org/wiki/File:Hazrati_Imam_Mosque_01.jpg",
     "width": 1600,
-    "height": 1067
+    "height": 1067,
+    "en": {
+      "caption": "Hazrati Imam, Tashkent",
+      "alt": "The mosque portal at the Hazrati Imam complex in Tashkent"
+    },
+    "uz": {
+      "caption": "Hazrati Imom, Toshkent",
+      "alt": "Toshkentdagi Hazrati Imom majmuasidagi masjid peshtoqi"
+    }
   },
   "tashkent-2": {
     "alt": "Высотные башни делового района Tashkent City",
@@ -57,7 +97,15 @@
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
     "source": "https://commons.wikimedia.org/wiki/File:Tashkent_City_Downtown_Towers.jpg",
     "width": 1600,
-    "height": 1067
+    "height": 1067,
+    "en": {
+      "caption": "Tashkent City, Tashkent",
+      "alt": "High-rise towers of the Tashkent City business district"
+    },
+    "uz": {
+      "caption": "Tashkent City, Toshkent",
+      "alt": "Tashkent City biznes tumanining baland minoralari"
+    }
   },
   "andijan": {
     "alt": "Купол и минарет мечети Девонабой в Андижане",
@@ -67,7 +115,15 @@
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
     "source": "https://commons.wikimedia.org/wiki/File:West_minaret_and_Dome_of_Devonaboy_Jome_Mosque,_Andijan,_Uzbekistan.jpg",
     "width": 1600,
-    "height": 1067
+    "height": 1067,
+    "en": {
+      "caption": "Devonaboy Mosque, Andijan",
+      "alt": "The dome and minaret of the Devonaboy Mosque in Andijan"
+    },
+    "uz": {
+      "caption": "Devonaboy masjidi, Andijon",
+      "alt": "Andijondagi Devonaboy masjidining gumbazi va minorasi"
+    }
   },
   "mountains": {
     "alt": "Чарвакское водохранилище среди гор летом",
@@ -77,6 +133,14 @@
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
     "source": "https://commons.wikimedia.org/wiki/File:%D0%9B%D0%B5%D1%82%D0%BE_%D0%BD%D0%B0_%D0%A7%D0%B0%D1%80%D0%B2%D0%B0%D0%BA%D1%81%D0%BA%D0%BE%D0%BC_%D0%B2%D0%BE%D0%B4%D0%BE%D1%85%D1%80%D0%B0%D0%BD%D0%B8%D0%BB%D0%B8%D1%89%D0%B5.jpg",
     "width": 1600,
-    "height": 1067
+    "height": 1067,
+    "en": {
+      "caption": "Charvak, Tashkent Region",
+      "alt": "The Charvak Reservoir among the mountains in summer"
+    },
+    "uz": {
+      "caption": "Chorvoq, Toshkent viloyati",
+      "alt": "Yozda togʻlar orasidagi Chorvoq suv ombori"
+    }
   }
 }

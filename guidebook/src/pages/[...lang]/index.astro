@@ -97,7 +97,7 @@ const faqPreview = pages.flatMap((p) => p.entry.data.faq.slice(0, 1).map((f) => 
         CITY_CARDS.map((c) => (
           <li>
             <a class="city reveal" href={url(lang, `/guide/${c.slug}/`)}>
-              <Photo id={c.photo} credit={false} sizes="(min-width: 900px) 30vw, 78vw" />
+              <Photo id={c.photo} lang={lang} credit={false} sizes="(min-width: 900px) 30vw, 78vw" />
               {PAGE_VIDEO[c.slug] && (
                 <span class="city-video">
                   <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path d="M8 5.5v13a.6.6 0 0 0 .9.5l10.4-6.5a.6.6 0 0 0 0-1L8.9 5a.6.6 0 0 0-.9.5Z" fill="currentColor" /></svg>

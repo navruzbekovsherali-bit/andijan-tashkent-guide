@@ -11,11 +11,13 @@ interface Props {
   video?: string;
   /** Accessible label for the play button. */
   videoLabel?: string;
+  /** Caption and alt text language (Russian is the base in photos.json). */
+  lang?: 'ru' | 'en' | 'uz';
 }
-const { id, class: cls = '', sizes = '(min-width: 900px) 50vw, 100vw', eager = false, credit = true, video, videoLabel = 'Смотреть видео' } = Astro.props;
+const { id, class: cls = '', sizes = '(min-width: 900px) 50vw, 100vw', eager = false, credit = true, video, videoLabel = 'Смотреть видео', lang = 'ru' } = Astro.props;
 const all = import.meta.glob<Record<string, any>>('../data/photos.json', { eager: true, import: 'default' });
 const photos = Object.values(all)[0] ?? {};
-const p = photos[id];
+const p = photos[id] && { ...photos[id], ...photos[id][lang] };
 ---
 
 {
