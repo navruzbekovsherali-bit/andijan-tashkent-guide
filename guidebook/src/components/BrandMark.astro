@@ -5,6 +5,10 @@
 const h = '1215,476 1440,466 1125,1307 902,1307 1007,1023 880,1023 720,1480 495,1465 812,622 1033,622 928,908 1052,908';
 const gapRight = '1502,300 1631,300 1403,900 1277,900';
 const gapLeft = '651,1050 522,1050 315.5,1600 444.6,1600';
+// The ring is two half-rings, each starting at a gap beside one stem of the H, so when the mark draws
+// itself the ring grows out of both stems at once (centre 965,965, r 616.5, gaps at -36.8° and 143.2°).
+const ringFromRight = 'M1458.7 595.7A616.5 616.5 0 0 0 595.7 471.3A616.5 616.5 0 0 0 471.3 1334.3';
+const ringFromLeft = 'M471.3 1334.3A616.5 616.5 0 0 0 1334.3 1458.7A616.5 616.5 0 0 0 1458.7 595.7';
 // The mark appears several times per page: each copy needs its own mask id.
 const id = `hb-gaps-${Math.random().toString(36).slice(2, 8)}`;
 ---
@@ -17,6 +21,9 @@ const id = `hb-gaps-${Math.random().toString(36).slice(2, 8)}`;
       <polygon points={gapLeft} fill="#000"></polygon>
     </mask>
   </defs>
-  <circle class="bm-ring" cx="965" cy="965" r="616.5" pathLength="1" fill="none" stroke="var(--mark, #1aa752)" stroke-width="137" mask={`url(#${id})`}></circle>
+  <g mask={`url(#${id})`} fill="none" stroke="var(--mark, #1aa752)" stroke-width="137">
+    <path class="bm-ring" pathLength="1" d={ringFromRight}></path>
+    <path class="bm-ring" pathLength="1" d={ringFromLeft}></path>
+  </g>
   <polygon class="bm-h" points={h} fill="var(--mark, #1aa752)"></polygon>
 </svg>
