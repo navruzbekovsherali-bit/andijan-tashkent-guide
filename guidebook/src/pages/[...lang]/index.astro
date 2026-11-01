@@ -58,6 +58,20 @@ const faqPreview = pages.flatMap((p) => p.entry.data.faq.slice(0, 1).map((f) => 
     </div>
   </section>
 
+  <section class="today" aria-label={tr('todayTitle')}>
+    <div class="today-row" data-today data-lang={lang}></div>
+  </section>
+
+  <section class="block stories-block">
+    <div class="wrap">
+      <div class="block-head">
+        <h2 class="h2">{tr('videoWeek')}</h2>
+        <p class="block-note">{tr('videoWeekLead')}</p>
+      </div>
+    </div>
+    <div class="stories" data-stories></div>
+  </section>
+
   <section class="block" id="topics">
     <div class="wrap">
       <div class="block-head">

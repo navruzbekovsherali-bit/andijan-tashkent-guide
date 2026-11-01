@@ -89,6 +89,9 @@ const ru: Dict = {
   minutes: 'мин чтения',
   allSections: 'Все разделы',
   onThisPage: 'На этой странице',
+  todayTitle: 'Сегодня для вас',
+  videoWeek: 'Видео недели',
+  videoWeekLead: 'Иногда проще посмотреть, чем читать. Короткие ролики по главным темам — по 30 секунд.',
 };
 
 const en: Dict = {
@@ -165,6 +168,9 @@ const en: Dict = {
   minutes: 'min read',
   allSections: 'All sections',
   onThisPage: 'On this page',
+  todayTitle: 'Today for you',
+  videoWeek: 'Videos of the week',
+  videoWeekLead: 'Sometimes watching is easier than reading. Short films on the main topics, 30 seconds each.',
 };
 
 const uz: Dict = {
@@ -241,6 +247,9 @@ const uz: Dict = {
   skip: 'Mazmunga oʻtish',
   allSections: 'Barcha boʻlimlar',
   onThisPage: 'Ushbu sahifada',
+  todayTitle: 'Bugun siz uchun',
+  videoWeek: 'Hafta videolari',
+  videoWeekLead: 'Baʼzan koʻrish oʻqishdan osonroq. Asosiy mavzular boʻyicha qisqa roliklar — 30 soniyadan.',
 };
 
 const DICTS: Record<Lang, Dict> = { ru, en, uz };

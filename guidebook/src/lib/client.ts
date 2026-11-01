@@ -396,6 +396,8 @@ export function initSite() {
     cityDepth,
     checklists,
     countdown,
+    todayWidgets,
+    stories,
     offline,
     dockLens,
     illustrationsOnScroll,
@@ -696,6 +698,222 @@ function reels() {
       { threshold: [0, 0.25, 0.6] },
     ).observe(fig);
   });
+}
+
+
+/* ---------- Home: "today for you" — payday, the next day off, my steps, exchange rates ---------- */
+const TODAY_TX = {
+  ru: { pay: 'До зарплаты', payToday: 'Зарплата сегодня', days: (n: number) => `${n} ${plural(n, 'день', 'дня', 'дней')}`, adv: 'аванс', kpi: 'KPI', sal: 'зарплата', exp: 'зарплата экспатам', hol: 'Ближайший выходной', holToday: 'Сегодня выходной', in: 'через', steps: 'Мои шаги', stepsOf: 'из', stepsNone: 'Начните с чек-листа', rate: 'Курс ЦБ', rateSrc: 'cbu.uz', locale: 'ru-RU' },
+  en: { pay: 'Until payday', payToday: 'Payday is today', days: (n: number) => `${n} ${n === 1 ? 'day' : 'days'}`, adv: 'advance', kpi: 'KPI', sal: 'salary', exp: 'expat salary', hol: 'Next day off', holToday: 'Today is a day off', in: 'in', steps: 'My steps', stepsOf: 'of', stepsNone: 'Start with the checklist', rate: 'Central Bank rate', rateSrc: 'cbu.uz', locale: 'en-GB' },
+  uz: { pay: 'Maoshgacha', payToday: 'Maosh bugun', days: (n: number) => `${n} kun`, adv: 'avans', kpi: 'KPI', sal: 'ish haqi', exp: 'ekspatlar maoshi', hol: 'Eng yaqin dam olish kuni', holToday: 'Bugun dam olish kuni', in: '', steps: 'Mening qadamlarim', stepsOf: '/', stepsNone: 'Chek-listdan boshlang', rate: 'MB kursi', rateSrc: 'cbu.uz', locale: 'uz-UZ' },
+};
+function plural(n: number, one: string, few: string, many: string) {
+  const a = n % 10, b = n % 100;
+  return a === 1 && b !== 11 ? one : a >= 2 && a <= 4 && (b < 10 || b >= 20) ? few : many;
+}
+// Days off from the decree on holidays (2026) and the fixed public holidays of 2027.
+const HOLIDAYS: [string, string, string, string][] = [
+  ['2026-12-08', 'День Конституции', 'Constitution Day', 'Konstitutsiya kuni'],
+  ['2027-01-01', 'Новый год', 'New Year', 'Yangi yil'],
+  ['2027-03-08', 'Международный женский день', 'International Women’s Day', 'Xalqaro xotin-qizlar kuni'],
+  ['2027-03-21', 'Навруз', 'Navruz', 'Navroʻz'],
+  ['2027-05-09', 'День памяти и почестей', 'Day of Remembrance', 'Xotira va qadrlash kuni'],
+  ['2027-09-01', 'День независимости', 'Independence Day', 'Mustaqillik kuni'],
+  ['2027-10-01', 'День учителей и наставников', 'Teachers’ Day', 'Oʻqituvchi va murabbiylar kuni'],
+  ['2027-12-08', 'День Конституции', 'Constitution Day', 'Konstitutsiya kuni'],
+];
+
+function lastWorkingDay(y: number, m: number) {
+  const d = new Date(y, m + 1, 0);
+  while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() - 1);
+  return d;
+}
+function nextPay(aud: string, today: Date): [Date, string] {
+  const out: [Date, string][] = [];
+  for (let k = 0; k < 2; k++) {
+    const y = today.getFullYear(), m = today.getMonth() + k;
+    if (aud === 'expat') out.push([new Date(y, m, 10), 'exp']);
+    else out.push([new Date(y, m, 12), 'adv'], [new Date(y, m, 25), 'kpi'], [lastWorkingDay(y, m), 'sal']);
+  }
+  return out.filter(([d]) => d >= today).sort((a, b) => +a[0] - +b[0])[0];
+}
+
+function todayWidgets() {
+  const row = document.querySelector<HTMLElement>('[data-today]');
+  if (!row) return;
+  const lang = pageLang();
+  const T = TODAY_TX[lang];
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const dayMs = 86400000;
+  const fmt = (d: Date) => d.toLocaleDateString(T.locale, { day: 'numeric', month: 'long' });
+  const aud = store.get('gb-audience') === 'expat' ? 'expat' : 'local';
+  const cards: string[] = [];
+
+  const [pd, kind] = nextPay(aud, today);
+  const pn = Math.round((+pd - +today) / dayMs);
+  cards.push(`<a class="w-card w-pay" href="${href(`/guide/${aud === 'expat' ? 'salary-expat' : 'salary-local'}/`)}">
+    <span class="w-k">${pn === 0 ? T.payToday : T.pay}</span>
+    <b class="w-big">${pn === 0 ? fmt(pd) : T.days(pn)}</b>
+    <span class="w-s">${T[kind as 'adv' | 'kpi' | 'sal' | 'exp']} · ${fmt(pd)}</span>
+    <i class="w-ring" style="--p:${1 - Math.min(pn, 30) / 30}"></i></a>`);
+
+  const hol = HOLIDAYS.map(([d, ...names]) => [new Date(`${d}T00:00:00`), names[lang === 'en' ? 1 : lang === 'uz' ? 2 : 0]] as [Date, string]).find(([d]) => d >= today);
+  if (hol) {
+    const hn = Math.round((+hol[0] - +today) / dayMs);
+    cards.push(`<a class="w-card w-hol" href="${href('/guide/work-time/')}">
+      <span class="w-k">${hn === 0 ? T.holToday : T.hol}</span>
+      <b class="w-big">${fmt(hol[0])}</b>
+      <span class="w-s">${escapeHtml(hol[1])}${hn > 0 ? ` · ${T.in} ${T.days(hn)}`.replace(' ·  ', ' · ') : ''}</span></a>`);
+  }
+
+  const list = aud === 'expat' ? ['arrival-72h', 'packing', 'relocation-budget', 'first-day-week'] : ['first-day-week'];
+  let done = 0, total = 0;
+  for (const slug of list) {
+    try {
+      done += (JSON.parse(store.get(`gb-check:${slug}`) || '[]') as number[]).length;
+    } catch {
+      /* nothing saved yet */
+    }
+    total += Number(store.get(`gb-check-n:${slug}`) || 0);
+  }
+  const first = aud === 'expat' ? 'arrival-72h' : 'first-day-week';
+  cards.push(`<a class="w-card w-steps" href="${href(`/guide/${first}/`)}">
+    <span class="w-k">${T.steps}</span>
+    <b class="w-big">${total ? `${done} <small>${T.stepsOf} ${total}</small>` : '0%'}</b>
+    <span class="w-s">${total ? '' : T.stepsNone}</span>
+    <span class="w-meter"><i style="--p:${total ? done / total : 0}"></i></span></a>`);
+
+  row.innerHTML = cards.join('');
+  rates(row, T);
+}
+
+/** Today's official rates from the Central Bank; the card stays away if the bank's site does not answer. */
+function rates(row: HTMLElement, T: (typeof TODAY_TX)['ru']) {
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), 6000);
+  fetch('https://cbu.uz/ru/arkhiv-kursov-valyut/json/', { signal: ctl.signal })
+    .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+    .then((list: { Ccy: string; Rate: string; Diff: string; Date: string }[]) => {
+      const pick = ['USD', 'EUR', 'RUB'].map((c) => list.find((x) => x.Ccy === c)).filter(Boolean) as typeof list;
+      if (!pick.length) return;
+      const n = (v: string) => Number(v).toLocaleString(T.locale, { maximumFractionDigits: 2 });
+      const card = document.createElement('a');
+      card.className = 'w-card w-rate';
+      card.href = 'https://cbu.uz/';
+      card.target = '_blank';
+      card.rel = 'noopener';
+      card.innerHTML = `<span class="w-k">${T.rate} · ${escapeHtml(pick[0].Date)}</span>${pick
+        .map((x) => `<span class="w-fx"><b>${x.Ccy}</b><span>${n(x.Rate)}</span><em class="${Number(x.Diff) >= 0 ? 'up' : 'down'}">${Number(x.Diff) >= 0 ? '▲' : '▼'} ${n(String(Math.abs(Number(x.Diff))))}</em></span>`)
+        .join('')}`;
+      row.append(card);
+    })
+    .catch(() => {})
+    .finally(() => clearTimeout(timer));
+}
+
+/* ---------- Home: "videos of the week" — stories you tap through, like on a phone ---------- */
+const STORY_ORDER: [string, string][] = [
+  ['arrival', 'arrival-72h'], ['hotel', 'arrival-72h'], ['firstday', 'first-day-week'], ['card', 'bank-card'], ['salary', 'salary-local'],
+  ['metro', 'transport'], ['imei', 'arrival-72h'], ['apartment', 'arrival-72h'], ['sickleave', 'sick-leave'], ['permit', 'work-permit'],
+  ['packing', 'packing'], ['emergency', 'emergency'], ['phrases', 'phrases'], ['cities', 'uzbekistan'], ['history', 'about-bank'], ['cards', 'bank-card'],
+];
+const STORY_TX = { ru: { open: 'Читать статью', close: 'Закрыть', next: 'Дальше' }, en: { open: 'Read the article', close: 'Close', next: 'Next' }, uz: { open: 'Maqolani oʻqish', close: 'Yopish', next: 'Keyingi' } };
+
+function stories() {
+  const strip = document.querySelector<HTMLElement>('[data-stories]');
+  if (!strip) return;
+  const lang = pageLang();
+  const root = base() || '/';
+  const pick = (r: (typeof REELS)[string], k: 'src' | 'poster') =>
+    (lang === 'en' ? r[k === 'src' ? 'srcEn' : 'posterEn'] : lang === 'uz' ? r[k === 'src' ? 'srcUz' : 'posterUz'] : undefined) ?? r[k];
+  const items = STORY_ORDER.filter(([k]) => REELS[k]).map(([k, slug]) => {
+    const r = REELS[k];
+    const aud = store.get('gb-audience');
+    return { key: k, title: r[lang][0], lead: r[lang][1], src: root + pick(r, 'src'), poster: root + pick(r, 'poster'), slug: k === 'salary' && aud === 'expat' ? 'salary-expat' : slug };
+  });
+  const seen = new Set<string>((() => {
+    try {
+      return JSON.parse(store.get('gb-stories-seen') || '[]') as string[];
+    } catch {
+      return [];
+    }
+  })());
+  strip.innerHTML = `<div class="stories-track">${items
+    .map((it, i) => `<button type="button" class="story${seen.has(it.key) ? ' is-seen' : ''}" data-i="${i}">
+      <span class="story-thumb"><img src="${it.poster}" alt="" loading="lazy" decoding="async"><span class="story-play" aria-hidden="true"></span></span>
+      <span class="story-title">${escapeHtml(it.title)}</span></button>`)
+    .join('')}</div>`;
+  strip.addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLElement>('.story');
+    if (b) openStories(items, Number(b.dataset.i), seen);
+  });
+}
+
+function openStories(items: { key: string; title: string; lead: string; src: string; poster: string; slug: string }[], start: number, seen: Set<string>) {
+  const lang = pageLang();
+  const T = STORY_TX[lang];
+  const box = document.createElement('div');
+  box.className = 'story-viewer';
+  box.setAttribute('role', 'dialog');
+  box.setAttribute('aria-modal', 'true');
+  box.innerHTML = `<div class="sv-scrim" data-close></div>
+    <div class="sv-frame">
+      <div class="sv-bars">${items.map(() => '<i><b></b></i>').join('')}</div>
+      <video playsinline preload="auto"></video>
+      <button type="button" class="sv-prev" aria-label="←"></button>
+      <button type="button" class="sv-next" aria-label="${T.next}"></button>
+      <button type="button" class="sv-close" data-close aria-label="${T.close}"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+      <div class="sv-foot"><b></b><span></span><a class="sv-open"></a></div>
+    </div>`;
+  document.body.append(box);
+  document.documentElement.classList.add('has-story');
+  const video = box.querySelector('video')!;
+  const bars = Array.from(box.querySelectorAll<HTMLElement>('.sv-bars b'));
+  let i = start;
+  const show = (n: number) => {
+    if (n < 0) n = 0;
+    if (n >= items.length) return close();
+    i = n;
+    const it = items[i];
+    seen.add(it.key);
+    store.set('gb-stories-seen', JSON.stringify([...seen]));
+    document.querySelector(`.story[data-i="${i}"]`)?.classList.add('is-seen');
+    bars.forEach((b, k) => b.style.setProperty('--p', k < i ? '1' : '0'));
+    video.src = it.src;
+    video.poster = it.poster;
+    video.play().catch(() => {});
+    box.querySelector('.sv-foot b')!.textContent = it.title;
+    box.querySelector('.sv-foot span')!.textContent = it.lead;
+    const open = box.querySelector<HTMLAnchorElement>('.sv-open')!;
+    open.href = href(`/guide/${it.slug}/`);
+    open.textContent = T.open;
+  };
+  video.addEventListener('timeupdate', () => bars[i]?.style.setProperty('--p', String(video.currentTime / (video.duration || 1))));
+  video.addEventListener('ended', () => show(i + 1));
+  box.querySelector('.sv-next')!.addEventListener('click', () => show(i + 1));
+  box.querySelector('.sv-prev')!.addEventListener('click', () => show(i - 1));
+  const onKey = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') close();
+    if (e.key === 'ArrowRight') show(i + 1);
+    if (e.key === 'ArrowLeft') show(i - 1);
+  };
+  let y0 = 0;
+  box.addEventListener('touchstart', (e) => (y0 = e.touches[0].clientY), { passive: true });
+  box.addEventListener('touchend', (e) => {
+    if (e.changedTouches[0].clientY - y0 > 90) close();
+  });
+  function close() {
+    video.pause();
+    document.removeEventListener('keydown', onKey);
+    box.classList.add('is-closing');
+    document.documentElement.classList.remove('has-story');
+    setTimeout(() => box.remove(), reduceMotion() ? 0 : 260);
+  }
+  box.querySelectorAll('[data-close]').forEach((el) => el.addEventListener('click', close));
+  document.addEventListener('keydown', onKey);
+  show(i);
+  box.querySelector<HTMLElement>('.sv-close')!.focus({ preventScroll: true });
 }
 
 /* ---------- Animated phone demos (illustrative screens, marked as examples) ---------- */
@@ -1168,6 +1386,7 @@ function checklists() {
   const article = document.querySelector<HTMLElement>('article[data-checklist]');
   if (!article) return;
   const key = `gb-check:${article.dataset.checklist}`;
+  store.set(`gb-check-n:${article.dataset.checklist}`, String(article.querySelectorAll('.prose > ul > li, .prose > ol > li').length));
   const items = Array.from(article.querySelectorAll<HTMLLIElement>('.prose > ul > li, .prose > ol > li'));
   if (!items.length) return;
   const tx = uiText();
