@@ -383,6 +383,7 @@ export function initSite() {
     dialable,
     tables,
     readingKit,
+    glossary,
     decorate,
     reveal,
     () => (cleanupProgress = progress()),
@@ -1257,6 +1258,108 @@ function headerOnScroll() {
   });
 }
 
+
+
+/* ---------- Glossary: the first mention of a term in an article explains itself on tap ---------- */
+const GLOSSARY: Record<'ru' | 'en' | 'uz', [RegExp, string][]> = {
+  ru: [
+    [/ПИНФЛ/, 'ПИНФЛ — персональный идентификационный номер физического лица, 14 цифр. Нужен для OneID, налоговой и банковских сервисов.'],
+    [/ЭДО/, 'ЭДО — система электронного документооборота банка: служебные записки, заявки, согласования.'],
+    [/БРВ/, 'БРВ — базовая расчётная величина. Из неё считают штрафы и сборы; с 01.09.2026 — 440 000 сум.'],
+    [/OneID/, 'OneID — единый вход в государственные онлайн-сервисы Узбекистана (id.egov.uz).'],
+    [/MyID/, 'MyID — биометрическая проверка личности по лицу. Нужна для банковских приложений и госуслуг.'],
+    [/IMEI/, 'IMEI — номер телефона как устройства. С местной SIM-картой его нужно зарегистрировать за 30 дней.'],
+    [/ДМС/, 'ДМС — добровольное медицинское страхование: полис, по которому лечат в частных клиниках.'],
+    [/НДФЛ/, 'НДФЛ — налог на доходы физических лиц. В Узбекистане — 12%.'],
+    [/HRBP|HR Business Partner/, 'HR Business Partner — ваш HR-партнёр: документы, медицина, страховка и переезд.'],
+    [/Buddy/, 'Buddy — коллега-наставник, который помогает освоиться в первые недели.'],
+    [/KPI/, 'KPI — ключевые показатели эффективности: по ним считают премию.'],
+    [/E-mehmon|emehmon/, 'E-mehmon — система регистрации иностранцев по месту пребывания (emehmon.uz).'],
+  ],
+  en: [
+    [/PINFL/, 'PINFL — your personal identification number, 14 digits. You need it for OneID, tax and banking services.'],
+    [/EDMS|EDM\b/, 'EDMS — the bank’s electronic document system: memos, requests and approvals.'],
+    [/BCA/, 'BCA (BRV) — the base calculation amount used for fines and fees; 440,000 soums from 01.09.2026.'],
+    [/OneID/, 'OneID — single sign-in for Uzbekistan’s government online services (id.egov.uz).'],
+    [/MyID/, 'MyID — face-based identity check used by banking apps and government services.'],
+    [/IMEI/, 'IMEI — your phone’s device number. With a local SIM card it must be registered within 30 days.'],
+    [/HR Business Partner|HRBP/, 'HR Business Partner — your HR partner for documents, healthcare, insurance and relocation.'],
+    [/Buddy/, 'Buddy — a colleague who helps you settle in during the first weeks.'],
+    [/KPI/, 'KPI — key performance indicators; your bonus is based on them.'],
+    [/E-mehmon|emehmon/, 'E-mehmon — the system for registering foreigners at their place of stay (emehmon.uz).'],
+  ],
+  uz: [
+    [/JShShIR/, 'JShShIR — jismoniy shaxsning shaxsiy identifikatsiya raqami, 14 ta raqam. OneID, soliq va bank xizmatlari uchun kerak.'],
+    [/EHA/, 'EHA — bankning elektron hujjat aylanishi tizimi: xizmat xatlari, arizalar, kelishuvlar.'],
+    [/BHM/, 'BHM — bazaviy hisoblash miqdori. Jarima va yigʻimlar undan hisoblanadi; 01.09.2026 dan — 440 000 soʻm.'],
+    [/OneID/, 'OneID — Oʻzbekiston davlat onlayn xizmatlariga yagona kirish (id.egov.uz).'],
+    [/MyID/, 'MyID — yuz boʻyicha biometrik tekshiruv. Bank ilovalari va davlat xizmatlari uchun kerak.'],
+    [/IMEI/, 'IMEI — telefonning qurilma raqami. Mahalliy SIM-karta bilan uni 30 kun ichida roʻyxatdan oʻtkazish kerak.'],
+    [/ITS/, 'ITS — ixtiyoriy tibbiy sugʻurta: xususiy klinikalarda davolanish uchun polis.'],
+    [/JShDS/, 'JShDS — jismoniy shaxslardan olinadigan daromad soligʻi. Oʻzbekistonda — 12%.'],
+    [/HR Business Partner|HRBP/, 'HR Business Partner — hujjatlar, tibbiyot, sugʻurta va koʻchish boʻyicha HR-hamkoringiz.'],
+    [/Buddy/, 'Buddy — dastlabki haftalarda moslashishga yordam beradigan hamkasb-murabbiy.'],
+    [/KPI/, 'KPI — samaradorlikning asosiy koʻrsatkichlari: mukofot ular boʻyicha hisoblanadi.'],
+    [/E-mehmon|emehmon/, 'E-mehmon — xorijliklarni turgan joyi boʻyicha roʻyxatga olish tizimi (emehmon.uz).'],
+  ],
+};
+
+function glossary() {
+  const prose = document.querySelector<HTMLElement>('article .prose');
+  if (!prose) return;
+  const terms = GLOSSARY[pageLang()];
+  const used = new Set<number>();
+  const walker = document.createTreeWalker(prose, NodeFilter.SHOW_TEXT, {
+    acceptNode: (n) =>
+      (n.parentElement?.closest('a, h1, h2, h3, button, code, .video-reel, .phone-demo, .calc, table, .term') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+  });
+  const nodes: Text[] = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode as Text);
+  for (const node of nodes) {
+    for (let i = 0; i < terms.length; i++) {
+      if (used.has(i)) continue;
+      const m = node.data.match(terms[i][0]);
+      if (!m || m.index === undefined) continue;
+      used.add(i);
+      const after = node.splitText(m.index);
+      after.splitText(m[0].length);
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'term';
+      b.dataset.def = terms[i][1];
+      b.textContent = m[0];
+      after.replaceWith(b);
+      break;
+    }
+  }
+  let tip: HTMLElement | null = null;
+  const hide = () => {
+    tip?.remove();
+    tip = null;
+  };
+  prose.addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>('.term');
+    if (!b) return;
+    e.stopPropagation();
+    const same = tip?.dataset.for === b.textContent;
+    hide();
+    if (same) return;
+    tip = document.createElement('div');
+    tip.className = 'term-tip glass';
+    tip.setAttribute('role', 'tooltip');
+    tip.dataset.for = b.textContent || '';
+    tip.textContent = b.dataset.def || '';
+    document.body.append(tip);
+    const r = b.getBoundingClientRect();
+    const w = Math.min(320, window.innerWidth - 24);
+    tip.style.width = `${w}px`;
+    tip.style.left = `${Math.min(Math.max(12, r.left + r.width / 2 - w / 2), window.innerWidth - w - 12)}px`;
+    const below = r.bottom + 10 + tip.offsetHeight < window.innerHeight - 90;
+    tip.style.top = `${below ? r.bottom + 10 : r.top - tip.offsetHeight - 10}px`;
+  });
+  document.addEventListener('click', hide);
+  window.addEventListener('scroll', hide, { passive: true });
+}
 
 /* ---------- Reading kit: long articles become chapters, steps, fact cards and a chapter bar ---------- */
 const CHAPTERS = { ru: 'Разделы статьи', en: 'Sections of the article', uz: 'Maqola boʻlimlari' };

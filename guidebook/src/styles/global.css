@@ -4550,3 +4550,39 @@ html.has-story .chapter-bar {
   font-size: var(--t-small);
   color: rgb(242 245 243 / 0.75);
 }
+
+/* glossary terms */
+.prose .term {
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline dotted;
+  text-decoration-color: var(--brand);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.22em;
+  cursor: help;
+}
+.term-tip.glass,
+.term-tip {
+  background: rgb(255 255 255 / 0.96);
+  box-shadow: 0 20px 50px -20px rgb(10 46 42 / 0.45), inset 0 0 0 1px rgb(14 26 24 / 0.08);
+}
+.term-tip {
+  position: fixed;
+  z-index: 60;
+  padding: 14px 16px;
+  border-radius: 18px;
+  color: var(--ink);
+  font-size: var(--t-small);
+  line-height: 1.45;
+  animation: tip-in 220ms var(--ease) both;
+}
+@keyframes tip-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+}
