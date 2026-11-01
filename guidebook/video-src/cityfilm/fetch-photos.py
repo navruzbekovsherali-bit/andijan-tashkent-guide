@@ -68,7 +68,7 @@ PLACES = {
 OK = re.compile(r'^(cc0|public domain|pd|cc by(-sa)? [\d.]+( [a-z]+)?)$', re.I)
 
 
-def get(url, binary=False, tries=8):
+def get(url, binary=False, tries=20):
     wait = 15
     for _ in range(tries):
         req = urllib.request.Request(url, headers={'User-Agent': UA})
@@ -113,11 +113,18 @@ def main():
     cities = sys.argv[1:] or list(PLACES)
     (HERE / 'photos').mkdir(exist_ok=True)
     for city in cities:
+        if (HERE / f'credits-{city}.json').exists():
+            print('have', city, flush=True)
+            continue
         out, used = [], set()
         for terms, place in PLACES[city]:
             if len(out) == 5:
                 break
-            found = pick(terms, used)
+            try:
+                found = pick(terms, used)
+            except RuntimeError as e:
+                print('  skip:', terms, e, flush=True)
+                continue
             if not found:
                 print('  none:', terms, flush=True)
                 continue

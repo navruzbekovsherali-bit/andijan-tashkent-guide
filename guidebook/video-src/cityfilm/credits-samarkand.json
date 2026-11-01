@@ -1,0 +1,67 @@
+[
+  {
+    "file": "samarkand-1.jpg",
+    "city": "samarkand",
+    "place": {
+      "ru": "Площадь Регистан",
+      "en": "Registan square",
+      "uz": "Registon maydoni"
+    },
+    "author": "Stomac",
+    "license": "CC BY-SA 2.0 fr",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/fr/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:Registan_Samarkand_Uzbekistan.JPG"
+  },
+  {
+    "file": "samarkand-2.jpg",
+    "city": "samarkand",
+    "place": {
+      "ru": "Шахи-Зинда",
+      "en": "Shah-i-Zinda",
+      "uz": "Shohi Zinda"
+    },
+    "author": "Bgag",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:Shah-i-Zinda_02.jpg"
+  },
+  {
+    "file": "samarkand-3.jpg",
+    "city": "samarkand",
+    "place": {
+      "ru": "Гур-Эмир",
+      "en": "Gur-e-Amir",
+      "uz": "Goʻri Amir"
+    },
+    "author": "Bgag",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:Gur-e_Amir_01.jpg"
+  },
+  {
+    "file": "samarkand-4.jpg",
+    "city": "samarkand",
+    "place": {
+      "ru": "Мечеть Биби-Ханум",
+      "en": "Bibi-Khanym mosque",
+      "uz": "Bibixonim masjidi"
+    },
+    "author": "Petar Milošević",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Bibi-Khanym_Mosque_interior,_Samarkand_(%D0%BC%D0%B5%D1%87%D0%B5%D1%82%D1%8C_%D0%91%D0%B8%D0%B1%D0%B8-%D0%A5%D0%B0%D0%BD%D1%83%D0%BC,_%D0%A1%D0%B5%D0%B2%D0%B5%D1%80%D0%BD%D1%8B%D0%B9_%D0%B7%D0%B0%D0%BB_%D0%BC%D0%B5%D1%87%D0%B5%D1%82%D0%B8).jpg"
+  },
+  {
+    "file": "samarkand-5.jpg",
+    "city": "samarkand",
+    "place": {
+      "ru": "Обсерватория Улугбека",
+      "en": "Ulugh Beg observatory",
+      "uz": "Ulugʻbek rasadxonasi"
+    },
+    "author": "Bgag",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:Ulugh_Beg_Observatory_Museum_02.jpg"
+  }
+]
