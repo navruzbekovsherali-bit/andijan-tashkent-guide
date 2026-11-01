@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Income certificate film</title>
+<!-- "Income certificate" film: online in minutes through OneID, or officially through EDM in 15–30 days. -->
+<link rel="stylesheet" href="film.css" />
+<style>
+  .bg { position: absolute; inset: 0; background: radial-gradient(70% 40% at 50% 36%, #e6eef6, transparent 70%), linear-gradient(180deg, #eef3f8 0%, #f3f5f1 100%); }
+  .phone { left: 250px; top: 260px; width: 580px; height: 1040px; }
+  .app { position: absolute; inset: 0; padding: 130px 40px 40px; }
+  .app .top { display: flex; align-items: center; gap: 16px; font-size: 32px; font-weight: 800; color: #1b4f8f; }
+  .app .top i { width: 44px; height: 44px; border-radius: 12px; background: #1b4f8f; }
+  .app h4 { margin: 48px 0 30px; font-size: 48px; letter-spacing: -0.02em; line-height: 1.1; }
+  .fld { padding: 22px 26px; border-radius: 22px; background: #fff; box-shadow: inset 0 0 0 3px #e3e7ec; font-size: 36px; font-weight: 650; min-height: 92px; }
+  .fld small { display: block; font-size: 24px; color: #6b7280; font-weight: 600; margin-bottom: 4px; }
+  .btn { margin-top: 26px; padding: 28px; border-radius: 22px; background: #1b4f8f; color: #fff; text-align: center; font-size: 36px; font-weight: 750; }
+  .doc { position: absolute; left: 40px; right: 40px; top: 300px; padding: 40px 36px; border-radius: 30px; background: #fff; box-shadow: 0 30px 60px -20px rgb(0 0 0 / 0.3); }
+  .doc .pdf { display: grid; place-items: center; width: 110px; height: 130px; border-radius: 16px; background: #c8372d; color: #fff; font-size: 32px; font-weight: 800; }
+  .doc b { display: block; margin-top: 26px; font-size: 40px; letter-spacing: -0.02em; }
+  .doc span { display: block; margin-top: 10px; font-size: 30px; color: #6b7280; }
+  .doc .ok { display: inline-flex; align-items: center; gap: 14px; margin-top: 30px; padding: 14px 24px; border-radius: 999px; background: #e6f5ec; color: var(--brand-ink); font-size: 32px; font-weight: 750; }
+  .cc { display: inline-flex; align-items: center; gap: 12px; margin-top: 26px; padding: 12px 22px; border-radius: 999px; background: var(--paper-2); font-size: 30px; font-weight: 700; color: var(--ink-2); }
+  .send { margin-top: 30px; padding: 26px; border-radius: 22px; background: var(--night); color: #fff; text-align: center; font-size: 38px; font-weight: 750; }
+  .wait { position: absolute; left: 70px; width: 940px; top: 270px; padding: 50px; border-radius: 44px; background: #fff; z-index: 12; box-shadow: 0 60px 120px -40px rgb(10 46 42 / 0.5), inset 0 0 0 2px rgb(14 26 24 / 0.06); }
+  .wait small { display: block; font-size: 28px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+  .wait .big { margin-top: 14px; font-size: 150px; line-height: 0.95; font-weight: 800; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; }
+  .wait .big em { font-style: normal; font-size: 52px; margin-left: 14px; letter-spacing: -0.02em; color: var(--ink-3); }
+  .dgrid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 10px; margin-top: 36px; }
+  .dgrid i { height: 54px; border-radius: 12px; background: var(--paper-2); }
+  .dgrid i.on { background: var(--brand); }
+  .dgrid i.soft { background: rgb(26 167 82 / 0.35); }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="bg"></div>
+  <div class="phone" id="phone"><div class="scr"><div class="island"></div>
+    <div class="app" id="app">
+      <div class="top"><i></i>my3.soliq.uz</div>
+      <h4 id="aH"></h4>
+      <div class="fld"><small id="aL"></small><span id="aV"></span></div>
+      <div class="btn" id="aBtn"></div>
+      <div class="doc" id="doc"><div class="pdf">PDF</div><b id="dB"></b><span id="dS"></span><div class="ok" id="dOk"></div></div>
+    </div>
+  </div></div>
+  <div class="card" id="mail" style="padding-bottom:56px">
+    <small id="mK"></small><h3 id="mH"></h3>
+    <div class="row"><label id="m1"></label><div id="mv1"></div></div>
+    <div class="row"><label id="m2"></label><div id="mv2"></div></div>
+    <div class="row"><label id="m3"></label><div id="mv3"></div></div>
+    <div class="cc" id="cc"></div>
+    <div class="send" id="send"></div>
+  </div>
+  <div class="wait" id="wait"><small id="wK"></small><div class="big">15–30<em id="wD"></em></div><div class="dgrid" id="dgrid"></div></div>
+</div>
+<script src="film.js"></script>
+<script>
+const { p, $, set, card, init, captions, progress, final, play, easeOut, back, fade, typ, caret } = Film;
+const T = init({
+  ru: {
+    c: [['Способ 1 · Быстро', 'Онлайн, за минуту', 'my3.soliq.uz или my.gov.uz, вход через OneID — справка формируется сразу.'],
+        ['Способ 2 · Официально', 'Письмо в бухгалтерию', 'В ЭДО: ФИО, ИНН и период. В копию — налоговых специалистов банка.'],
+        ['Срок', 'От 15 до 30 дней', 'Если справка нужна срочно, выбирайте онлайн.']],
+    aH: 'Вход через OneID', aL: 'ПИНФЛ', aV: '3 1234 5678 9012', aBtn: 'Войти', dB: 'Справка о доходах', dS: 'январь — октябрь 2026', dOk: '✓ Готово сразу',
+    mK: 'ЭДО · Письмо', mH: 'Справка о доходах', m1: 'ФИО', mv1: 'Каримов Алишер', m2: 'ИНН', mv2: '512 345 678', m3: 'Период', mv3: '01.2026 — 10.2026', cc: 'Копия: налоговые специалисты', send: 'Отправить в бухгалтерию',
+    wK: 'Срок через ЭДО', wD: 'дней',
+    final: { title: 'Справка у вас', items: [{ text: 'Срочно — онлайн, сразу' }, { text: 'Официально — через ЭДО' }, { text: '15–30 дней на ответ' }, { text: 'Нужен OneID', small: 'Для входа понадобится ПИНФЛ', next: true }] },
+  },
+  en: {
+    c: [['Way 1 · Fast', 'Online, in a minute', 'my3.soliq.uz or my.gov.uz, signing in with OneID — the certificate is ready at once.'],
+        ['Way 2 · Official', 'A letter to Accounting', 'In the EDMS: full name, TIN and period. Copy the bank’s tax specialists.'],
+        ['Timing', '15 to 30 days', 'If you need it urgently, go online.']],
+    aH: 'Sign in with OneID', aL: 'PINFL', aV: '3 1234 5678 9012', aBtn: 'Sign in', dB: 'Income certificate', dS: 'January — October 2026', dOk: '✓ Ready at once',
+    mK: 'EDMS · Letter', mH: 'Income certificate', m1: 'Full name', mv1: 'Alisher Karimov', m2: 'TIN', mv2: '512 345 678', m3: 'Period', mv3: '01.2026 — 10.2026', cc: 'Copy: tax specialists', send: 'Send to Accounting',
+    wK: 'Through the EDMS', wD: 'days',
+    final: { title: 'Certificate in hand', items: [{ text: 'Urgent — online, at once' }, { text: 'Official — through the EDMS' }, { text: '15–30 days for a reply' }, { text: 'You need OneID', small: 'Signing in requires your PINFL', next: true }] },
+  },
+  uz: {
+    c: [['1-usul · Tez', 'Onlayn, bir daqiqada', 'my3.soliq.uz yoki my.gov.uz, OneID orqali kirish — maʼlumotnoma darhol tayyor.'],
+        ['2-usul · Rasmiy', 'Buxgalteriyaga xat', 'EHAda: F.I.Sh., STIR va davr. Nusxaga — bankning soliq mutaxassislari.'],
+        ['Muddat', '15 kundan 30 kungacha', 'Shoshilinch kerak boʻlsa, onlayn usulni tanlang.']],
+    aH: 'OneID orqali kirish', aL: 'JShShIR', aV: '3 1234 5678 9012', aBtn: 'Kirish', dB: 'Daromad haqida maʼlumotnoma', dS: 'yanvar — oktabr 2026', dOk: '✓ Darhol tayyor',
+    mK: 'EHA · Xat', mH: 'Daromad maʼlumotnomasi', m1: 'F.I.Sh.', mv1: 'Karimov Alisher', m2: 'STIR', mv2: '512 345 678', m3: 'Davr', mv3: '01.2026 — 10.2026', cc: 'Nusxa: soliq mutaxassislari', send: 'Buxgalteriyaga yuborish',
+    wK: 'EHA orqali muddat', wD: 'kun',
+    final: { title: 'Maʼlumotnoma qoʻlingizda', items: [{ text: 'Shoshilinch — onlayn, darhol' }, { text: 'Rasmiy — EHA orqali' }, { text: 'Javob 15–30 kunda' }, { text: 'OneID kerak', small: 'Kirish uchun JShShIR kerak boʻladi', next: true }] },
+  },
+});
+for (const k of ['aH', 'aL', 'aBtn', 'dB', 'dS', 'dOk', 'mK', 'mH', 'm1', 'm2', 'm3', 'cc', 'send', 'wK', 'wD']) $(k).textContent = T[k];
+$('dgrid').innerHTML = '<i></i>'.repeat(30);
+
+function render(t) {
+  // 1. online through OneID
+  const ph = p(t, 0.2, 1.0, back), phOut = p(t, 7.4, 7.9);
+  set('phone', { transform: `translateY(${(1 - ph) * 1300 + phOut * -1400}px)` });
+  $('aV').innerHTML = typ(t, T.aV, 1.6, 3.0) + caret(t, 1.6, 3.0);
+  const press = Math.max(p(t, 3.4, 3.6) - p(t, 3.6, 3.9), 0);
+  set('aBtn', { transform: `scale(${1 - press * 0.06})` });
+  const d = p(t, 4.2, 4.9, back);
+  set('doc', { opacity: t < 4.2 ? 0 : 1, transform: `translateY(${(1 - d) * 300}px) scale(${0.9 + d * 0.1})` });
+  set('dOk', { opacity: p(t, 5.4, 5.8), transform: `scale(${0.8 + p(t, 5.4, 5.8, back) * 0.2})`, transformOrigin: '0 50%' });
+  // 2. a letter in EDM
+  card('mail', t, 8.0, 14.4);
+  [['mv1', 9.0], ['mv2', 9.9], ['mv3', 10.8]].forEach(([id, a]) => ($(id).innerHTML = typ(t, T[id], a, a + 0.7) + caret(t, a, a + 0.7)));
+  set('cc', { opacity: p(t, 11.8, 12.2), transform: `translateX(${(1 - p(t, 11.8, 12.3, back)) * -60}px)` });
+  const sp = Math.max(p(t, 12.8, 13.0) - p(t, 13.0, 13.3), 0);
+  set('send', { transform: `scale(${1 - sp * 0.05})`, background: t > 13.1 ? 'var(--brand)' : 'var(--night)' });
+  // 3. 15–30 days
+  card('wait', t, 14.6, 21.8);
+  [...$('dgrid').children].forEach((c, i) => { c.className = t > 15.6 + i * 0.12 ? (i < 15 ? 'on' : 'soft') : ''; });
+
+  captions(t, [[T.c[0], 0.3, 7.6], [T.c[1], 7.9, 14.3], [T.c[2], 14.6, 21.7]]);
+  progress(t, [[0, 7.7], [7.7, 14.4], [14.4, 21.8]]);
+  final(t, 22.0);
+}
+play(render, 28.5);
+</script>
+</body>
+</html>

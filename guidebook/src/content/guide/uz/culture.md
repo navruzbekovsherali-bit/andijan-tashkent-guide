@@ -20,6 +20,8 @@ faq:
 
 Oʻzbekiston — odamlar orasidagi munosabatlar koʻpincha jadvaldan muhimroq boʻlgan mamlakat. Ushbu bir nechta qoida mahalliy hayotga yumshoq kirib borishingizga yordam beradi.
 
+<div class="video-reel" data-reel="culture"></div>
+
 ## Mehmondoʻstlik
 
 Bu yerda mehmon — baraka. Agar sizni choyga chaqirishsa, rad etishga shoshilmang.

@@ -21,6 +21,8 @@ faq:
 
 Below are the basic rules of Uzbekistan's medical system and tips on how to get help.
 
+<div class="video-reel" data-reel="medicine"></div>
+
 ## Emergency care
 
 - **Ambulance: 103.** Works across the whole country. Operators speak Uzbek and Russian.

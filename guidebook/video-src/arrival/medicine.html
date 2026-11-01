@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Medicine film</title>
+<!-- "Medicine" film: 103 and free emergency care, state or private clinics and insurance, antibiotics only on an e-prescription. -->
+<link rel="stylesheet" href="film.css" />
+<style>
+  .bg { position: absolute; inset: 0; background: radial-gradient(70% 40% at 50% 36%, #e5f0ef, transparent 70%), linear-gradient(180deg, #edf4f3 0%, #f3f5f1 100%); }
+  .call { position: absolute; left: 70px; width: 940px; top: 270px; padding: 60px 50px; border-radius: 44px; background: linear-gradient(160deg, #2a1312, #4a1d1a); color: #fff; z-index: 12; text-align: center; box-shadow: 0 60px 120px -40px rgb(40 10 10 / 0.6); }
+  .call .num { font-size: 230px; font-weight: 800; letter-spacing: -0.05em; line-height: 1; }
+  .call .sub { margin-top: 10px; font-size: 40px; opacity: 0.85; }
+  .ring { position: absolute; left: 50%; top: 170px; width: 300px; height: 300px; margin-left: -150px; border-radius: 50%; border: 5px solid rgb(255 255 255 / 0.4); }
+  .free { display: inline-flex; align-items: center; gap: 16px; margin-top: 46px; padding: 20px 32px; border-radius: 999px; background: #fff; color: var(--ink); font-size: 38px; font-weight: 800; }
+  .free i { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--brand); }
+  .pair { position: absolute; left: 70px; right: 70px; top: 270px; z-index: 12; display: grid; gap: 22px; }
+  .opt { padding: 40px 44px; border-radius: 40px; background: #fff; box-shadow: 0 40px 80px -40px rgb(10 46 42 / 0.5), inset 0 0 0 2px rgb(14 26 24 / 0.06); }
+  .opt.pro { background: radial-gradient(80% 70% at 100% 0%, #1d6b52, transparent 70%), var(--night); color: #fff; }
+  .opt small { display: block; font-size: 26px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+  .opt.pro small { color: #a9c2bc; }
+  .opt b { display: block; margin: 10px 0 16px; font-size: 54px; letter-spacing: -0.03em; }
+  .opt span { display: block; font-size: 34px; line-height: 1.4; color: var(--ink-2); }
+  .opt.pro span { color: #d6e6e1; }
+  .ins { display: inline-flex; margin-top: 18px; padding: 12px 22px; border-radius: 999px; background: var(--brand); color: #fff; font-size: 30px; font-weight: 750; }
+  .phone { left: 250px; top: 260px; width: 580px; height: 1040px; }
+  .rx { position: absolute; inset: 0; padding: 140px 44px 40px; text-align: center; }
+  .rx .hdr { font-size: 30px; font-weight: 800; color: #1b4f8f; letter-spacing: 0.04em; }
+  .rx h4 { margin: 30px 0 30px; font-size: 46px; line-height: 1.1; }
+  .qr { width: 330px; height: 330px; margin: 0 auto; border-radius: 26px; background: #fff; box-shadow: inset 0 0 0 4px #e3e7ec; display: grid; place-items: center; }
+  .rx .ok { display: inline-flex; align-items: center; gap: 12px; margin-top: 34px; padding: 14px 24px; border-radius: 999px; background: #e6f5ec; color: var(--brand-ink); font-size: 32px; font-weight: 750; }
+  .box { position: absolute; left: 640px; top: 860px; z-index: 19; width: 300px; height: 190px; border-radius: 22px; background: #fff; box-shadow: 0 30px 60px -20px rgb(0 0 0 / 0.35), inset 0 0 0 4px var(--ink); padding: 26px; font-size: 32px; font-weight: 800; }
+  .box i { display: block; width: 70px; height: 12px; border-radius: 6px; background: #c8372d; margin-bottom: 18px; }
+  .box span { display: block; margin-top: 10px; font-size: 24px; font-weight: 700; color: #c8372d; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="bg"></div>
+  <div class="call" id="call"><span class="ring" id="r1"></span><span class="ring" id="r2"></span><div class="num">103</div><div class="sub" id="cSub"></div><div class="free" id="free"><i><svg viewBox="0 0 24 24" width="32"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></i><span id="freeT"></span></div></div>
+  <div class="pair" id="pair">
+    <div class="opt" id="o1"><small id="o1k"></small><b id="o1b"></b><span id="o1s"></span></div>
+    <div class="opt pro" id="o2"><small id="o2k"></small><b id="o2b"></b><span id="o2s"></span><div class="ins" id="ins"></div></div>
+  </div>
+  <div class="phone" id="phone"><div class="scr"><div class="island"></div>
+    <div class="rx"><div class="hdr" id="rxH"></div><h4 id="rxT"></h4>
+      <div class="qr"><svg viewBox="0 0 21 21" width="260" height="260" shape-rendering="crispEdges" id="qr"></svg></div>
+      <div class="ok" id="rxOk"></div></div>
+  </div></div>
+  <div class="box" id="box"><i></i><b id="bxT"></b><span id="bxS"></span></div>
+</div>
+<script src="film.js"></script>
+<script>
+const { p, $, set, card, init, captions, progress, final, play, easeOut, back, fade } = Film;
+const T = init({
+  ru: {
+    c: [['Срочно', 'Скорая помощь — 103', 'Экстренная помощь при угрозе жизни бесплатна и для иностранцев. Операторы говорят по-узбекски и по-русски.'],
+        ['Клиники', 'Где лечиться', 'Плановое лечение платное. Частные клиники быстрее и чаще говорят по-английски. Помогает полис ДМС.'],
+        ['Аптека', 'Антибиотики — по рецепту', 'С 15.12.2025 их продают только по электронному рецепту врача. Привычные лекарства привезите с собой.']],
+    cSub: 'круглосуточно, по всей стране', freeT: 'Экстренно — бесплатно',
+    o1k: 'Государственная', o1b: 'Больница', o1s: 'Помогут, но сервис и оснащение бывают проще, особенно вне больших городов.',
+    o2k: 'Частная', o2b: 'Клиника', o2s: 'Современное оборудование, быстрая запись, англоговорящий персонал.', ins: 'по полису ДМС',
+    rxH: 'ЭЛЕКТРОННЫЙ РЕЦЕПТ', rxT: 'Рецепт от врача', rxOk: '✓ Покажите в аптеке', bxT: 'Антибиотик', bxS: 'только по рецепту',
+    final: { title: 'Если нужен врач', items: [{ text: '103 — скорая, круглосуточно' }, { text: 'Экстренная помощь бесплатна' }, { text: 'Антибиотики — по рецепту' }, { text: 'Оформите ДМС', small: 'Сначала проверьте соцпакет в банке', next: true }] },
+  },
+  en: {
+    c: [['Urgent', 'Ambulance — 103', 'Emergency care when life is at risk is free, for foreigners too. Operators speak Uzbek and Russian.'],
+        ['Clinics', 'Where to get treated', 'Planned treatment is paid. Private clinics are faster and more often speak English. Health insurance helps.'],
+        ['Pharmacy', 'Antibiotics on prescription', 'Since 15.12.2025 they are sold only on a doctor’s e-prescription. Bring your usual medicines with you.']],
+    cSub: '24/7, nationwide', freeT: 'Emergency care is free',
+    o1k: 'State', o1b: 'Hospital', o1s: 'They will help, but service and equipment can be basic, especially outside big cities.',
+    o2k: 'Private', o2b: 'Clinic', o2s: 'Modern equipment, quick appointments, English-speaking staff.', ins: 'with health insurance',
+    rxH: 'E-PRESCRIPTION', rxT: 'From your doctor', rxOk: '✓ Show it at the pharmacy', bxT: 'Antibiotic', bxS: 'prescription only',
+    final: { title: 'If you need a doctor', items: [{ text: '103 — ambulance, 24/7' }, { text: 'Emergency care is free' }, { text: 'Antibiotics — on prescription' }, { text: 'Get health insurance', small: 'Check the bank’s benefits package first', next: true }] },
+  },
+  uz: {
+    c: [['Shoshilinch', 'Tez yordam — 103', 'Hayotga xavf tugʻilganda shoshilinch yordam xorijliklar uchun ham bepul. Operatorlar oʻzbek va rus tillarida gaplashadi.'],
+        ['Klinikalar', 'Qayerda davolanish', 'Rejali davolanish pullik. Xususiy klinikalar tezroq va koʻpincha ingliz tilida gaplashadi. ITS polisi yordam beradi.'],
+        ['Dorixona', 'Antibiotiklar — retsept bilan', '15.12.2025 dan ular faqat shifokorning elektron retsepti bilan sotiladi. Odatdagi dorilarni oʻzingiz bilan olib keling.']],
+    cSub: 'kecha-kunduz, butun mamlakatda', freeT: 'Shoshilinch yordam — bepul',
+    o1k: 'Davlat', o1b: 'Shifoxona', o1s: 'Yordam berishadi, lekin xizmat va jihozlar, ayniqsa katta shaharlardan tashqarida, oddiyroq boʻlishi mumkin.',
+    o2k: 'Xususiy', o2b: 'Klinika', o2s: 'Zamonaviy uskunalar, tez navbat, ingliz tilida gaplashadigan xodimlar.', ins: 'ITS polisi bilan',
+    rxH: 'ELEKTRON RETSEPT', rxT: 'Shifokordan retsept', rxOk: '✓ Dorixonada koʻrsating', bxT: 'Antibiotik', bxS: 'faqat retsept bilan',
+    final: { title: 'Shifokor kerak boʻlsa', items: [{ text: '103 — tez yordam, kecha-kunduz' }, { text: 'Shoshilinch yordam bepul' }, { text: 'Antibiotiklar — retsept bilan' }, { text: 'ITS polisini rasmiylashtiring', small: 'Avval bankdagi ijtimoiy paketni tekshiring', next: true }] },
+  },
+});
+for (const k of ['cSub', 'freeT', 'o1k', 'o1b', 'o1s', 'o2k', 'o2b', 'o2s', 'ins', 'rxH', 'rxT', 'rxOk', 'bxT', 'bxS']) $(k).textContent = T[k];
+// a decorative QR code (not a real one)
+let q = ''; for (let y = 0; y < 21; y++) for (let x = 0; x < 21; x++) { const corner = (x < 7 && y < 7) || (x > 13 && y < 7) || (x < 7 && y > 13); const on = corner ? (x % 6 === 0 || y % 6 === 0 || (x > 1 && x < 5 && y > 1 && y < 5) || (x > 15 && x < 19 && y > 1 && y < 5) || (x > 1 && x < 5 && y > 15 && y < 19) || x === 20 || y === 20) : ((x * 7 + y * 13 + x * y) % 5 < 2); if (on) q += `<rect x="${x}" y="${y}" width="1" height="1"/>`; }
+$('qr').innerHTML = `<g fill="#0e1a18">${q}</g>`;
+
+function render(t) {
+  // 1. 103
+  card('call', t, 0.2, 7.6);
+  [['r1', 0], ['r2', 0.8]].forEach(([id, o]) => { const k = (((t - 1.0 + o) % 1.6) + 1.6) % 1.6 / 1.6; set(id, { transform: `scale(${1 + k * 1.3})`, opacity: t < 1.0 ? 0 : (1 - k) * (1 - p(t, 4.0, 4.4)) }); });
+  set('free', { opacity: p(t, 4.4, 4.8), transform: `scale(${0.7 + p(t, 4.4, 4.9, back) * 0.3})` });
+  // 2. state or private
+  [['o1', 8.0], ['o2', 8.6]].forEach(([id, a]) => { const v = p(t, a, a + 0.7, back); set(id, { opacity: t < a ? 0 : 1 - p(t, 13.8, 14.2), transform: `translateX(${(1 - v) * (id === 'o1' ? -1000 : 1000)}px)` }); });
+  set('ins', { opacity: p(t, 10.6, 11.0), transform: `scale(${0.7 + p(t, 10.6, 11.1, back) * 0.3})`, transformOrigin: '0 50%' });
+  // 3. e-prescription and the box
+  const ph = p(t, 14.4, 15.2, back), phOut = p(t, 21.4, 21.8);
+  set('phone', { opacity: t < 14.4 ? 0 : 1, transform: `translateY(${(1 - ph) * 1300 + phOut * -1400}px)` });
+  set('rxOk', { opacity: p(t, 16.6, 17.0) });
+  const b = p(t, 17.6, 18.3, back);
+  set('box', { opacity: t < 17.6 ? 0 : 1 - phOut, transform: `translate(${(1 - b) * 500}px, ${(1 - b) * 200}px) rotate(${(1 - b) * 30 - 6}deg)` });
+
+  captions(t, [[T.c[0], 0.3, 7.5], [T.c[1], 7.9, 14.1], [T.c[2], 14.4, 21.6]]);
+  progress(t, [[0, 7.6], [7.6, 14.2], [14.2, 21.8]]);
+  final(t, 22.0);
+}
+play(render, 28.5);
+</script>
+</body>
+</html>

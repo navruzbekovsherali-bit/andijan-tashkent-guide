@@ -57,6 +57,11 @@ const numbered = groups.map((g) => ({ ...g, steps: g.pages.map((p) => ({ p, n: +
     </div>
   </header>
 
+  <section class="stories-block hub-stories" aria-label={tr('videoWeek')}>
+    <div class="wrap"><p class="label">{tr('videoWeek')}</p></div>
+    <div class="stories" data-stories={aud}></div>
+  </section>
+
   <div class="wrap">
     {
       numbered.map((g) => (

@@ -20,6 +20,8 @@ faq:
 
 Uzbekistan is a country where relationships between people often matter more than schedules. These few rules will help you ease into local life.
 
+<div class="video-reel" data-reel="culture"></div>
+
 ## Hospitality
 
 A guest here is a blessing. If you are invited for tea, do not rush to say no.

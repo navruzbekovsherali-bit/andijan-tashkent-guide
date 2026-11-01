@@ -23,6 +23,8 @@ faq:
 
 A business trip has three steps: a request before the trip, the trip itself and a report after you return.
 
+<div class="video-reel" data-reel="trips"></div>
+
 ## 1. Before the trip: a request in EDM
 
 Create a "Business trip" document in the EDM system and include:

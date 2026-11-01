@@ -23,6 +23,8 @@ faq:
 
 Daromad haqidagi maʼlumotnomani ikki usulda olish mumkin: davlat portallarida onlayn yoki bank buxgalteriyasi orqali.
 
+<div class="video-reel" data-reel="tax"></div>
+
 ## 1-usul. Davlat portallarida onlayn
 
 Maʼlumotnoma shoshilinch kerak boʻlsa mos keladi. Maʼlumotnoma darhol shakllanadi.

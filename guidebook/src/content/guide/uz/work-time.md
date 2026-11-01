@@ -31,6 +31,8 @@ faq:
     a: 'Yoʻq, bayram kunlari taʼtilning kalendar kunlariga kiritilmaydi.'
 ---
 
+<div class="video-reel" data-reel="worktime"></div>
+
 ## Ish jadvali
 
 Bank besh kunlik ish haftasi boʻyicha ishlaydi — haftasiga 40 soat.

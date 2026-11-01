@@ -23,6 +23,8 @@ faq:
 
 Xizmat safari uch bosqichda oʻtadi: safardan oldin ariza, safarning oʻzi va qaytgandan keyin hisobot.
 
+<div class="video-reel" data-reel="trips"></div>
+
 ## 1. Safardan oldin: EHAda ariza
 
 EHA tizimida «Xizmat safari» hujjatini yarating va quyidagilarni koʻrsating:

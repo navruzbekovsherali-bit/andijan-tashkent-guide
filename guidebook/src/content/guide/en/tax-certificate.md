@@ -23,6 +23,8 @@ faq:
 
 You can get an income certificate in two ways: online on government portals or through the bank's Accounting department.
 
+<div class="video-reel" data-reel="tax"></div>
+
 ## Option 1. Online on government portals
 
 Best if you need the certificate urgently. It is generated immediately.

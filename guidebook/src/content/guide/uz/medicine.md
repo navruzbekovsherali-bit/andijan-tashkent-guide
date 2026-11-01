@@ -21,6 +21,8 @@ faq:
 
 Quyida — Oʻzbekiston tibbiyot tizimining asosiy qoidalari va yordamni qanday olish boʻyicha maslahatlar.
 
+<div class="video-reel" data-reel="medicine"></div>
+
 ## Shoshilinch yordam
 
 - **Tez yordam: 103.** Butun mamlakat boʻylab ishlaydi. Operatorlar oʻzbek va rus tillarida gaplashadi.

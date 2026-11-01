@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Business trip film</title>
+<!-- "Business trip" film: a request in EDM signed before you go, original receipts on the way, a report within 3 days and the money back with your salary. -->
+<link rel="stylesheet" href="film.css" />
+<style>
+  .bg { position: absolute; inset: 0; background: radial-gradient(70% 40% at 50% 36%, #e4ecf6, transparent 70%), linear-gradient(180deg, #eef3f8 0%, #f3f5f1 100%); }
+  .sig { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 30px; }
+  .sig span { display: flex; align-items: center; gap: 14px; padding: 14px 22px 14px 14px; border-radius: 999px; background: var(--paper-2); font-size: 30px; font-weight: 700; color: var(--ink-3); }
+  .sig span i { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: #d7dcdf; }
+  .sig span.on { background: #e6f5ec; color: var(--brand-ink); }
+  .sig span.on i { background: var(--brand); }
+  .env { position: absolute; left: 240px; top: 760px; width: 600px; height: 400px; z-index: 12; }
+  .env .body { position: absolute; inset: 0; border-radius: 30px; background: #fff; box-shadow: 0 50px 100px -40px rgb(10 46 42 / 0.5), inset 0 0 0 4px var(--ink); }
+  .env .flap { position: absolute; left: 0; right: 0; top: 0; height: 240px; transform-origin: 50% 0; }
+  .env .lbl { position: absolute; left: 0; right: 0; bottom: 46px; text-align: center; font-size: 36px; font-weight: 750; }
+  .rc { position: absolute; z-index: 13; width: 220px; padding: 26px 24px 30px; background: #fffdf8; border-radius: 10px; box-shadow: 0 20px 40px -18px rgb(10 46 42 / 0.45), inset 0 0 0 3px rgb(14 26 24 / 0.1); font-size: 24px; color: var(--ink-3); }
+  .rc b { display: block; font-size: 30px; color: var(--ink); margin-bottom: 14px; }
+  .rc i { display: block; height: 10px; margin-top: 10px; border-radius: 5px; background: #ece7dc; }
+  .rc em { display: block; margin-top: 18px; font-style: normal; font-size: 34px; font-weight: 800; color: var(--ink); }
+  .plane { position: absolute; z-index: 11; width: 360px; }
+  .clock3 { position: absolute; left: 70px; width: 940px; top: 270px; padding: 50px; border-radius: 44px; background: radial-gradient(80% 70% at 100% 0%, #1d6b52, transparent 70%), var(--night); color: #fff; z-index: 12; box-shadow: 0 60px 120px -40px rgb(10 46 42 / 0.6); }
+  .clock3 small { display: block; font-size: 28px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #a9c2bc; }
+  .clock3 .big { margin-top: 14px; font-size: 180px; line-height: 0.9; font-weight: 800; letter-spacing: -0.05em; }
+  .clock3 .big em { font-style: normal; font-size: 56px; margin-left: 14px; letter-spacing: -0.02em; }
+  .days3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 34px; }
+  .days3 i { height: 22px; border-radius: 11px; background: var(--brand); transform-origin: 0 50%; }
+  .hq { position: absolute; left: 250px; top: 860px; z-index: 11; display: flex; align-items: center; gap: 16px; padding: 18px 26px 18px 18px; border-radius: 999px; background: #fff; box-shadow: 0 30px 60px -30px rgb(10 46 42 / 0.5); font-size: 30px; font-weight: 750; }
+  .hq i { display: grid; place-items: center; width: 60px; height: 60px; border-radius: 50%; background: var(--night); }
+  .coin { position: absolute; z-index: 14; width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff2b8, #e6c86a 60%, #c9a43b); box-shadow: inset 0 0 0 5px rgb(0 0 0 / 0.15), 0 20px 40px -16px rgb(0 0 0 / 0.4); display: grid; place-items: center; font-weight: 800; font-size: 46px; color: #7a5a14; }
+  .paid { position: absolute; left: 110px; right: 110px; top: 1110px; z-index: 14; display: flex; align-items: center; gap: 22px; padding: 26px 30px; border-radius: 30px; background: #fff; box-shadow: 0 30px 60px -24px rgb(10 46 42 / 0.5); }
+  .paid .ic { flex: none; width: 74px; height: 74px; border-radius: 20px; background: var(--night); display: grid; place-items: center; }
+  .paid .ic svg { width: 52px; }
+  .paid b { display: block; font-size: 34px; }
+  .paid span { font-size: 30px; color: var(--ink-2); }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="bg"></div>
+  <div class="card" id="req" style="padding-bottom:56px">
+    <small id="rK"></small><h3 id="rH"></h3>
+    <div class="row"><label id="l1"></label><div id="v1"></div></div>
+    <div class="row"><label id="l2"></label><div id="v2"></div></div>
+    <div class="row"><label id="l3"></label><div id="v3"></div></div>
+    <div class="row"><label id="l4"></label><div id="v4"></div></div>
+    <div class="sig" id="sig"></div>
+  </div>
+  <svg class="plane" id="plane" viewBox="0 0 360 140"><path d="M20 82 L300 70 Q340 70 342 82 Q340 94 300 94 L20 96 Z" fill="#fff" stroke="#0e1a18" stroke-width="6" stroke-linejoin="round"/><path d="M150 82 L120 20 L160 20 L210 80 Z M150 92 L120 136 L160 136 L210 94 Z M30 82 L14 40 L40 40 L70 80 Z" fill="#fff" stroke="#0e1a18" stroke-width="6" stroke-linejoin="round"/><path d="M60 86 H290" stroke="#1aa752" stroke-width="6"/></svg>
+  <div class="env" id="env"><div class="body"></div><svg class="flap" id="flap" viewBox="0 0 600 240" preserveAspectRatio="none"><path d="M4 4 L300 220 L596 4 Z" fill="#f4f6f5" stroke="#0e1a18" stroke-width="5" stroke-linejoin="round"/></svg><div class="lbl" id="envL"></div></div>
+  <div class="rc" id="rc0"><b id="rc0b"></b><i></i><i style="width:70%"></i><em>1 240 000</em></div>
+  <div class="rc" id="rc1"><b id="rc1b"></b><i></i><i style="width:60%"></i><em>TAS → AZN</em></div>
+  <div class="rc" id="rc2"><b id="rc2b"></b><i></i><i style="width:80%"></i><em>356 000</em></div>
+  <div class="clock3" id="rep"><small id="repK"></small><div class="big">3<em id="repD"></em></div><div class="days3" id="days3"><i></i><i></i><i></i></div></div>
+  <div class="hq" id="hq"><i><svg viewBox="0 0 24 24" width="34"><path d="M12 22s-7-6.5-7-12a7 7 0 0114 0c0 5.5-7 12-7 12z" fill="#1aa752"/><circle cx="12" cy="10" r="2.6" fill="#fff"/></svg></i><span id="hqT"></span></div>
+  <div class="coin" id="coin">₮</div>
+  <div class="paid" id="paid"><span class="ic"><svg viewBox="270 270 1390 1390"><circle cx="965" cy="965" r="616.5" fill="none" stroke="#1aa752" stroke-width="137" stroke-dasharray="1500 300 1500 572"/><polygon points="1215,476 1440,466 1125,1307 902,1307 1007,1023 880,1023 720,1480 495,1465 812,622 1033,622 928,908 1052,908" fill="#1aa752"/></svg></span><div><b id="paidB"></b><span id="paidS"></span></div></div>
+</div>
+<script src="film.js"></script>
+<script>
+const { p, $, set, card, init, captions, progress, final, play, easeOut, easeInOut, back, fade, typ, caret, stamp } = Film;
+const T = init({
+  ru: {
+    c: [['Шаг 1 · До поездки', 'Заявка в ЭДО', 'Цель, место, даты и расходы. Выезжайте, только когда все руководители подписали.'],
+        ['Шаг 2 · В поездке', 'Сохраняйте чеки', 'Оригиналы всех чеков, билетов и посадочных талонов — без них расходы не вернут.'],
+        ['Шаг 3 · После', 'Отчёт за 3 дня', 'Оригиналы — почтой в головной офис в Андижане. Деньги вернутся с зарплатой.']],
+    rK: 'ЭДО · Командировка', rH: 'Заявка', l1: 'Цель', v1: 'Встреча с партнёрами', l2: 'Место', v2: 'Андижан, головной офис', l3: 'Даты', v3: '12.11 — 14.11, 3 дня', l4: 'Расходы', v4: 'перелёт, отель, суточные',
+    sig: ['Руководитель', 'Директор', 'Бухгалтерия'], env: 'Оригиналы чеков', rc: ['Отель', 'Билет', 'Такси'],
+    repK: 'Отчёт сдать за', repD: 'дня', hq: 'Головной офис · Андижан', paidB: 'Расходы возмещены', paidS: 'вместе с ближайшей зарплатой',
+    final: { title: 'Командировка без сюрпризов', items: [{ text: 'Заявка подписана до поездки' }, { text: 'Оригиналы чеков сохранены' }, { text: 'Отчёт — в течение 3 дней' }, { text: 'Нужны деньги заранее?', small: 'Аванс оформляет бухгалтерия', next: true }] },
+  },
+  en: {
+    c: [['Step 1 · Before you go', 'A request in the EDMS', 'Purpose, place, dates and expenses. Travel only once every manager has signed.'],
+        ['Step 2 · On the trip', 'Keep the receipts', 'Originals of every receipt, ticket and boarding pass — without them nothing is reimbursed.'],
+        ['Step 3 · Afterwards', 'A report within 3 days', 'Post the originals to the head office in Andijan. The money comes back with your salary.']],
+    rK: 'EDMS · Business trip', rH: 'Request', l1: 'Purpose', v1: 'Meeting with partners', l2: 'Place', v2: 'Andijan, head office', l3: 'Dates', v3: '12.11 — 14.11, 3 days', l4: 'Expenses', v4: 'flight, hotel, per diem',
+    sig: ['Manager', 'Director', 'Accounting'], env: 'Original receipts', rc: ['Hotel', 'Ticket', 'Taxi'],
+    repK: 'Report due within', repD: 'days', hq: 'Head office · Andijan', paidB: 'Expenses reimbursed', paidS: 'together with your next salary',
+    final: { title: 'A trip with no surprises', items: [{ text: 'Request signed before you go' }, { text: 'Original receipts kept' }, { text: 'Report within 3 days' }, { text: 'Need money in advance?', small: 'Accounting arranges an advance', next: true }] },
+  },
+  uz: {
+    c: [['1-qadam · Safardan oldin', 'EHAda ariza', 'Maqsad, joy, sanalar va xarajatlar. Barcha rahbarlar imzolagandan keyingina yoʻlga chiqing.'],
+        ['2-qadam · Safarda', 'Cheklarni saqlang', 'Barcha cheklar, chiptalar va boarding talonlarning asl nusxalari — ularsiz xarajat qoplanmaydi.'],
+        ['3-qadam · Keyin', '3 kunda hisobot', 'Asl nusxalarni Andijondagi Bosh ofisga pochta orqali yuboring. Pul maosh bilan qaytadi.']],
+    rK: 'EHA · Xizmat safari', rH: 'Ariza', l1: 'Maqsad', v1: 'Hamkorlar bilan uchrashuv', l2: 'Joy', v2: 'Andijon, Bosh ofis', l3: 'Sanalar', v3: '12.11 — 14.11, 3 kun', l4: 'Xarajatlar', v4: 'parvoz, mehmonxona, kundalik',
+    sig: ['Rahbar', 'Direktor', 'Buxgalteriya'], env: 'Cheklar asl nusxasi', rc: ['Mehmonxona', 'Chipta', 'Taksi'],
+    repK: 'Hisobot muddati', repD: 'kun', hq: 'Bosh ofis · Andijon', paidB: 'Xarajatlar qoplandi', paidS: 'eng yaqin maosh bilan birga',
+    final: { title: 'Kutilmagan holatlarsiz safar', items: [{ text: 'Ariza safardan oldin imzolangan' }, { text: 'Cheklar asl nusxasi saqlangan' }, { text: 'Hisobot — 3 kun ichida' }, { text: 'Oldindan pul kerakmi?', small: 'Avansni buxgalteriya rasmiylashtiradi', next: true }] },
+  },
+});
+for (const k of ['rK', 'rH', 'l1', 'l2', 'l3', 'l4', 'repK', 'repD', 'paidB', 'paidS']) $(k).textContent = T[k];
+$('hqT').textContent = T.hq; $('envL').textContent = T.env;
+T.rc.forEach((r, i) => ($(`rc${i}b`).textContent = r));
+const TICK = '<svg viewBox="0 0 24 24" width="30"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+$('sig').innerHTML = T.sig.map((s, i) => `<span id="s${i}"><i>${TICK}</i>${s}</span>`).join('');
+const RC = [[120, 300], [440, 250], [760, 320]];
+
+function render(t) {
+  // 1. the request
+  card('req', t, 0.2, 7.8);
+  [['v1', 1.2], ['v2', 2.0], ['v3', 2.8], ['v4', 3.6]].forEach(([id, a]) => ($(id).innerHTML = typ(t, T[id], a, a + 0.7) + caret(t, a, a + 0.7)));
+  T.sig.forEach((_, i) => $(`s${i}`).classList.toggle('on', t > 4.8 + i * 0.6));
+  // 2. the trip: a plane crosses, receipts drop into the envelope
+  const pl = p(t, 8.0, 10.2, easeInOut);
+  set('plane', { left: `${-400 + pl * 1900}px`, top: `${560 - Math.sin(pl * Math.PI) * 160}px`, opacity: t < 8 || t > 10.3 ? 0 : 1, transform: `rotate(${-6 + pl * 8}deg)` });
+  const envIn = p(t, 9.4, 10.0, back), envOut = p(t, 14.2, 14.6);
+  set('env', { opacity: t < 9.4 ? 0 : 1 - envOut, transform: `translateY(${(1 - envIn) * 900 + envOut * 300}px)` });
+  set('flap', { transform: `scaleY(${t < 12.9 ? -1 : -1 + 2 * p(t, 12.9, 13.4)})` });
+  RC.forEach(([x, y], i) => {
+    const a = 10.0 + i * 0.45;
+    const sIn = p(t, a, a + 0.5, back);
+    const drop = p(t, 11.6 + i * 0.35, 12.2 + i * 0.35, easeInOut);
+    set(`rc${i}`, { left: `${x + (420 - x) * drop}px`, top: `${y + (1 - sIn) * -600 + drop * 520}px`, opacity: t < a || drop >= 0.98 ? 0 : 1, transform: `rotate(${(i - 1) * 8 * (1 - drop)}deg) scale(${1 - drop * 0.4})` });
+  });
+  // 3. report within 3 days, the envelope flies to the head office, money comes back
+  card('rep', t, 14.6, 21.8);
+  [...$('days3').children].forEach((d, i) => set(d, { transform: `scaleX(${1 - p(t, 15.6 + i * 0.6, 16.1 + i * 0.6)})` }));
+  set('hq', { opacity: fade(t, 17.0, 17.4, 21.2, 21.6), transform: `translateY(${(1 - p(t, 17.0, 17.4, back)) * 40}px)` });
+  const c = p(t, 18.4, 19.4, easeInOut);
+  set('coin', { left: `${760 - c * 520}px`, top: `${900 + c * 200 - Math.sin(c * Math.PI) * 260}px`, opacity: t < 18.4 ? 0 : 1 - p(t, 19.3, 19.6), transform: `rotate(${c * 360}deg)` });
+  set('paid', { opacity: fade(t, 19.4, 19.8, 21.3, 21.7), transform: `translateY(${(1 - p(t, 19.4, 19.8, easeOut)) * -40}px)` });
+
+  captions(t, [[T.c[0], 0.3, 7.6], [T.c[1], 7.9, 14.3], [T.c[2], 14.6, 21.7]]);
+  progress(t, [[0, 7.7], [7.7, 14.4], [14.4, 21.8]]);
+  final(t, 22.0);
+}
+play(render, 28.5);
+</script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Culture film</title>
+<!-- "Culture" film: tea poured to half the bowl, bread broken by hand, a greeting with the hand on the heart. -->
+<link rel="stylesheet" href="film.css" />
+<style>
+  .bg { position: absolute; inset: 0; background: radial-gradient(70% 40% at 50% 38%, #f6ead8, transparent 70%), linear-gradient(180deg, #f7f1e8 0%, #f3f2ee 100%); }
+  .scene { position: absolute; left: 0; right: 0; top: 230px; height: 1060px; }
+  .tag { position: absolute; left: 50%; top: 900px; transform: translateX(-50%); padding: 20px 34px; border-radius: 999px; background: var(--night); color: #fff; font-size: 40px; font-weight: 750; white-space: nowrap; z-index: 3; }
+  .bub { position: absolute; z-index: 4; padding: 28px 36px; border-radius: 40px; border-bottom-left-radius: 10px; background: #fff; box-shadow: 0 30px 60px -30px rgb(10 46 42 / 0.5), inset 0 0 0 4px var(--ink); font-size: 50px; font-weight: 800; letter-spacing: -0.02em; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="bg"></div>
+  <!-- 1. tea -->
+  <div class="scene" id="sTea">
+    <svg class="abs" viewBox="0 0 1080 1060" width="1080" height="1060">
+      <defs>
+        <clipPath id="bowl"><path d="M300 520 Q300 820 540 820 Q780 820 780 520 Z"/></clipPath>
+        <pattern id="ornament" width="80" height="80" patternUnits="userSpaceOnUse"><circle cx="40" cy="40" r="14" fill="none" stroke="#1b4f8f" stroke-width="6"/><path d="M0 40 H26 M54 40 H80" stroke="#1b4f8f" stroke-width="6"/></pattern>
+      </defs>
+      <g id="pot">
+        <path d="M600 140 Q600 70 690 70 Q780 70 780 140 L800 300 Q800 360 690 360 Q580 360 580 300 Z" fill="#fff" stroke="#0e1a18" stroke-width="7"/>
+        <path d="M600 210 L520 170 Q470 150 460 190" fill="none" stroke="#0e1a18" stroke-width="12" stroke-linecap="round"/>
+        <rect x="585" y="210" width="210" height="40" fill="url(#ornament)" opacity="0.8"/>
+        <circle cx="690" cy="60" r="16" fill="#0e1a18"/>
+      </g>
+      <path id="stream" d="M462 196 Q470 330 540 470" fill="none" stroke="#c87b2a" stroke-width="16" stroke-linecap="round" stroke-dasharray="1" pathLength="1"/>
+      <g clip-path="url(#bowl)"><rect id="tea" x="300" y="820" width="480" height="300" fill="#c87b2a"/></g>
+      <path d="M300 520 Q300 820 540 820 Q780 820 780 520 Z" fill="none" stroke="#0e1a18" stroke-width="8"/>
+      <path d="M300 520 H780" stroke="#0e1a18" stroke-width="8"/>
+      <rect x="310" y="560" width="460" height="44" fill="url(#ornament)" opacity="0.55"/>
+      <path id="half" d="M250 670 H830" stroke="#1aa752" stroke-width="5" stroke-dasharray="18 14"/>
+    </svg>
+    <div class="tag" id="tTea"></div>
+  </div>
+  <!-- 2. bread -->
+  <div class="scene" id="sBread">
+    <svg class="abs" viewBox="0 0 1080 1060" width="1080" height="1060">
+      <defs>
+        <g id="nonHalf">
+          <path d="M540 260 A260 260 0 0 0 540 780 Z" fill="#d79a4f" stroke="#0e1a18" stroke-width="8"/>
+          <path d="M540 400 A120 120 0 0 0 540 640 Z" fill="#efd3a4" stroke="#0e1a18" stroke-width="5"/>
+          <g fill="#0e1a18"><circle cx="480" cy="470" r="7"/><circle cx="470" cy="530" r="7"/><circle cx="480" cy="590" r="7"/><circle cx="430" cy="500" r="7"/><circle cx="430" cy="560" r="7"/></g>
+        </g>
+      </defs>
+      <use href="#nonHalf" id="nonL"/>
+      <use href="#nonHalf" id="nonR" transform="translate(1080 0) scale(-1 1)"/>
+      <path id="crumbs" d="M540 300 l-12 14 M540 520 l14 10 M540 720 l-14 -8" stroke="#0e1a18" stroke-width="6" stroke-linecap="round"/>
+    </svg>
+    <div class="tag" id="tBread"></div>
+  </div>
+  <!-- 3. greeting -->
+  <div class="scene" id="sHi">
+    <div id="hiA" style="position:absolute;left:110px;top:250px;transform:scale(1.7);transform-origin:0 0"></div>
+    <div id="hiB" style="position:absolute;left:560px;top:250px;transform:scale(1.7);transform-origin:0 0"></div>
+    <div class="bub" id="bub"></div>
+    <div class="tag" id="tHi"></div>
+  </div>
+</div>
+<script src="film.js"></script>
+<script>
+const { p, $, set, init, captions, progress, final, play, easeOut, back, fade, person } = Film;
+const T = init({
+  ru: {
+    c: [['Чай', 'Пиалу наливают наполовину', 'Так хозяин может чаще подливать — это забота о госте. Полная пиала — намёк, что пора уходить.'],
+        ['Хлеб', 'Нон ломают руками', 'Его не режут ножом, не кладут лицевой стороной вниз и никогда не выбрасывают.'],
+        ['Приветствие', 'Рука у сердца', '«Ассалому алайкум» и ладонь на груди — знак искренности и уважения.']],
+    tTea: 'наполовину — это забота', tBread: 'руками, а не ножом', tHi: 'ладонь — на сердце', hi: 'Ассалому алайкум!',
+    final: { title: 'Тепло и с уважением', items: [{ text: 'Пиала — не до краёв' }, { text: 'Хлеб — руками' }, { text: 'Старшим — лучшее место' }, { text: 'Сначала человек, потом дело', small: 'Спросите о здоровье и семье перед разговором о работе', next: true }] },
+  },
+  en: {
+    c: [['Tea', 'The bowl is filled halfway', 'So the host can top it up often — that is caring for a guest. A full bowl hints it is time to go.'],
+        ['Bread', 'Non is broken by hand', 'It is never cut with a knife, never placed face down and never thrown away.'],
+        ['Greeting', 'Hand on the heart', '“Assalomu alaykum” with a palm on the chest is a sign of sincerity and respect.']],
+    tTea: 'halfway means care', tBread: 'by hand, not with a knife', tHi: 'palm on the heart', hi: 'Assalomu alaykum!',
+    final: { title: 'Warmth and respect', items: [{ text: 'Tea bowl — never full' }, { text: 'Bread — by hand' }, { text: 'Elders get the best seat' }, { text: 'People first, then business', small: 'Ask about health and family before work talk', next: true }] },
+  },
+  uz: {
+    c: [['Choy', 'Piyola yarmigacha quyiladi', 'Shunda mezbon tez-tez quyib turadi — bu mehmonga gʻamxoʻrlik. Toʻla piyola — ketish vaqti boʻlganiga ishora.'],
+        ['Non', 'Non qoʻl bilan ushatiladi', 'U pichoq bilan kesilmaydi, yuzi pastga qoʻyilmaydi va hech qachon tashlanmaydi.'],
+        ['Salomlashish', 'Qoʻl yurakda', '«Assalomu alaykum» va koʻksidagi kaft — samimiyat va hurmat belgisi.']],
+    tTea: 'yarmigacha — bu gʻamxoʻrlik', tBread: 'qoʻl bilan, pichoqsiz', tHi: 'kaft — yurakda', hi: 'Assalomu alaykum!',
+    final: { title: 'Iliqlik va hurmat', items: [{ text: 'Piyola — toʻldirilmaydi' }, { text: 'Non — qoʻl bilan' }, { text: 'Kattalarga — eng yaxshi joy' }, { text: 'Avval inson, keyin ish', small: 'Ishdan oldin sogʻliq va oila haqida soʻrang', next: true }] },
+  },
+});
+$('tTea').textContent = T.tTea; $('tBread').textContent = T.tBread; $('tHi').textContent = T.tHi; $('bub').textContent = T.hi;
+$('hiA').innerHTML = person('pa', { bag: false, jacket: '#0b4a43' });
+$('hiB').innerHTML = person('pb', { bag: false, jacket: '#1aa752', hair: '#3b2a1e' });
+set('pb', { transform: 'scaleX(-1)', transformOrigin: '120px 0' });
+
+const scene = (id, t, a, b) => set(id, { opacity: fade(t, a, a + 0.5, b - 0.4, b), transform: `translateY(${(1 - p(t, a, a + 0.7, easeOut)) * 80}px)` });
+const tag = (id, t, a, b) => set(id, { opacity: fade(t, a, a + 0.4, b - 0.4, b), transform: `translateX(-50%) scale(${0.8 + p(t, a, a + 0.5, back) * 0.2})` });
+
+function render(t) {
+  // 1. tea pours to half the bowl
+  scene('sTea', t, 0.2, 7.6);
+  const pour = p(t, 1.4, 4.4);
+  $('stream').setAttribute('stroke-dashoffset', String(t < 1.4 ? 1 : t > 4.6 ? -1 : 1 - p(t, 1.4, 1.8)));
+  set('stream', { opacity: t > 4.4 ? 1 - p(t, 4.4, 4.8) : 1 });
+  $('tea').setAttribute('y', String(820 - pour * 150));
+  set('pot', { transform: `rotate(${-18 * p(t, 1.0, 1.5) + 18 * p(t, 4.4, 4.9)}deg)`, transformOrigin: '690px 210px' });
+  set('half', { opacity: p(t, 4.6, 5.0) });
+  tag('tTea', t, 5.0, 7.4);
+  // 2. the bread breaks in two
+  scene('sBread', t, 7.8, 13.6);
+  const br = p(t, 9.4, 10.4, back);
+  $('nonL').setAttribute('transform', `translate(${-br * 60} ${br * 10}) rotate(${-br * 8} 540 520)`);
+  $('nonR').setAttribute('transform', `translate(${1080 + br * 60} ${br * 10}) scale(-1 1) rotate(${-br * 8} 540 520)`);
+  set('crumbs', { opacity: br > 0.2 ? 1 - p(t, 10.6, 11.2) : 0 });
+  tag('tBread', t, 10.6, 13.4);
+  // 3. a greeting with the hand on the heart
+  scene('sHi', t, 13.8, 21.6);
+  ['pa', 'pb'].forEach((id, i) => set(`${id}-arm`, { transform: `rotate(${p(t, 15.0 + i * 0.6, 15.6 + i * 0.6, back) * 78}deg)` }));
+  const bb = p(t, 15.4, 15.9, back);
+  set('bub', { left: '150px', top: '90px', opacity: t < 15.4 ? 0 : fade(t, 15.4, 15.6, 21.2, 21.6), transform: `scale(${0.6 + bb * 0.4})`, transformOrigin: '0 100%' });
+  tag('tHi', t, 17.4, 21.4);
+
+  captions(t, [[T.c[0], 0.3, 7.5], [T.c[1], 7.8, 13.5], [T.c[2], 13.8, 21.6]]);
+  progress(t, [[0, 7.6], [7.6, 13.7], [13.7, 21.7]]);
+  final(t, 22.0);
+}
+play(render, 28.5);
+</script>
+</body>
+</html>

@@ -31,6 +31,8 @@ faq:
     a: 'No, public holidays are not counted in the calendar days of your leave.'
 ---
 
+<div class="video-reel" data-reel="worktime"></div>
+
 ## Working schedule
 
 The bank works a five-day week, 40 hours a week.

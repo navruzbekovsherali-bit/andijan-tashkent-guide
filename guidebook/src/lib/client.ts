@@ -608,6 +608,11 @@ const FILMS: Record<string, [[string, string], [string, string], [string, string
   packing: [['Что взять с собой', 'Ручная кладь, аптечка, одежда и таможня — за 25 секунд.'], ['What to pack', 'Hand luggage, medicines, clothes and customs — in 25 seconds.'], ['Oʻzingiz bilan nima olish kerak', 'Qoʻl yuki, dori qutisi, kiyim va bojxona — 25 soniyada.']],
   emergency: [['Экстренная ситуация', '112, что сказать оператору и прямые номера служб.'], ['In an emergency', '112, what to tell the operator, and the direct numbers.'], ['Favqulodda vaziyat', '112, operatorga nima deyish va xizmatlarning toʻgʻridan-toʻgʻri raqamlari.']],
   phrases: [['Пара слов по-узбекски', 'Приветствие, рынок и такси — с переводом.'], ['A few words in Uzbek', 'A greeting, the market and a taxi — with translations.'], ['Bir necha oʻzbekcha soʻz', 'Salomlashish, bozor va taksi — tarjimasi bilan.']],
+  worktime: [['Рабочий день и отпуск', 'График 08:30–17:30, праздники и 28 дней отпуска.'], ['Working day and leave', 'Hours 08:30–17:30, public holidays and 28 days of leave.'], ['Ish kuni va taʼtil', '08:30–17:30 jadvali, bayramlar va 28 kunlik taʼtil.']],
+  trips: [['Командировка в 3 шага', 'Заявка в ЭДО, чеки в поездке и отчёт за 3 дня.'], ['A business trip in 3 steps', 'An EDMS request, receipts on the way and a report within 3 days.'], ['Xizmat safari 3 qadamda', 'EHAda ariza, safarda cheklar va 3 kunda hisobot.']],
+  tax: [['Справка о доходах', 'Онлайн за минуту или через ЭДО за 15–30 дней.'], ['Income certificate', 'Online in a minute, or through the EDMS in 15–30 days.'], ['Daromad maʼlumotnomasi', 'Onlayn bir daqiqada yoki EHA orqali 15–30 kunda.']],
+  culture: [['Культурный код', 'Чай, хлеб и приветствие — три правила гостеприимства.'], ['The cultural code', 'Tea, bread and a greeting — three rules of hospitality.'], ['Madaniy kod', 'Choy, non va salomlashish — mehmondoʻstlikning uch qoidasi.']],
+  medicine: [['Если нужен врач', '103, клиники и страховка, антибиотики по рецепту.'], ['If you need a doctor', '103, clinics and insurance, antibiotics on prescription.'], ['Shifokor kerak boʻlsa', '103, klinikalar va sugʻurta, antibiotiklar retsept bilan.']],
   cities: [['Путешествие по Узбекистану', 'Ташкент, Самарканд, Бухара, Хива и Андижан на одной карте.'], ['Travelling around Uzbekistan', 'Tashkent, Samarkand, Bukhara, Khiva and Andijan on one map.'], ['Oʻzbekiston boʻylab sayohat', 'Toshkent, Samarqand, Buxoro, Xiva va Andijon bitta xaritada.']],
 };
 for (const [name, [ru, en, uz]] of Object.entries(FILMS)) {
@@ -739,7 +744,7 @@ function nextPay(aud: string, today: Date): [Date, string] {
 }
 
 function todayWidgets() {
-  const row = document.querySelector<HTMLElement>('[data-today]');
+  const row = document.querySelector<HTMLElement>('[data-widgets]');
   if (!row) return;
   const lang = pageLang();
   const T = TODAY_TX[lang];
@@ -816,6 +821,7 @@ function rates(row: HTMLElement, T: (typeof TODAY_TX)['ru']) {
 const STORY_ORDER: [string, string][] = [
   ['arrival', 'arrival-72h'], ['hotel', 'arrival-72h'], ['firstday', 'first-day-week'], ['card', 'bank-card'], ['salary', 'salary-local'],
   ['metro', 'transport'], ['imei', 'arrival-72h'], ['apartment', 'arrival-72h'], ['sickleave', 'sick-leave'], ['permit', 'work-permit'],
+  ['worktime', 'work-time'], ['trips', 'business-trips'], ['tax', 'tax-certificate'], ['medicine', 'medicine'], ['culture', 'culture'],
   ['packing', 'packing'], ['emergency', 'emergency'], ['phrases', 'phrases'], ['cities', 'uzbekistan'], ['history', 'about-bank'], ['cards', 'bank-card'],
 ];
 const STORY_TX = { ru: { open: 'Читать статью', close: 'Закрыть', next: 'Дальше' }, en: { open: 'Read the article', close: 'Close', next: 'Next' }, uz: { open: 'Maqolani oʻqish', close: 'Yopish', next: 'Keyingi' } };
@@ -827,10 +833,13 @@ function stories() {
   const root = base() || '/';
   const pick = (r: (typeof REELS)[string], k: 'src' | 'poster') =>
     (lang === 'en' ? r[k === 'src' ? 'srcEn' : 'posterEn'] : lang === 'uz' ? r[k === 'src' ? 'srcUz' : 'posterUz'] : undefined) ?? r[k];
-  const items = STORY_ORDER.filter(([k]) => REELS[k]).map(([k, slug]) => {
+  // local staff do not need the arrival stories (customs, hotel, IMEI, flat, permit, packing)
+  const ARRIVAL = ['arrival', 'hotel', 'imei', 'apartment', 'permit', 'packing', 'metro'];
+  const only = strip.dataset.stories;
+  const items = STORY_ORDER.filter(([k]) => REELS[k] && !(only === 'local' && ARRIVAL.includes(k))).map(([k, slug]) => {
     const r = REELS[k];
     const aud = store.get('gb-audience');
-    return { key: k, title: r[lang][0], lead: r[lang][1], src: root + pick(r, 'src'), poster: root + pick(r, 'poster'), slug: k === 'salary' && aud === 'expat' ? 'salary-expat' : slug };
+    return { key: k, title: r[lang][0], lead: r[lang][1], src: root + pick(r, 'src'), poster: root + pick(r, 'poster'), slug: k === 'salary' && (only || aud) === 'expat' ? 'salary-expat' : slug };
   });
   const seen = new Set<string>((() => {
     try {
@@ -1267,6 +1276,22 @@ function readingKit() {
     t.classList.add('cards-on-phone');
     t.querySelectorAll('tbody tr').forEach((tr) => Array.from(tr.children).forEach((td, i) => td.setAttribute('data-label', names[i] || '')));
   });
+
+  // articles with a film get a "watch" chip under the title
+  const reel = prose.querySelector<HTMLElement>('.video-reel');
+  const meta = document.querySelector<HTMLElement>('.page-head .meta-row');
+  if (reel && meta) {
+    reel.id ||= 'film';
+    const chip = document.createElement('a');
+    chip.className = 'chip chip-video';
+    chip.href = `#${reel.id}`;
+    chip.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M8 5.5v13a.6.6 0 0 0 .9.5l10.4-6.5a.6.6 0 0 0 0-1L8.9 5a.6.6 0 0 0-.9.5Z" fill="currentColor"/></svg>${{ ru: 'Смотреть видео · 30 сек', en: 'Watch the film · 30 s', uz: 'Videoni koʻrish · 30 s' }[pageLang()]}`;
+    chip.addEventListener('click', (e) => {
+      e.preventDefault();
+      reel.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'center' });
+    });
+    meta.prepend(chip);
+  }
 
   countUp(prose);
   stepsFill(prose);

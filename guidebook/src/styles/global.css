@@ -4441,3 +4441,21 @@ html.has-story .topbar,
 html.has-story .chapter-bar {
   visibility: hidden;
 }
+.hub-stories {
+  margin-top: 8px;
+}
+.hub-stories .label {
+  margin-bottom: 10px;
+}
+.chip-video {
+  background: var(--night);
+  color: #fff;
+  text-decoration: none;
+  box-shadow: 0 10px 24px -14px rgb(10 46 42 / 0.8);
+}
+.chip-video svg {
+  color: var(--brand);
+}
+.video-reel {
+  scroll-margin-top: 120px;
+}

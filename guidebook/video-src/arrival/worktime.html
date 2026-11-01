@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Work time film</title>
+<!-- "Work time" film: the working day and lunch, the five-day week, the public holidays, 28 days of leave after six months. -->
+<link rel="stylesheet" href="film.css" />
+<style>
+  .bg { position: absolute; inset: 0; background: radial-gradient(70% 40% at 50% 36%, #e2efe8, transparent 70%), linear-gradient(180deg, var(--sky) 0%, #f3f5f1 100%); }
+  .panel { position: absolute; left: 70px; width: 940px; top: 270px; padding: 50px 50px 46px; border-radius: 44px; background: #fff; z-index: 12; box-shadow: 0 60px 120px -40px rgb(10 46 42 / 0.5), inset 0 0 0 2px rgb(14 26 24 / 0.06); }
+  .panel small { display: block; font-size: 28px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+  .now { margin: 14px 0 34px; font-size: 120px; font-weight: 800; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; line-height: 1; }
+  .now em { font-style: normal; font-size: 40px; font-weight: 700; color: var(--brand-ink); margin-left: 18px; letter-spacing: 0; }
+  .track { position: relative; height: 60px; border-radius: 30px; background: var(--paper-2); overflow: hidden; }
+  .track .fill { position: absolute; inset: 0; background: var(--brand); transform-origin: 0 50%; }
+  .track .lunch { position: absolute; top: 0; bottom: 0; background: repeating-linear-gradient(-45deg, #f2c94c, #f2c94c 12px, #f7dc86 12px, #f7dc86 24px); }
+  .ticks { position: relative; height: 34px; margin-top: 14px; font-size: 28px; font-weight: 700; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .ticks span { position: absolute; top: 0; padding: 0 6px; }
+  .week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; margin-top: 44px; }
+  .week span { display: grid; place-items: center; height: 96px; border-radius: 24px; background: var(--paper-2); font-size: 34px; font-weight: 750; color: var(--ink-3); }
+  .week span.on { background: var(--night); color: #fff; }
+  .hols { position: absolute; left: 70px; right: 70px; top: 270px; z-index: 12; display: grid; gap: 18px; }
+  .hol { display: flex; align-items: center; gap: 28px; padding: 26px 32px; border-radius: 32px; background: #fff; box-shadow: 0 30px 60px -36px rgb(10 46 42 / 0.5), inset 0 0 0 2px rgb(14 26 24 / 0.06); }
+  .hol b { flex: none; display: grid; place-items: center; width: 130px; height: 110px; border-radius: 24px; background: var(--night); color: #fff; font-size: 30px; line-height: 1.05; text-align: center; font-weight: 800; }
+  .hol b i { display: block; font-style: normal; font-size: 52px; letter-spacing: -0.03em; }
+  .hol span { font-size: 40px; font-weight: 700; letter-spacing: -0.02em; }
+  .leave { position: absolute; left: 70px; width: 940px; top: 270px; padding: 56px 50px 50px; border-radius: 44px; background: radial-gradient(80% 70% at 100% 0%, #1d6b52, transparent 70%), var(--night); color: #fff; z-index: 12; box-shadow: 0 60px 120px -40px rgb(10 46 42 / 0.6); }
+  .leave small { display: block; font-size: 28px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #a9c2bc; }
+  .leave .n { margin-top: 16px; font-size: 240px; line-height: 0.9; font-weight: 800; letter-spacing: -0.06em; font-variant-numeric: tabular-nums; }
+  .leave .n em { font-style: normal; font-size: 56px; letter-spacing: -0.02em; margin-left: 16px; }
+  .leave .law { margin-top: 18px; font-size: 34px; color: #cfe1dc; }
+  .leave .law s { color: #8fb0a8; }
+  .months { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; margin-top: 50px; }
+  .months i { height: 22px; border-radius: 11px; background: rgb(255 255 255 / 0.16); }
+  .months i.on { background: var(--brand); }
+  .unlock { display: flex; align-items: center; gap: 20px; margin-top: 26px; font-size: 36px; font-weight: 700; }
+  .unlock span { display: grid; place-items: center; width: 70px; height: 70px; border-radius: 50%; background: var(--brand); }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="bg"></div>
+  <div class="panel" id="day">
+    <small id="dayK"></small>
+    <div class="now" id="now"></div>
+    <div class="track"><div class="fill" id="fill"></div><div class="lunch" id="lunch"></div></div>
+    <div class="ticks"><span style="left:0">08:30</span><span style="left:44.4%;transform:translateX(-100%)">12:30</span><span style="left:55.6%">13:30</span><span style="right:0">17:30</span></div>
+    <div class="week" id="week"></div>
+  </div>
+  <div class="hols" id="hols"></div>
+  <div class="leave" id="leave">
+    <small id="lvK"></small>
+    <div class="n"><span id="lvN">21</span><em id="lvD"></em></div>
+    <div class="law" id="law"></div>
+    <div class="months" id="months"></div>
+    <div class="unlock" id="unlock"><span><svg viewBox="0 0 24 24" width="40"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b id="unT"></b></div>
+  </div>
+</div>
+<script src="film.js"></script>
+<script>
+const { p, $, set, card, init, captions, progress, final, play, easeOut, back, fade } = Film;
+const T = init({
+  ru: {
+    c: [['Рабочий день', 'С 08:30 до 17:30', 'Обед — с 12:30 до 13:30. Пятидневка, суббота и воскресенье — выходные.'],
+        ['Праздники', 'Отдыхает вся страна', 'Даты 2026 года и дополнительные выходные — в статье.'],
+        ['Отпуск', '28 дней в году', 'По закону — 21 день, в нашем банке — 28. Первый отпуск — через 6 месяцев.']],
+    dayK: 'Рабочий день', lunch: 'обед', wd: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
+    hols: [['1', 'янв', 'Новый год'], ['20', 'мар', 'Рамазан хайит'], ['21', 'мар', 'Навруз'], ['27', 'мая', 'Курбан хайит'], ['1', 'сен', 'День независимости'], ['8', 'дек', 'День Конституции']],
+    lvK: 'Ежегодный отпуск', lvD: 'дней', law: 'по закону <s>21</s> · в Hamkorbank — 28', unT: 'Доступен через 6 месяцев работы',
+    final: { title: 'Ваш ритм работы', items: [{ text: '08:30–17:30, обед в 12:30' }, { text: 'Пятидневка: Пн–Пт' }, { text: '28 дней отпуска в году' }, { text: 'Согласуйте отпуск заранее', small: 'С руководителем — чтобы команда успела перестроиться', next: true }] },
+  },
+  en: {
+    c: [['Working day', 'From 08:30 to 17:30', 'Lunch is from 12:30 to 13:30. A five-day week; Saturday and Sunday are off.'],
+        ['Public holidays', 'The whole country rests', 'The 2026 dates and extra days off are in the article.'],
+        ['Annual leave', '28 days a year', 'The law gives 21 days; our bank gives 28. Your first leave comes after 6 months.']],
+    dayK: 'Working day', lunch: 'lunch', wd: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+    hols: [['1', 'Jan', 'New Year'], ['20', 'Mar', 'Ramadan Hayit'], ['21', 'Mar', 'Navruz'], ['27', 'May', 'Qurbon Hayit'], ['1', 'Sep', 'Independence Day'], ['8', 'Dec', 'Constitution Day']],
+    lvK: 'Annual leave', lvD: 'days', law: 'by law <s>21</s> · at Hamkorbank — 28', unT: 'Available after 6 months of work',
+    final: { title: 'Your working rhythm', items: [{ text: '08:30–17:30, lunch at 12:30' }, { text: 'Five days: Mon–Fri' }, { text: '28 days of leave a year' }, { text: 'Agree your leave early', small: 'With your manager, so the team can plan', next: true }] },
+  },
+  uz: {
+    c: [['Ish kuni', '08:30 dan 17:30 gacha', 'Tushlik — 12:30 dan 13:30 gacha. Besh kunlik hafta, shanba va yakshanba — dam olish.'],
+        ['Bayramlar', 'Butun mamlakat dam oladi', '2026-yil sanalari va qoʻshimcha dam olish kunlari — maqolada.'],
+        ['Taʼtil', 'Yiliga 28 kun', 'Qonun boʻyicha — 21 kun, bizning bankda — 28. Birinchi taʼtil — 6 oydan keyin.']],
+    dayK: 'Ish kuni', lunch: 'tushlik', wd: ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya'],
+    hols: [['1', 'yan', 'Yangi yil'], ['20', 'mar', 'Ramazon hayiti'], ['21', 'mar', 'Navroʻz'], ['27', 'may', 'Qurbon hayiti'], ['1', 'sen', 'Mustaqillik kuni'], ['8', 'dek', 'Konstitutsiya kuni']],
+    lvK: 'Yillik taʼtil', lvD: 'kun', law: 'qonun boʻyicha <s>21</s> · Hamkorbankda — 28', unT: '6 oy ishlagandan keyin',
+    final: { title: 'Ish ritmingiz', items: [{ text: '08:30–17:30, tushlik 12:30 da' }, { text: 'Besh kun: Du–Ju' }, { text: 'Yiliga 28 kun taʼtil' }, { text: 'Taʼtilni oldindan kelishing', small: 'Rahbar bilan — jamoa rejalashtira olishi uchun', next: true }] },
+  },
+});
+$('dayK').textContent = T.dayK; $('lvK').textContent = T.lvK; $('lvD').textContent = T.lvD; $('law').innerHTML = T.law; $('unT').textContent = T.unT;
+$('week').innerHTML = T.wd.map((d, i) => `<span id="w${i}">${d}</span>`).join('');
+$('hols').innerHTML = T.hols.map(([d, m, n], i) => `<div class="hol" id="h${i}"><b><i>${d}</i>${m}</b><span>${n}</span></div>`).join('');
+$('months').innerHTML = '<i></i>'.repeat(6);
+// the day runs 08:30→17:30 (540 minutes); lunch 12:30–13:30 sits at 240–300
+set('lunch', { left: `${(240 / 540) * 100}%`, width: `${(60 / 540) * 100}%` });
+
+function render(t) {
+  // 1. the working day
+  card('day', t, 0.2, 7.6);
+  const k = p(t, 1.0, 5.6);
+  const min = Math.round(k * 540);
+  const hh = Math.floor((8 * 60 + 30 + min) / 60), mm = (8 * 60 + 30 + min) % 60;
+  $('now').innerHTML = `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}${min >= 240 && min < 300 ? `<em>${T.lunch}</em>` : ''}`;
+  set('fill', { transform: `scaleX(${k})` });
+  T.wd.forEach((_, i) => $(`w${i}`).classList.toggle('on', i < 5 && t > 4.6 + i * 0.25));
+  // 2. holidays drop in one by one
+  T.hols.forEach((_, i) => {
+    const a = 8.0 + i * 0.5;
+    const v = p(t, a, a + 0.6, back);
+    set(`h${i}`, { opacity: t < a ? 0 : 1 - p(t, 13.6, 14.0), transform: `translateX(${(1 - v) * (i % 2 ? 900 : -900)}px) rotate(${(1 - v) * (i % 2 ? 6 : -6)}deg)` });
+  });
+  // 3. leave: 21 by law grows to 28 at the bank, six months fill, then it unlocks
+  card('leave', t, 14.2, 21.8);
+  $('lvN').textContent = String(Math.round(21 + 7 * p(t, 15.6, 17.0, easeOut)));
+  [...$('months').children].forEach((m, i) => m.classList.toggle('on', t > 17.4 + i * 0.35));
+  const u = p(t, 19.6, 20.1, back);
+  set('unlock', { opacity: t < 19.6 ? 0 : 1, transform: `scale(${0.7 + u * 0.3})`, transformOrigin: '0 50%' });
+
+  captions(t, [[T.c[0], 0.3, 7.4], [T.c[1], 7.6, 13.8], [T.c[2], 14.2, 21.6]]);
+  progress(t, [[0, 7.5], [7.5, 14], [14, 21.8]]);
+  final(t, 22.0);
+}
+play(render, 28.5);
+</script>
+</body>
+</html>
