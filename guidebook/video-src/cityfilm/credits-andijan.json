@@ -1,0 +1,54 @@
+[
+  {
+    "file": "andijan-1.jpg",
+    "city": "andijan",
+    "place": {
+      "ru": "Мечеть Джами",
+      "en": "Jami mosque",
+      "uz": "Jome masjidi"
+    },
+    "author": "4pf3154f7",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:Jami_Mosque_in_Andijan.jpg"
+  },
+  {
+    "file": "andijan-2.jpg",
+    "city": "andijan",
+    "place": {
+      "ru": "Музей комплекса Джами",
+      "en": "Jami complex museum",
+      "uz": "Jome majmuasi muzeyi"
+    },
+    "author": "Petar Milošević",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Museum,_Andijan_Jame_Mosque_Complex,_Uzbekistan.jpg"
+  },
+  {
+    "file": "andijan-3.jpg",
+    "city": "andijan",
+    "place": {
+      "ru": "Проспект Бабура",
+      "en": "Babur avenue",
+      "uz": "Bobur shoh koʻchasi"
+    },
+    "author": "Umarxon III",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Babur_Prospect,_Andijan,_Uzbekistan.jpg"
+  },
+  {
+    "file": "andijan-4.jpg",
+    "city": "andijan",
+    "place": {
+      "ru": "Парк имени Навои",
+      "en": "Navoi park",
+      "uz": "Navoiy bogʻi"
+    },
+    "author": "Xasanboy off",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Alisher_Navoiy_nomli_markaziy_madaniyat_va_istirohat_bog%CA%BBi_(Andijon_viloyati,_Andijon_shahri).jpg"
+  }
+]

@@ -1,0 +1,54 @@
+[
+  {
+    "file": "tashkent-1.jpg",
+    "city": "tashkent",
+    "place": {
+      "ru": "Комплекс Хазрати Имам",
+      "en": "Hazrati Imam complex",
+      "uz": "Hazrati Imom majmuasi"
+    },
+    "author": "LBM1948",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Hazrat_Imam_01.jpg"
+  },
+  {
+    "file": "tashkent-2.jpg",
+    "city": "tashkent",
+    "place": {
+      "ru": "Медресе Кукельдаш",
+      "en": "Kukeldash madrasah",
+      "uz": "Koʻkaldosh madrasasi"
+    },
+    "author": "Adam Harangozó",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Kukeldash_Madrasah_in_Tashkent_2.jpg"
+  },
+  {
+    "file": "tashkent-3.jpg",
+    "city": "tashkent",
+    "place": {
+      "ru": "Базар Чорсу",
+      "en": "Chorsu bazaar",
+      "uz": "Chorsu bozori"
+    },
+    "author": "Adam Harangozó",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Chorsu_Bazaar_in_Tashkent_3.jpg"
+  },
+  {
+    "file": "tashkent-4.jpg",
+    "city": "tashkent",
+    "place": {
+      "ru": "Мечеть Минор",
+      "en": "Minor mosque",
+      "uz": "Minor masjidi"
+    },
+    "author": "Humoyun Mehridinov",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Minor_masjidi_15.jpg"
+  }
+]

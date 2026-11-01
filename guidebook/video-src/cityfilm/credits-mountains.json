@@ -1,0 +1,67 @@
+[
+  {
+    "file": "mountains-1.jpg",
+    "city": "mountains",
+    "place": {
+      "ru": "Чарвакское водохранилище",
+      "en": "Charvak reservoir",
+      "uz": "Chorvoq suv ombori"
+    },
+    "author": "26D",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Clouds_over_the_Charvak_Reservoir.jpg"
+  },
+  {
+    "file": "mountains-2.jpg",
+    "city": "mountains",
+    "place": {
+      "ru": "Горы Чимгана",
+      "en": "Chimgan mountains",
+      "uz": "Chimyon togʻlari"
+    },
+    "author": "Jabez at English Wikipedia",
+    "license": "Public domain",
+    "licenseUrl": "",
+    "source": "https://commons.wikimedia.org/wiki/File:Greater_Chimgan_Mountain.JPG"
+  },
+  {
+    "file": "mountains-3.jpg",
+    "city": "mountains",
+    "place": {
+      "ru": "Угам-Чаткальский парк",
+      "en": "Ugam-Chatkal park",
+      "uz": "Ugom-Chotqol bogʻi"
+    },
+    "author": "26D",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Ugam-Chatkal_State_Biosphere_Reserve_in_January.jpg"
+  },
+  {
+    "file": "mountains-4.jpg",
+    "city": "mountains",
+    "place": {
+      "ru": "Бельдерсай",
+      "en": "Beldersay",
+      "uz": "Beldersoy"
+    },
+    "author": "German Stimban",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Beldersay_start.JPG"
+  },
+  {
+    "file": "mountains-5.jpg",
+    "city": "mountains",
+    "place": {
+      "ru": "Западный Тянь-Шань",
+      "en": "Western Tian Shan",
+      "uz": "Gʻarbiy Tyan-Shan"
+    },
+    "author": "Panpanchik",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Western_Tian_Shan_mountains_in_Amirsoy,_Uzbekistan.jpg"
+  }
+]
