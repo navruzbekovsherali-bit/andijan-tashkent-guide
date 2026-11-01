@@ -104,8 +104,10 @@ const faqPreview = pages.flatMap((p) => p.entry.data.faq.slice(0, 1).map((f) => 
                   {tr('video')}
                 </span>
               )}
-              <span class="city-name">{c.title[lang]}</span>
-              <span class="round-arrow"><Icon name="arrow" size={16} /></span>
+              <span class="city-bar">
+                <span class="city-name">{c.title[lang]}</span>
+                <span class="round-arrow"><Icon name="arrow" size={16} /></span>
+              </span>
             </a>
           </li>
         ))
