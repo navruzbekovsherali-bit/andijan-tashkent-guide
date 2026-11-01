@@ -3784,3 +3784,262 @@ html[data-view='expat'] .q-aud {
     display: none;
   }
 }
+
+/* ==========================================================================
+   Reading kit: chapters, steps, fact cards, phone-friendly tables, chapter bar
+   ========================================================================== */
+/* chapter number above each section heading */
+.prose h2 .ch-no {
+  display: block;
+  width: max-content;
+  margin-bottom: 10px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgb(26 167 82 / 0.12);
+  color: var(--brand-ink);
+  font-size: var(--t-label);
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+}
+.js .prose h2 .ch-no.reveal {
+  transform: translateY(8px) scale(0.9);
+}
+
+/* steps: a route of numbered stops whose line fills as you read */
+.prose ol.route-steps {
+  --fill: 0;
+  position: relative;
+  padding-left: 0;
+  list-style: none;
+  counter-reset: step;
+}
+.prose ol.route-steps::before,
+.prose ol.route-steps::after {
+  content: '';
+  position: absolute;
+  left: 17px;
+  top: 18px;
+  bottom: 18px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--line);
+}
+.prose ol.route-steps::after {
+  background: var(--brand);
+  transform-origin: top;
+  transform: scaleY(var(--fill));
+}
+.prose ol.route-steps > li {
+  position: relative;
+  counter-increment: step;
+  min-height: 36px;
+  padding: 6px 0 6px 52px;
+}
+.prose ol.route-steps > li + li {
+  margin-top: 14px;
+}
+.prose ol.route-steps > li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--white);
+  box-shadow: inset 0 0 0 2px var(--line);
+  color: var(--ink-2);
+  font-weight: 750;
+  font-size: var(--t-small);
+  font-variant-numeric: tabular-nums;
+  transition: background-color 350ms, color 350ms, box-shadow 350ms, transform 450ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.prose ol.route-steps > li.is-passed::before {
+  background: var(--brand);
+  box-shadow: none;
+  color: #fff;
+  transform: scale(1.06);
+}
+.prose ol.route-steps > li.lead > strong:first-child {
+  display: block;
+  margin-bottom: 2px;
+}
+
+/* fact cards: bullet points with a bold lead */
+.prose ul.facts {
+  display: grid;
+  gap: 10px;
+  padding-left: 0;
+  list-style: none;
+}
+.prose ul.facts > li {
+  max-width: none;
+  margin: 0;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: var(--white);
+  box-shadow: 0 1px 0 rgb(14 26 24 / 0.04), 0 14px 30px -24px rgb(10 46 42 / 0.45), inset 0 0 0 1px rgb(14 26 24 / 0.06);
+  color: var(--ink-2);
+  transition: transform 300ms var(--ease), box-shadow 300ms;
+}
+.prose ul.facts > li.lead > strong:first-child {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--ink);
+  font-size: 1.05em;
+}
+.prose ul.facts > li::before {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 4px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+  background: var(--brand);
+}
+@media (hover: hover) {
+  .prose ul.facts > li:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 1px 0 rgb(14 26 24 / 0.04), 0 22px 40px -24px rgb(10 46 42 / 0.5), inset 0 0 0 1px rgb(14 26 24 / 0.06);
+  }
+}
+@media (min-width: 640px) {
+  .prose ul.facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* bold numbers stand out */
+.prose strong.num {
+  color: var(--brand-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* wide tables become stacked cards on phones */
+@media (max-width: 639px) {
+  .prose table.cards-on-phone,
+  .prose table.cards-on-phone tbody,
+  .prose table.cards-on-phone tr,
+  .prose table.cards-on-phone td {
+    display: block;
+  }
+  .prose table.cards-on-phone thead {
+    display: none;
+  }
+  .prose table.cards-on-phone tr {
+    margin-bottom: 10px;
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: var(--white);
+    box-shadow: inset 0 0 0 1px rgb(14 26 24 / 0.07);
+  }
+  .prose table.cards-on-phone td {
+    padding: 6px 0;
+    border: 0;
+  }
+  .prose table.cards-on-phone td:first-child {
+    padding-top: 0;
+    font-size: 1.05em;
+  }
+  .prose table.cards-on-phone td:not(:first-child)::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 2px;
+    color: var(--ink-3);
+    font-size: var(--t-label);
+    font-weight: 650;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+}
+
+/* chapter bar: phones only, slides in under the top bar once the first section is reached */
+.chapter-bar {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  top: calc(env(safe-area-inset-top, 0px) + var(--bar-h) + 18px);
+  z-index: 39;
+  border-radius: 999px;
+  opacity: 0;
+  transform: translateY(-12px);
+  pointer-events: none;
+  transition: opacity 300ms var(--ease), transform 400ms var(--ease);
+}
+.chapter-bar.is-shown {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.topbar.is-hidden ~ .chapter-bar,
+body:has(.topbar.is-hidden) .chapter-bar {
+  top: calc(env(safe-area-inset-top, 0px) + 10px);
+}
+.chapter-track {
+  display: flex;
+  gap: 4px;
+  padding: 5px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-radius: inherit;
+}
+.chapter-track::-webkit-scrollbar {
+  display: none;
+}
+.chapter-track a {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 70vw;
+  min-height: 38px;
+  padding: 0 14px 0 6px;
+  border-radius: 999px;
+  color: var(--ink-2);
+  font-size: var(--t-small);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-decoration: none;
+  transition: background-color 250ms, color 250ms;
+}
+.chapter-track a b {
+  display: grid;
+  place-items: center;
+  flex: none;
+  min-width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgb(14 26 24 / 0.06);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  transition: background-color 250ms, color 250ms;
+}
+.chapter-track a.is-done b {
+  background: rgb(26 167 82 / 0.16);
+  color: var(--brand-ink);
+}
+.chapter-track a.is-active {
+  background: var(--ink);
+  color: #fff;
+}
+.chapter-track a.is-active b {
+  background: var(--brand);
+  color: #fff;
+}
+@media (min-width: 1100px) {
+  .chapter-bar {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chapter-bar,
+  .prose ol.route-steps > li::before {
+    transition: none;
+  }
+}

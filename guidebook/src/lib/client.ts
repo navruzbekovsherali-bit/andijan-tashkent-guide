@@ -382,6 +382,7 @@ export function initSite() {
     callouts,
     dialable,
     tables,
+    readingKit,
     decorate,
     reveal,
     () => (cleanupProgress = progress()),
@@ -999,6 +1000,159 @@ function headerOnScroll() {
   });
 }
 
+
+/* ---------- Reading kit: long articles become chapters, steps, fact cards and a chapter bar ---------- */
+const CHAPTERS = { ru: 'Разделы статьи', en: 'Sections of the article', uz: 'Maqola boʻlimlari' };
+
+function readingKit() {
+  const prose = document.querySelector<HTMLElement>('article .prose');
+  if (!prose) return;
+  const checklist = !!prose.closest('article[data-checklist]');
+  const heads = Array.from(prose.querySelectorAll<HTMLElement>(':scope > h2'));
+
+  // chapter numbers: 01, 02… above each section heading
+  heads.forEach((h, i) => {
+    const n = document.createElement('span');
+    n.className = 'ch-no';
+    n.setAttribute('aria-hidden', 'true');
+    n.textContent = String(i + 1).padStart(2, '0');
+    h.prepend(n);
+  });
+
+  if (!checklist) {
+    // numbered lists read as a route of steps
+    prose.querySelectorAll<HTMLOListElement>(':scope > ol').forEach((ol) => ol.classList.add('route-steps'));
+    // bullet lists whose items open with a bold lead become cards
+    prose.querySelectorAll<HTMLUListElement>(':scope > ul').forEach((ul) => {
+      const items = Array.from(ul.children);
+      const led = items.filter((li) => li.firstElementChild?.tagName === 'STRONG' && li.firstChild === li.firstElementChild);
+      if (items.length < 2 || led.length / items.length < 0.6) return;
+      ul.classList.add('facts');
+      led.forEach((li) => {
+        li.classList.add('lead');
+        // the bold lead becomes the card title, so the dash or colon after it goes
+        const after = li.firstElementChild!.nextSibling;
+        if (after?.nodeType === 3) after.textContent = (after.textContent || '').replace(/^\s*[—–:-]\s*/, ' ').replace(/^\s+/, '');
+        const lead = li.firstElementChild as HTMLElement;
+        lead.textContent = (lead.textContent || '').replace(/[.:]\s*$/, '');
+      });
+    });
+    prose.querySelectorAll<HTMLOListElement>(':scope > ol.route-steps > li').forEach((li) => {
+      if (li.firstElementChild?.tagName === 'STRONG' && li.firstChild === li.firstElementChild) li.classList.add('lead');
+    });
+  }
+
+  // wide tables turn into cards on phones: each cell carries its column name
+  prose.querySelectorAll<HTMLTableElement>('table').forEach((t) => {
+    const names = Array.from(t.querySelectorAll('thead th')).map((th) => (th.textContent || '').trim());
+    if (names.length < 3) return;
+    t.classList.add('cards-on-phone');
+    t.querySelectorAll('tbody tr').forEach((tr) => Array.from(tr.children).forEach((td, i) => td.setAttribute('data-label', names[i] || '')));
+  });
+
+  countUp(prose);
+  stepsFill(prose);
+  if (heads.length >= 3) chapterBar(heads);
+}
+
+/** Bold numbers ("12%", "30 дней", "440 000 сум") count up the first time they come into view. */
+function countUp(root: HTMLElement) {
+  if (reduceMotion()) return;
+  const nums = Array.from(root.querySelectorAll<HTMLElement>('strong')).filter((el) => {
+    const t = (el.textContent || '').trim();
+    return t.length <= 24 && /^[≈~]?\s?\d/.test(t) && !/[–—:\-/]/.test(t) && !/\d[.,]\d+[.,]\d/.test(t) && !el.closest('a, table');
+  });
+  if (!nums.length) return;
+  const run = (el: HTMLElement) => {
+    const text = el.textContent || '';
+    const m = text.match(/\d[\d\s ]*(?:[.,]\d+)?/);
+    if (!m) return;
+    const raw = m[0];
+    const target = parseFloat(raw.replace(/[\s ]/g, '').replace(',', '.'));
+    if (!isFinite(target) || target === 0) return;
+    const dec = (raw.split(/[.,]/)[1] || '').length;
+    const sep = raw.includes(',') ? ',' : '.';
+    const group = /\d[\s ]\d/.test(raw);
+    const fmt = (v: number) => {
+      let out = v.toFixed(dec).replace('.', sep);
+      if (group) out = out.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+      return out;
+    };
+    const t0 = performance.now();
+    const dur = 900;
+    const tick = (now: number) => {
+      const k = Math.min(1, (now - t0) / dur);
+      const e = 1 - Math.pow(1 - k, 3);
+      el.textContent = text.replace(raw, k < 1 ? fmt(target * e) : raw);
+      if (k < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  };
+  const seen = new IntersectionObserver(
+    (es) => es.forEach((e) => {
+      if (!e.isIntersecting) return;
+      seen.unobserve(e.target);
+      run(e.target as HTMLElement);
+    }),
+    { threshold: 1 },
+  );
+  nums.forEach((el) => {
+    el.classList.add('num');
+    seen.observe(el);
+  });
+}
+
+/** The line of a steps list fills as you read down it. */
+function stepsFill(root: HTMLElement) {
+  const lists = Array.from(root.querySelectorAll<HTMLElement>('.route-steps'));
+  if (!lists.length) return;
+  onScrollFrame(() => {
+    const at = window.innerHeight * 0.62;
+    for (const ol of lists) {
+      const r = ol.getBoundingClientRect();
+      ol.style.setProperty('--fill', String(clamp01((at - r.top) / Math.max(r.height, 1))));
+      Array.from(ol.children).forEach((li) => li.classList.toggle('is-passed', (li as HTMLElement).getBoundingClientRect().top < at));
+    }
+  });
+}
+
+/** Phones: a slim glass bar with the article's sections, so the reader always knows where they are. */
+function chapterBar(heads: HTMLElement[]) {
+  const lang = pageLang();
+  const bar = document.createElement('nav');
+  bar.className = 'chapter-bar glass';
+  bar.setAttribute('aria-label', CHAPTERS[lang]);
+  bar.innerHTML = `<div class="chapter-track">${heads
+    .map((h, i) => {
+      const label = Array.from(h.childNodes).filter((n) => !(n as HTMLElement).classList?.contains('ch-no')).map((n) => n.textContent).join('').trim();
+      return `<a href="#${h.id}" data-i="${i}"><b>${String(i + 1).padStart(2, '0')}</b>${escapeHtml(label)}</a>`;
+    })
+    .join('')}</div>`;
+  document.body.append(bar);
+  const track = bar.querySelector<HTMLElement>('.chapter-track')!;
+  const links = Array.from(track.querySelectorAll<HTMLAnchorElement>('a'));
+  const end = document.querySelector<HTMLElement>('.pager') || document.querySelector<HTMLElement>('.site-footer');
+  let active = -2;
+  onScrollFrame(() => {
+    const top = 140;
+    const shown = heads[0].getBoundingClientRect().top < top && (!end || end.getBoundingClientRect().top > window.innerHeight * 0.6);
+    bar.classList.toggle('is-shown', shown);
+    let a = -1;
+    heads.forEach((h, i) => {
+      if (h.getBoundingClientRect().top < top + 40) a = i;
+    });
+    if (a !== active) {
+      active = a;
+      links.forEach((l, i) => {
+        l.classList.toggle('is-active', i === a);
+        l.classList.toggle('is-done', i < a);
+      });
+      const cur = links[a];
+      if (cur) track.scrollTo({ left: cur.offsetLeft - 16, behavior: reduceMotion() ? 'auto' : 'smooth' });
+    }
+  });
+}
+
 /* ---------- Checklists: tick what is done; remembered on this device ---------- */
 const UI = {
   ru: { done: 'Сделано', of: 'из', reset: 'Сбросить', mark: 'Отметить' },
@@ -1140,6 +1294,10 @@ function decorate() {
   mark('.prose > blockquote');
   mark('.prose > .phone-demo');
   mark('.prose > .video-reel');
+  mark('.prose > p');
+  mark('.route-steps > li', true);
+  mark('.facts > li', true);
+  mark('.prose > h2 .ch-no');
   document.querySelectorAll<HTMLElement>('.table-scroll').forEach((t) =>
     t.querySelectorAll<HTMLElement>('tbody tr').forEach((tr, i) => {
       tr.classList.add('reveal');
