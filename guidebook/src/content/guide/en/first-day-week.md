@@ -13,7 +13,7 @@ faq:
   - q: 'What time should I arrive on my first day?'
     a: 'The working day starts at 08:30. Arrive by then: the welcome meeting begins at 09:00.'
   - q: 'What should I bring on my first day?'
-    a: 'Essential: your original passport and the documents on the list from HR. Useful: your own laptop (if you have one), a notebook, a pen and a bottle of water.'
+    a: 'Essential: your original passport and the documents on the list from HR. Useful: a notebook, a pen and a bottle of water. The bank will give you a work computer and set it up.'
   - q: 'Who will meet me at the office?'
     a: 'The HR onboarding specialist or your Buddy.'
   - q: 'What is the dress code at the bank?'
@@ -33,7 +33,7 @@ We have prepared everything for a comfortable start. Below is the plan for your 
 ### What to bring
 
 - **Essential:** your original passport and the documents for your paperwork, as listed by HR.
-- **Useful:** your own laptop (if you have one), a notebook, a pen and a bottle of water.
+- **Useful:** a notebook, a pen and a bottle of water. The bank will give you a work computer and set it up; personal devices are not connected to the corporate network.
 
 ## Your first day
 

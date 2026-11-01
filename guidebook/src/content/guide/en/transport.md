@@ -70,7 +70,7 @@ Good if you are not in a hurry and want to feel the rhythm of the city.
 Good if you want complete freedom to get around.
 
 - **Documents:** an international driving permit is required.
-- **Price:** according to the onboarding team, from $30 to $50 a day.
+- **Price:** about $900–1500 a month ($30–50 a day).
 - **Where to hire:** there are international chains (for example, Europcar) and local rental companies.
 - **Traffic** drives on the right.
 

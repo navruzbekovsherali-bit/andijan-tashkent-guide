@@ -19,7 +19,7 @@ faq:
   - q: 'Which taxi app should I use?'
     a: 'The main service is Yandex Go. In Tashkent there is also MyTaxi. For trips between cities, inDrive is handy: you suggest the price yourself.'
   - q: 'Do I need to register my phone to use the apps?'
-    a: 'If you use a local SIM card, yes: you need to register the IMEI on uzimei.uz. Sources give a deadline of 30 or 60 days from first connection; check the exact deadline on uzimei.uz.'
+    a: 'If you use a local SIM card, yes: you need to register the IMEI on uzimei.uz. The deadline is 30 days from the first use of a local SIM card.'
 ---
 
 Most services are linked to a local phone number. So the first thing to do is buy a SIM card from one of the operators: Beeline, Ucell, Mobiuz or Uztelecom.
@@ -65,4 +65,4 @@ On Android, search for these apps in Google Play by name.
 2. **Register your IMEI.** If you use a local SIM card, register your phone on [uzimei.uz](https://uzimei.uz). Otherwise it will be blocked on local networks.
 3. **Subscribe to useful Telegram bots** of the utility companies and the tax service. It is the easiest way to check balances and charges.
 
-> **Check with HR.** Sources give different deadlines for IMEI registration: 30 or 60 days from when you first connect a local SIM card. Check the exact deadline on uzimei.uz and do not put it off.
+> **Important.** Register the IMEI within 30 days of first using a local SIM card, or the phone will be cut off from the network. Do not put it off.

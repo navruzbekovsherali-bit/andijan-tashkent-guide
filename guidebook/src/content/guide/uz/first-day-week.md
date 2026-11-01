@@ -13,7 +13,7 @@ faq:
   - q: 'Birinchi kuni soat nechada kelish kerak?'
     a: 'Ish kuni 08:30 da boshlanadi. Shu vaqtgacha keling: 09:00 da tanishuv uchrashuvi boshlanadi.'
   - q: 'Birinchi kuni oʻzim bilan nima olishim kerak?'
-    a: 'Albatta — pasportning asl nusxasi va HR roʻyxatidagi hujjatlar. Foydali — oʻz noutbukingiz (agar boʻlsa), daftar, ruchka va bir shisha suv.'
+    a: 'Albatta — pasportning asl nusxasi va HR roʻyxatidagi hujjatlar. Foydali — daftar, ruchka va bir shisha suv. Ish kompyuterini bank beradi va sozlab qoʻyadi.'
   - q: 'Meni ofisda kim kutib oladi?'
     a: 'HR moslashuv boʻyicha mutaxassisi yoki Buddy’ingiz.'
   - q: 'Bankda qanday dress-kod?'
@@ -33,7 +33,7 @@ Qulay start uchun hammasini tayyorladik. Quyida — birinchi kun va birinchi haf
 ### Oʻzingiz bilan nima olish kerak
 
 - **Albatta:** pasportning asl nusxasi va HR roʻyxati boʻyicha rasmiylashtirish uchun hujjatlar.
-- **Foydali:** oʻz noutbukingiz (agar boʻlsa), daftar, ruchka va bir shisha suv.
+- **Foydali:** daftar, ruchka va bir shisha suv. Ish kompyuterini bank beradi va sozlab qoʻyadi, shaxsiy qurilmalar korporativ tarmoqqa ulanmaydi.
 
 ## Birinchi kun dasturi
 

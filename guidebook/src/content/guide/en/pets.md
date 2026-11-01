@@ -56,7 +56,7 @@ The requirements are based on the rules of the International Air Transport Assoc
 
 1. **Arrange transport with the airline** right after buying your ticket: the number of places for animals on board is limited. Uzbekistan Airways' rules are on [uzairways.com](https://www.uzairways.com).
 2. **Check the requirements of the destination country** if you are taking a pet *out of* Uzbekistan. For example, the EU and the UAE may require a rabies antibody test.
-3. **Get the veterinary certificate (Form No. 1)** at a state veterinary clinic 2–3 days before departure.
+3. **Get the veterinary certificate (Form No. 1)** at a state veterinary clinic 1–5 days before departure.
 4. **Arrive at the airport 3–4 hours early.** First go through veterinary control in the terminal and get the international certificate, then go to check-in.
 
 ## Living with a pet in Uzbekistan

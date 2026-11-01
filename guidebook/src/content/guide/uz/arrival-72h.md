@@ -15,12 +15,12 @@ sources:
     url: 'https://uzimei.uz'
 tldr:
   - 'Aeroportda telefonni «qizil yoʻlak»da deklaratsiya qiling — aks holda IMEI’ni roʻyxatdan oʻtkazishda uning narxining 30% ini toʻlaysiz.'
-  - '3 kun ichida vaqtincha turgan joy boʻyicha roʻyxatdan oʻting: mehmonxonada buni siz uchun qilishadi, kvartirada — emehmon.uz orqali.'
+  - 'Turgan joy boʻyicha roʻyxat — 3 kun ichida. Mehmonxonada buni mehmonxona qiladi, kvartirada — uy egasi: oʻzingiz roʻyxatdan oʻta olmaysiz.'
   - 'Roʻyxatni kechiktirganlik uchun — 5 BHMdan (2,2 mln soʻm) jarima; jarimani toʻlamaslik mamlakatdan chiqarib yuborishga olib kelishi mumkin.'
   - 'Birinchi kunning oʻzidayoq moslashuv boʻyicha mutaxassis bilan bogʻlaning va unga manzilingizni ayting.'
 faq:
   - q: 'IMEI’ni roʻyxatdan oʻtkazish uchun necha kun bor?'
-    a: 'Manbalar turlicha: mahalliy SIM-karta birinchi ulangan paytdan boshlab 30 yoki 60 kun. Aniq muddatni uzimei.uz saytida aniqlang va roʻyxatdan oʻtkazishni kechiktirmang. Rouming rejimidagi xorijiy SIM-karta bilan telefonni roʻyxatdan oʻtkazish shart emas.'
+    a: 'Mahalliy SIM-kartadan birinchi foydalanilgan paytdan boshlab 30 kun. Ulgurmasangiz, telefon roʻyxatdan oʻtkazilguncha mobil tarmoqdan uziladi. Rouming rejimidagi xorijiy SIM-karta bilan telefonni roʻyxatdan oʻtkazish shart emas.'
   - q: 'Telefonni bojxonada deklaratsiya qilish kerakmi?'
     a: 'Ha. Bojxona deklaratsiyasisiz IMEI’ni roʻyxatdan oʻtkazishda qurilma qiymatining 30% ini, 01.01.2027 dan — 20% ini toʻlashga toʻgʻri keladi. Aeroportlarda telefonni QR-kod orqali onlayn deklaratsiya qilish mumkin.'
   - q: 'Vaqtincha turgan joy boʻyicha qaysi muddatda roʻyxatdan oʻtish kerak?'
@@ -58,7 +58,8 @@ Bu dastlabki kunlar uchun eng muhim sahifa. Bosqichlarni tartib bilan bajaring: 
 
 1. **Vaqtincha turgan joy boʻyicha roʻyxatdan oʻting.** Bu sizning asosiy huquqiy qadamingiz.
    - **Mehmonxonada** roʻyxat avtomatik rasmiylashtiriladi. Chiqib ketayotganda roʻyxatga olish talonining chop etilgan nusxasini soʻrang.
-   - **Kvartirada** [emehmon.uz](https://emehmon.uz) orqali mustaqil ravishda yoki uy egasi bilan birga migratsiya boʻlimida roʻyxatdan oʻting.
+   - **Kvartirada** roʻyxatni **uy egasi** rasmiylashtiradi — [emehmon.uz](https://emehmon.uz) orqali yoki migratsiya boʻlimida. Oʻzingiz roʻyxatdan oʻta olmaysiz: arizani qabul qiluvchi tomon beradi, kechiktirish uchun jarima esa sizga ham, unga ham solinadi.
+   - **Ijara shartnomasini imzolashdan oldin** uy egasi sizni roʻyxatdan oʻtkazishga va rasmiy shartnoma tuzishga rozi ekaniga ishonch hosil qiling. Baʼzi ijaraga beruvchilar bundan qochadi — unda roʻyxat boʻlmaydi va muammo sizda boʻladi. Ikkilansangiz, darhol moslashuv boʻyicha mutaxassisga ayting.
 2. **Hujjatlarni tayyorlang:** xorijga chiqish pasporti, oldingi yashash joyidan talon (agar boʻlsa), uy egasining roziligi.
 3. **Buddy bilan tanishing.** Murabbiyingiz bank hayotiga tezroq qoʻshilishga yordam beradi.
 
@@ -72,7 +73,7 @@ Bu dastlabki kunlar uchun eng muhim sahifa. Bosqichlarni tartib bilan bajaring: 
 2. Agar mahalliy SIM-kartadan foydalansangiz, **telefon IMEI’sini** [uzimei.uz](https://uzimei.uz) saytida **roʻyxatdan oʻtkazing**. Holatni `*1170#` buyrugʻi bilan, IMEI’ni SMS orqali 1170 raqamiga yuborib, uzimei.uz yoki my.gov.uz saytida tekshirish mumkin.
 3. **Hujjatlarni saqlang:** bojxona deklaratsiyasi, roʻyxatga olish taloni, ijara shartnomasi.
 
-> **HR bilan aniqlang.** Manbalar IMEI’ni roʻyxatdan oʻtkazish muddatini turlicha koʻrsatadi: mahalliy SIM-karta birinchi ulangandan boshlab 30 yoki 60 kun. Aniq muddatni uzimei.uz saytida aniqlang va kechiktirmang. Ulgurmasangiz, telefon mahalliy tarmoqlarda bloklanadi. Rouming rejimidagi xorijiy SIM-karta bilan roʻyxatdan oʻtkazish shart emas.
+> **Muhim.** IMEI’ni mahalliy SIM-kartadan birinchi foydalanilgandan keyin **30 kun** ichida roʻyxatdan oʻtkazish kerak. Ulgurmasangiz, telefon roʻyxatdan oʻtkazilguncha mobil tarmoqdan uziladi. Shu 30 kun ichida yigʻim kamroq. Rouming rejimidagi xorijiy SIM-karta bilan roʻyxatdan oʻtkazish shart emas.
 
 ## Roʻyxatdan oʻtish muddatlari va jarimalar
 

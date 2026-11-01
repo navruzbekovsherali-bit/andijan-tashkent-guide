@@ -58,4 +58,4 @@ If the car stays in the country longer than 90 days, you have to pay a fee. Sinc
 - **Overstaying.** If you exceed the period and do not pay the fee, you face large fines, the car being towed to an impound lot and even confiscation by court order.
 - **Permanent import (customs clearance).** If you decide to keep the car for good, the benefits for small-engine cars were cancelled on 1 January 2026: the duty is 15% of the value plus $0.40 for each cm³ of engine capacity. This rule applies to permanent import, not temporary import.
 
-> **Tip.** It is often simpler and cheaper to rent a car: according to the adaptation team, it costs about $300–500. This way you avoid fees, paperwork and waiting at the border.
+> **Tip.** It is often simpler and cheaper to rent a car: it costs about $900–1500 a month ($30–50 a day). This way you avoid fees, paperwork and waiting at the border.

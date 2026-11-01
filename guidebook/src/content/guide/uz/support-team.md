@@ -15,7 +15,7 @@ faq:
   - q: 'HR Business Partner nima bilan shugʻullanadi?'
     a: 'Rasmiylashtirish, maʼlumotnomalar va mehnat qonunchiligi boʻyicha savollar, tibbiy xizmat va sugʻurta, shuningdek, boshqa shahardan koʻchib kelgan boʻlsangiz, relokatsiya va uy-joy bilan yordam beradi.'
   - q: 'Hamkasblarga Telegram’da yozsa boʻladimi?'
-    a: 'Ha, bizda shunday odat, javoblar esa tez va aniq boʻladi.'
+    a: 'Ha, tezkor ish savollari uchun bizda shunday odat. Lekin mijozlar maʼlumotlari, hujjatlar, parollar va har qanday bank sirini faqat korporativ kanallar orqali yuboring: IceWarp pochtasi va EHA.'
 ---
 
 Yangi joydagi dastlabki vaqt — har doim maʼlumotlar oqimi. Asosiy qoida: **savol yoki shubha boʻlsa — darhol soʻrang**. Biz har bir qadamingizni baholash uchun emas, ish ritmiga kirishingizga yordam berish uchun yoningizdamiz.
@@ -44,4 +44,6 @@ HR-hamkor sizga ishlash qulay boʻlishini va barcha rasmiyatchiliklar oʻz vaqti
 - **Salomatlik:** tibbiy xizmat va sugʻurta.
 - **Koʻchish:** agar boshqa shahardan koʻchib kelgan boʻlsangiz, HRBP relokatsiya va uy-joy bilan yordam beradi.
 
-> **Maslahat.** Hamkasblarga Telegram’da yozishdan tortinmang: bizda tez va aniq javob berish odat. Kimga murojaat qilishni bilmasangiz, Buddy’ingizga yozing — u yoʻl koʻrsatadi.
+> **Maslahat.** Tezkor savollar uchun hamkasblarga Telegram’da yozish mumkin: bizda tez va aniq javob berish odat. Kimga murojaat qilishni bilmasangiz, Buddy’ingizga yozing — u yoʻl koʻrsatadi.
+
+> **Muhim.** Mijozlar maʼlumotlari, hujjatlar, parollar, ish tizimlarining skrinshotlari va har qanday bank sirini Telegram va boshqa shaxsiy messenjerlarga yuborish mumkin emas. Buning uchun faqat korporativ kanallar bor: IceWarp pochtasi va EHA.

@@ -25,7 +25,7 @@ faq:
   - q: 'Who do I call in an emergency?'
     a: 'Call 112. It is a single service for any emergency. You can also call directly: 101 for fire, 102 for police, 103 for an ambulance, 104 for gas emergencies, 1050 for the Ministry of Emergency Situations.'
   - q: 'How do I contact my embassy?'
-    a: 'Phone numbers for the embassies of the USA, Germany, France and Russia are on this page. The British Embassy takes enquiries through the contact form on gov.uk.'
+    a: 'The embassy phone numbers are on this page. The British Embassy has no public phone line: for urgent help use the contact form on gov.uk or the FCDO 24/7 number in London, +44 20 7008 5000.'
   - q: 'Who at the bank do I call if something happens?'
     a: 'Ask your onboarding specialist for the contacts of your HR Business Partner and the bank''s emergency line, and save them in your phone.'
 ---
@@ -65,13 +65,13 @@ There are always people nearby who are ready to help.
 
 | Country | Phone |
 |---|---|
-| USA | +998 71 120-54-50 |
+| USA | +998 71 120-54-50 (also after hours for emergencies) |
 | Germany | +998 71 120-84-40, duty officer +998 93 181-54-06 |
 | France | +998 71 232-81-00 |
 | Russia | +998 71 120-35-04 (24 hours), consular section +998 71 140-72-00 |
-| United Kingdom | contact form on [gov.uk](https://www.gov.uk/world/organisations/british-embassy-tashkent) |
+| United Kingdom | [contact form](https://www.contact.service.csd.fcdo.gov.uk/posts/uzbekistan/british-embassy-tashkent); 24/7 — FCDO London +44 20 7008 5000 |
 
-> **Check with HR.** We could not confirm the British Embassy's phone number on its official website. Please use the contact form on gov.uk.
+> **Please note.** The US Embassy number is from the State Department's official list. The British Embassy does not publish a phone number: for urgent help use the contact form or the FCDO 24/7 number in London. Embassies receive visitors by appointment only.
 
 ## Good to know
 

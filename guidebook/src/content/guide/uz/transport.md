@@ -69,7 +69,7 @@ Agar shoshilmayotgan boʻlsangiz va shahar ritmini his qilmoqchi boʻlsangiz, mo
 Agar sizga toʻliq harakat erkinligi kerak boʻlsa, mos keladi.
 
 - **Hujjatlar:** xalqaro haydovchilik guvohnomasi shart.
-- **Narx:** moslashuv jamoasi maʼlumotlariga koʻra — kuniga $30 dan $50 gacha.
+- **Narx:** oyiga taxminan $900–1500 (kuniga $30–50).
 - **Qayerdan olish mumkin:** xalqaro tarmoqlar (masalan, Europcar) va mahalliy prokatlar bor.
 - **Harakat** oʻng tomonlama.
 

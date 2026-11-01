@@ -13,12 +13,12 @@ tldr:
   - 'Kirish paytida pasportning amal qilish muddati kamida yana 6 oy boʻlishi kerak.'
   - 'Bojsiz olib kirish mumkin: samolyotda $1000 gacha, poyezdda $500 gacha, avtomobilda yoki piyoda $300 gacha boʻlgan tovarlar.'
   - 'Oʻzbekistonda antibiotiklar faqat elektron retsept boʻyicha sotiladi — odatdagi zaxirani oʻzingiz bilan oling.'
-  - 'Katta miqdordagi naqd pulni yozma deklaratsiya qilish kerak; aniq chegarani customs.uz saytida aniqlang.'
+  - '100 mln soʻmdan (taxminan $8000) ortiq naqd pulni yozma deklaratsiya qilish kerak.'
 faq:
   - q: 'Bojsiz qancha narsa olib kirish mumkin?'
     a: 'Samolyotda — $1000 gacha, poyezdda — $500 gacha, avtomobilda yoki piyoda — $300 gacha boʻlgan summaga. Aviachegaradan foydalanish uchun xorijda kamida 3 sutka boʻlish kerak. Meʼyorlar qayta koʻrib chiqiladi, shuning uchun safardan oldin ularni customs.uz saytida tekshiring.'
   - q: 'Qancha naqd puldan deklaratsiya kerak?'
-    a: 'Valyuta olib kirish cheklanmagan, lekin katta summani yozma deklaratsiya qilish kerak. 2026-yil oktabr holatiga koʻra chegara — taxminan $2000 ekvivalenti; bojxona saytida 70 mln soʻm summasi ham koʻrsatilgan. Aniq chegarani customs.uz saytida aniqlang.'
+    a: 'Valyuta olib kirish cheklanmagan, lekin 100 mln soʻm ekvivalentidan (taxminan $8000) ortiq summani yozma deklaratsiya qilish kerak. Kichikroq summani xohishga koʻra deklaratsiya qilish mumkin — bu chiqishda pulni olib chiqishni osonlashtiradi.'
   - q: 'Dorixonada antibiotiklarni retseptsiz sotib olsa boʻladimi?'
     a: 'Yoʻq. 15.12.2025 dan antibiotiklar faqat elektron retsept boʻyicha beriladi. Odatdagi zaxirani oʻzingiz bilan oling.'
 ---
@@ -66,10 +66,13 @@ Aviachegaradan foydalanish uchun xorijda kamida 3 sutka boʻlish kerak. Zargarli
 
 Valyuta olib kirish cheklanmagan, lekin katta summani yozma deklaratsiya qilish kerak.
 
-> **HR bilan aniqlang.** 2026-yil oktabr holatiga koʻra $2000 ekvivalentidan ortiq summa uchun yozma deklaratsiya kerak; bojxona saytida 70 mln soʻm summasi ham koʻrsatilgan. Meʼyorlar qayta koʻrib chiqiladi, shuning uchun safardan oldin ularni customs.uz saytida tekshiring.
+- **100 mln soʻm** ekvivalentidan (taxminan $8000) ortiq — majburiy yozma deklaratsiya.
+- Kichikroq summani xohishga koʻra deklaratsiya qilish mumkin. Chiqishda deklaratsiyasiz 100 mln soʻmgacha olib chiqish mumkin, undan koʻpi — faqat kirishda deklaratsiya qilingan summa doirasida.
+
+Manba — gov.uz dagi bojxona qoidalari tushuntirishi. Meʼyorlar vaqti-vaqti bilan oʻzgaradi, shuning uchun safardan oldin customs.uz saytida tekshiring.
 
 ### Telefon
 
-Kirishda telefonni bojxonada deklaratsiya qiling, aks holda IMEI’ni roʻyxatdan oʻtkazishda uning qiymatining 30% ini toʻlashga toʻgʻri keladi. Batafsil — «Yetib kelgandan keyingi dastlabki 72 soat» sahifasida.
+Kirishda telefonni deklaratsiya qiling — eng qulayi «Yo‘lovchi deklaratsiyasi» ilovasida, keyin bojxonada QR-kodni koʻrsating. Bojsiz: **samolyotda jami $1000 gacha** (ikkitadan koʻp emas), poyezdda $500 gacha, avtomobilda yoki piyoda $300 gacha. Limitdan ortiq summaga — 30% boj. Bojxona hujjatisiz IMEI’ni roʻyxatdan oʻtkazib boʻlmaydi. Batafsil — «Yetib kelgandan keyingi dastlabki 72 soat» sahifasida.
 
 > **Maslahat.** Butun uyingizni olib kelishga urinmang. Kerakli hamma narsani joyida osongina sotib olish mumkin. Eng zarur narsalardan boshlang, biz esa sizga moslashishga yordam beramiz.

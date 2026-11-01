@@ -15,7 +15,7 @@ faq:
   - q: 'What does the HR Business Partner do?'
     a: 'Handles paperwork, certificates and employment law questions, healthcare and insurance, and helps with relocation and housing if you have moved from another city.'
   - q: 'Can I message colleagues on Telegram?'
-    a: 'Yes, it is common practice here, and people reply quickly and to the point.'
+    a: 'Yes, for quick work questions that is common practice. But client data, documents, passwords and anything covered by banking secrecy go only through corporate channels: IceWarp mail and the EDMS.'
 ---
 
 The first weeks in a new place always bring a flood of information. The main rule: **if you have a question or a doubt, ask straight away**. We are here to help you find your rhythm, not to judge every step.
@@ -44,4 +44,6 @@ Your HR partner makes sure you are comfortable at work and that all formalities 
 - **Health:** healthcare and insurance.
 - **Relocation:** if you have moved from another city, your HRBP will help with relocation and housing.
 
-> **Tip.** Do not hesitate to message colleagues on Telegram: people here usually reply quickly and to the point. If you do not know who to ask, write to your Buddy. They will point you in the right direction.
+> **Tip.** For quick questions you can message colleagues on Telegram: people here usually reply quickly and to the point. If you do not know who to ask, write to your Buddy. They will point you in the right direction.
+
+> **Important.** Never send client data, documents, passwords, screenshots of work systems or anything covered by banking secrecy through Telegram or other personal messengers. Use only corporate channels for this: IceWarp mail and the EDMS.

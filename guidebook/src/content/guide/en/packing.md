@@ -13,12 +13,12 @@ tldr:
   - 'Your passport must be valid for at least 6 more months on the day you enter the country.'
   - 'You can bring in goods duty-free worth up to $1000 by air, up to $500 by train and up to $300 by car or on foot.'
   - 'In Uzbekistan antibiotics are sold only with an electronic prescription. Bring your usual supply with you.'
-  - 'A large amount of cash must be declared in writing. Check the exact threshold on customs.uz.'
+  - 'Cash above 100 million soums (about $8,000) must be declared in writing.'
 faq:
   - q: 'How much can I bring in without paying duty?'
     a: 'By air, goods worth up to $1000; by train, up to $500; by car or on foot, up to $300. To use the air allowance, you must have been abroad for at least 3 days. The rules are reviewed from time to time, so check them on customs.uz before you travel.'
   - q: 'From what amount of cash do I need a declaration?'
-    a: 'There is no limit on bringing in currency, but a large amount must be declared in writing. As of October 2026 the threshold is about $2000 or the equivalent; the customs website also gives a figure of 70 million soums. Check the exact threshold on customs.uz.'
+    a: 'There is no limit on bringing in currency, but anything above the equivalent of 100 million soums (about $8,000) must be declared in writing. You may declare a smaller amount if you wish; it makes taking money out easier when you leave.'
   - q: 'Can I buy antibiotics at a pharmacy without a prescription?'
     a: 'No. Since 15.12.2025 antibiotics are sold only with an electronic prescription. Bring your usual supply with you.'
 ---
@@ -66,10 +66,13 @@ To use the air allowance, you must have been abroad for at least 3 days. Jewelle
 
 There is no limit on bringing in currency, but a large amount must be declared in writing.
 
-> **Check with HR.** As of October 2026 a written declaration is needed for amounts above the equivalent of $2000; the customs website also gives a figure of 70 million soums. The rules are reviewed from time to time, so check them on customs.uz before you travel.
+- Above the equivalent of **100 million soums** (about $8,000): a written declaration is required.
+- You may declare a smaller amount if you wish. When you leave, you can take out up to 100 million soums without a declaration; more only up to the amount you declared on entry.
+
+Source: the customs rules explained on gov.uz. The rules change from time to time, so check customs.uz before you travel.
 
 ### Phone
 
-Declare your phone at customs when you enter. Otherwise you will have to pay 30% of its value when you register the IMEI. There is more on the "Your first 72 hours after arrival" page.
+Declare your phone when you enter — easiest in the "Yo‘lovchi deklaratsiyasi" app, then show the QR code at customs. Phones worth up to **$1,000 in total by air** (no more than two) are duty-free, up to $500 by train and up to $300 by car or on foot. Above the limit the duty is 30% of the excess. You cannot register the IMEI without a customs document. There is more on the "Your first 72 hours after arrival" page.
 
 > **Tip.** Do not try to bring your whole home with you. Everything you need is easy to buy locally. Start with the minimum, and we will help you settle in.

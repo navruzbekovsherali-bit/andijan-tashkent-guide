@@ -72,7 +72,7 @@ const T = init({
     wK: 'НАПОМИНАНИЕ', wT: 'Зарегистрируйте телефон, чтобы он работал с местной SIM-картой',
     sH: 'Регистрация устройства', sL3: 'Декларация', fileT: 'declaration.pdf', send: 'Зарегистрировать', sOk: 'Заявка принята',
     st: 'Статус: зарегистрирован',
-    final: { title: 'Телефон зарегистрирован', items: [{ text: 'IMEI найден' }, { text: 'Заявка подана' }, { text: 'Статус проверен' }, { text: 'Не откладывайте', small: 'Срок — 30 или 60 дней: точный уточните на uzimei.uz', next: true }] },
+    final: { title: 'Телефон зарегистрирован', items: [{ text: 'IMEI найден' }, { text: 'Заявка подана' }, { text: 'Статус проверен' }, { text: 'Не откладывайте', small: 'Срок — 30 дней с первого использования местной SIM-карты', next: true }] },
   },
   en: {
     c: [['Why', 'IMEI registration', 'With a local SIM card, your phone must be registered — or it gets blocked on the network.'],
@@ -82,7 +82,7 @@ const T = init({
     wK: 'REMINDER', wT: 'Register your phone so it keeps working with a local SIM card',
     sH: 'Device registration', sL3: 'Declaration', fileT: 'declaration.pdf', send: 'Register', sOk: 'Application accepted',
     st: 'Status: registered',
-    final: { title: 'Your phone is registered', items: [{ text: 'IMEI found' }, { text: 'Application sent' }, { text: 'Status checked' }, { text: 'Do not wait', small: '30 or 60 days: check the exact deadline on uzimei.uz', next: true }] },
+    final: { title: 'Your phone is registered', items: [{ text: 'IMEI found' }, { text: 'Application sent' }, { text: 'Status checked' }, { text: 'Do not wait', small: '30 days from first using a local SIM card', next: true }] },
   },
   uz: {
     c: [['Nima uchun', 'IMEI’ni roʻyxatdan oʻtkazish', 'Mahalliy SIM-karta bilan telefon roʻyxatdan oʻtgan boʻlishi kerak — aks holda u tarmoqda bloklanadi.'],
@@ -92,7 +92,7 @@ const T = init({
     wK: 'ESLATMA', wT: 'Telefon mahalliy SIM-karta bilan ishlashi uchun uni roʻyxatdan oʻtkazing',
     sH: 'Qurilmani roʻyxatdan oʻtkazish', sL3: 'Deklaratsiya', fileT: 'deklaratsiya.pdf', send: 'Roʻyxatdan oʻtkazish', sOk: 'Ariza qabul qilindi',
     st: 'Holat: roʻyxatdan oʻtgan',
-    final: { title: 'Telefoningiz roʻyxatdan oʻtdi', items: [{ text: 'IMEI topildi' }, { text: 'Ariza yuborildi' }, { text: 'Holat tekshirildi' }, { text: 'Kechiktirmang', small: '30 yoki 60 kun: aniq muddatni uzimei.uz’da tekshiring', next: true }] },
+    final: { title: 'Telefoningiz roʻyxatdan oʻtdi', items: [{ text: 'IMEI topildi' }, { text: 'Ariza yuborildi' }, { text: 'Holat tekshirildi' }, { text: 'Kechiktirmang', small: 'Mahalliy SIM-kartadan birinchi foydalanishdan 30 kun', next: true }] },
   },
 }, { segs: 4 });
 for (const k of ['wK', 'wT', 'sH', 'sL3', 'fileT', 'sOk']) $(k).textContent = T[k];

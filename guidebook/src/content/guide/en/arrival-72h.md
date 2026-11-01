@@ -15,12 +15,12 @@ sources:
     url: 'https://uzimei.uz'
 tldr:
   - 'At the airport, declare your phone in the "red channel". Otherwise you will pay 30% of its price when you register the IMEI.'
-  - 'Register at your place of stay within 3 days. A hotel does this for you; in a flat, use emehmon.uz.'
+  - 'Registration at your place of stay: within 3 days. A hotel does it for you; in a flat, the owner must do it — you cannot register yourself.'
   - 'Late registration means a fine from 5 BCA (2.2 million soums). Not paying the fine can lead to deportation.'
   - 'On your very first day, contact your onboarding specialist and give them your address.'
 faq:
   - q: 'How many days do I have to register my IMEI?'
-    a: 'Sources differ: 30 or 60 days from when you first connect a local SIM card. Check the exact deadline on uzimei.uz and do not put registration off. If you use a foreign SIM card in roaming, you do not need to register the phone.'
+    a: '30 days from the first use of a local SIM card. If you miss it, the phone is cut off from the mobile network until you register it. If you use a foreign SIM card in roaming, you do not need to register the phone.'
   - q: 'Do I need to declare my phone at customs?'
     a: 'Yes. Without a customs declaration you will have to pay 30% of the device value when you register the IMEI, or 20% from 01.01.2027. At airports you can declare your phone online using a QR code.'
   - q: 'How soon do I need to register at my place of stay?'
@@ -58,7 +58,8 @@ This is the most important page for your first days. Follow the steps in order. 
 
 1. **Register at your place of stay.** This is your main legal step.
    - **In a hotel**, registration is done automatically. When you check out, ask for a printout of the registration slip.
-   - **In a flat**, register yourself on [emehmon.uz](https://emehmon.uz), or go with the owner to the migration office.
+   - **In a flat**, the **owner of the flat** registers you, on [emehmon.uz](https://emehmon.uz) or at the migration office. You cannot do it yourself: the host submits the application, and a late registration means a fine for both of you.
+   - **Before you sign a lease**, make sure the owner agrees to register you and signs an official rental agreement. Some landlords avoid this; then there is no registration, and the problem is yours. If in doubt, tell your onboarding specialist straight away.
 2. **Get your documents ready:** international passport, the slip from your previous address (if you have one), and the owner's consent.
 3. **Meet your Buddy.** Your mentor will help you settle into life at the bank faster.
 
@@ -72,7 +73,7 @@ This is the most important page for your first days. Follow the steps in order. 
 2. **Register your phone's IMEI** on [uzimei.uz](https://uzimei.uz) if you use a local SIM card. You can check the status by dialling `*1170#`, by sending your IMEI by SMS to 1170, on uzimei.uz or on my.gov.uz.
 3. **Keep your documents:** customs declaration, registration slip, rental agreement.
 
-> **Check with HR.** Sources give different deadlines for IMEI registration: 30 or 60 days from when you first connect a local SIM card. Check the exact deadline on uzimei.uz and do not put it off. If you miss it, your phone will be blocked on local networks. With a foreign SIM card in roaming, you do not need to register.
+> **Important.** Register the IMEI within **30 days** of first using a local SIM card. If you miss it, the phone is cut off from the mobile network until you register it. The fee is lower within those 30 days. With a foreign SIM card in roaming, you do not need to register.
 
 ## Registration deadlines and fines
 

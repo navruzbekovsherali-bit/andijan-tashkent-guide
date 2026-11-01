@@ -58,4 +58,4 @@ Agar mashina mamlakatda 90 kundan ortiq qolsa, yigʻim toʻlash kerak. 2024-yil 
 - **Muddatni buzish.** Muddatdan oshirib, yigʻimni toʻlamasangiz, katta jarimalar, mashinani jarima maydonchasiga evakuatsiya qilish va hatto sud qarori bilan musodara qilish xavfi bor.
 - **Doimiy olib kirish (bojxona rasmiylashtiruvi).** Agar mashinani butunlay qoldirishga qaror qilsangiz, 01.01.2026 dan kichik litrajli mashinalar uchun imtiyozlar bekor qilingan: boj — qiymatining 15% va dvigatel hajmining har bir sm³ uchun $0,40. Bu qoida vaqtincha emas, aynan doimiy olib kirishga tegishli.
 
-> **Maslahat.** Koʻpincha avtomobilni ijaraga olish osonroq va foydaliroq: moslashuv jamoasi maʼlumotlariga koʻra, bu taxminan $300–500. Shunday qilib yigʻimlar, rasmiylashtirish va chegarada kutishdan qochasiz.
+> **Maslahat.** Koʻpincha avtomobilni ijaraga olish osonroq va foydaliroq: bu oyiga taxminan $900–1500 (kuniga $30–50). Shunday qilib yigʻimlar, rasmiylashtirish va chegarada kutishdan qochasiz.

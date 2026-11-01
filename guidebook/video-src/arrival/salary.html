@@ -45,29 +45,29 @@ const T = init({
   ru: {
     c: [['Зарплата', 'Когда приходят деньги', 'Выплаты — в сумах на карту. Налог на доходы — 12%.'],
         ['Экспатам', '1 раз в месяц', 'Как правило, до 10-го числа. Если оффер в net — налог 12% покрывает банк.'],
-        ['Местным', '3 раза в месяц', 'До 12-го — аванс, до 25-го — KPI, 31-го — заработная плата.']],
+        ['Местным', '3 раза в месяц', 'До 12-го — аванс, до 25-го — KPI, в последний рабочий день месяца — зарплата.']],
     mon: 'Октябрь 2026', wd: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'], expat: 'Экспатам', local: 'Местным',
     l10: 'до 10-го', l12: 'аванс', l25: 'KPI', l31: 'зарплата', tax: 'НДФЛ 12%',
     push1: 'Зачисление зарплаты', push1s: 'на вашу карту · в сумах', push2: 'Аванс зачислен', push3: 'Премия по KPI', push4: 'Заработная плата',
-    final: { title: 'Зарплата по расписанию', items: [{ text: 'Экспатам — до 10-го' }, { text: 'Местным — 12, 25 и 31' }, { text: 'НДФЛ — 12%' }, { text: 'Оклад и премии — по офферу', small: 'Вопросы по выплатам задавайте HR', next: true }] },
+    final: { title: 'Зарплата по расписанию', items: [{ text: 'Экспатам — до 10-го' }, { text: 'Местным — 3 раза в месяц' }, { text: 'НДФЛ — 12%' }, { text: 'Оклад и премии — по офферу', small: 'Вопросы по выплатам задавайте HR', next: true }] },
   },
   en: {
     c: [['Salary', 'When pay arrives', 'Paid in sums to your card. Income tax is 12%.'],
         ['Expats', 'Once a month', 'Usually by the 10th. If your offer is net, the bank covers the 12% tax.'],
-        ['Local hires', 'Three times a month', 'Advance by the 12th, KPI by the 25th, salary on the 31st.']],
+        ['Local hires', 'Three times a month', 'Advance by the 12th, KPI by the 25th, salary on the last working day.']],
     mon: 'October 2026', wd: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'], expat: 'Expats', local: 'Local hires',
     l10: 'by 10th', l12: 'advance', l25: 'KPI', l31: 'salary', tax: 'Tax 12%',
     push1: 'Salary credited', push1s: 'to your card · in sums', push2: 'Advance credited', push3: 'KPI bonus', push4: 'Salary',
-    final: { title: 'Pay on schedule', items: [{ text: 'Expats — by the 10th' }, { text: 'Local hires — 12, 25 and 31' }, { text: 'Income tax — 12%' }, { text: 'Salary and bonuses — as in your offer', small: 'Ask HR about payments', next: true }] },
+    final: { title: 'Pay on schedule', items: [{ text: 'Expats — by the 10th' }, { text: 'Local hires — 3 times a month' }, { text: 'Income tax — 12%' }, { text: 'Salary and bonuses — as in your offer', small: 'Ask HR about payments', next: true }] },
   },
   uz: {
     c: [['Maosh', 'Pul qachon tushadi', 'Soʻmda kartangizga toʻlanadi. Daromad soligʻi — 12%.'],
         ['Ekspatlar', 'Oyiga bir marta', 'Odatda 10-sanagacha. Offer net boʻlsa, 12% soliqni bank qoplaydi.'],
-        ['Mahalliy xodimlar', 'Oyiga uch marta', 'Avans 12-sanagacha, KPI 25-sanagacha, ish haqi 31-sanada.']],
+        ['Mahalliy xodimlar', 'Oyiga uch marta', 'Avans 12-sanagacha, KPI 25-sanagacha, ish haqi oyning oxirgi ish kunida.']],
     mon: 'Oktabr 2026', wd: ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya'], expat: 'Ekspatlar', local: 'Mahalliy xodimlar',
     l10: '10-gacha', l12: 'avans', l25: 'KPI', l31: 'ish haqi', tax: 'Soliq 12%',
     push1: 'Maosh tushdi', push1s: 'kartaga · soʻmda', push2: 'Avans tushdi', push3: 'KPI mukofoti', push4: 'Ish haqi',
-    final: { title: 'Maosh jadval boʻyicha', items: [{ text: 'Ekspatlar — 10-sanagacha' }, { text: 'Mahalliy xodimlar — 12, 25 va 31' }, { text: 'Daromad soligʻi — 12%' }, { text: 'Oklad va mukofotlar — offer boʻyicha', small: 'Toʻlovlar haqida HRdan soʻrang', next: true }] },
+    final: { title: 'Maosh jadval boʻyicha', items: [{ text: 'Ekspatlar — 10-sanagacha' }, { text: 'Mahalliy xodimlar — oyiga 3 marta' }, { text: 'Daromad soligʻi — 12%' }, { text: 'Oklad va mukofotlar — offer boʻyicha', small: 'Toʻlovlar haqida HRdan soʻrang', next: true }] },
   },
 });
 $('mon').textContent = T.mon; $('tax').textContent = T.tax;
@@ -81,6 +81,9 @@ const coinTo = (id, n, a) => {
   set(id, { left: `${r.left + r.width / 2 - 35}px`, top: `${r.top - 300 + v * 300 + 16}px`, opacity: t0 < a ? 0 : 1 - p(t0, a + 0.6, a + 0.8), transform: `scale(${1 - v * 0.3}) rotate(${v * 180}deg)` });
 };
 let t0 = 0;
+
+// Salary falls on the last working day: in October 2026 the 31st is a Saturday, so it is Friday the 30th.
+const LAST = 30;
 
 function render(t) {
   t0 = t;
@@ -97,15 +100,15 @@ function render(t) {
     } else {
       if (n === 12 && t > 13.8) c.classList.add('pay');
       if (n === 25 && t > 16.0) c.classList.add('pay');
-      if (n === 31 && t > 18.2) c.classList.add('pay2');
+      if (n === LAST && t > 18.2) c.classList.add('pay2');
     }
   }
-  if (!expat) { label(10, '', false); label(12, T.l12, t > 13.8); label(25, T.l25, t > 16.0); label(31, T.l31, t > 18.2); }
-  else { label(10, T.l10, t > 6.4); label(12, '', false); label(25, '', false); label(31, '', false); }
+  if (!expat) { label(10, '', false); label(12, T.l12, t > 13.8); label(25, T.l25, t > 16.0); label(LAST, T.l31, t > 18.2); }
+  else { label(10, T.l10, t > 6.4); label(12, '', false); label(25, '', false); label(LAST, '', false); }
   const swap = fade(t, 11.8, 12.2, 12.2, 12.6);
   set('cal', { filter: `blur(${(1 - Math.min(1, Math.abs(t - 12.2) / 0.4)) * 6}px)` });
   coinTo('coin1', expat ? 10 : 12, expat ? 5.8 : 13.2);
-  if (!expat) { coinTo('coin2', 25, 15.4); coinTo('coin3', 31, 17.6); } else { set('coin2', { opacity: 0 }); set('coin3', { opacity: 0 }); }
+  if (!expat) { coinTo('coin2', 25, 15.4); coinTo('coin3', LAST, 17.6); } else { set('coin2', { opacity: 0 }); set('coin3', { opacity: 0 }); }
   // push notifications
   const pushes = [[6.5, 9.0, T.push1], [13.9, 15.3, T.push2], [16.1, 17.5, T.push3], [18.3, 21.0, T.push4]];
   const cur = pushes.find(([a, b]) => t >= a - 0.1 && t <= b + 0.4);

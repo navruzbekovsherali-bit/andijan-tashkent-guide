@@ -19,7 +19,7 @@ faq:
   - q: 'Qaysi taksidan foydalanish kerak?'
     a: 'Asosiy xizmat — Yandex Go. Toshkentda MyTaxi ham ishlaydi. Shaharlararo safarlar uchun narxni oʻzingiz taklif qiladigan inDrive qulay.'
   - q: 'Ilovalardan foydalanish uchun telefonni roʻyxatdan oʻtkazish kerakmi?'
-    a: 'Agar mahalliy SIM-kartadan foydalansangiz — ha, IMEI’ni uzimei.uz saytida roʻyxatdan oʻtkazish kerak. Manbalar birinchi ulanishdan boshlab 30 yoki 60 kun muddatni koʻrsatadi; aniq muddatni uzimei.uz saytida aniqlang.'
+    a: 'Agar mahalliy SIM-kartadan foydalansangiz — ha, IMEI’ni uzimei.uz saytida roʻyxatdan oʻtkazish kerak. Muddat — mahalliy SIM-kartadan birinchi foydalanilgandan keyin 30 kun.'
 ---
 
 Koʻpchilik xizmatlar mahalliy telefon raqamiga bogʻlanadi. Shuning uchun avvalo operatorlardan birining SIM-kartasini sotib oling: Beeline, Ucell, Mobiuz yoki Uztelecom.
@@ -65,4 +65,4 @@ Android uchun bu ilovalarni Google Play’da nomi boʻyicha qidiring.
 2. **IMEI’ni roʻyxatdan oʻtkazing.** Agar mahalliy SIM-kartadan foydalansangiz, telefonni [uzimei.uz](https://uzimei.uz) saytida roʻyxatdan oʻtkazing, aks holda u mahalliy tarmoqlarda bloklanadi.
 3. Kommunal xizmatlar va soliq idorasining **foydali Telegram-botlariga obuna boʻling** — balans va hisob-kitoblarni bilishning eng oson yoʻli.
 
-> **HR bilan aniqlang.** Manbalar IMEI’ni roʻyxatdan oʻtkazish muddatini turlicha koʻrsatadi: mahalliy SIM-karta birinchi ulangandan boshlab 30 yoki 60 kun. Aniq muddatni uzimei.uz saytida aniqlang va kechiktirmang.
+> **Muhim.** IMEI’ni mahalliy SIM-kartadan birinchi foydalanilgandan keyin 30 kun ichida roʻyxatdan oʻtkazing, aks holda telefon tarmoqdan uziladi. Kechiktirmang.

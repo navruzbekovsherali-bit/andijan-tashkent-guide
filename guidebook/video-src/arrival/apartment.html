@@ -88,27 +88,27 @@
 const { p, key, fade, $, set, typ, caret, card, person, walk, init, captions, progress, final, play, TICK, easeOut, back, clamp } = Film;
 const T = init({
   ru: {
-    c: [['Квартира', 'Живёте в квартире?', 'Тогда регистрацию оформляете вы — в течение 3 дней после заселения.'],
+    c: [['Квартира', 'Живёте в квартире?', 'Регистрацию оформляет собственник жилья — в течение 3 дней после заселения.'],
         ['Документы', 'Подготовьте документы', 'Загранпаспорт, согласие владельца жилья и талон с прошлого места, если он есть.'],
-        ['Онлайн', 'Заявка на emehmon.uz', 'Заполните её сами — или сходите с владельцем в отдел миграции.']],
+        ['Онлайн', 'Заявка на emehmon.uz', 'Заявку подаёт собственник — онлайн или в отделе миграции. Сами вы не сможете.']],
     owner: 'Добро пожаловать! Вот ключи',
     dK: 'Регистрация в квартире', dH: 'Что понадобится', d1: 'Загранпаспорт', d2: 'Согласие владельца жилья', d3: ['Талон с прошлого места', 'если вы уже где-то жили'],
     sH: 'Регистрация по месту пребывания', sL1: 'Адрес', sV1: 'Ташкент, дом 12, кв. 34', sL2: 'Владелец', sV2: 'согласие приложено ✓', sL3: 'Проживание', sV3: '28.10 — 30.11', send: 'Отправить', sOk: 'Регистрация оформлена',
     final: { title: 'Готово. Вы зарегистрированы', items: [{ text: 'Документы собраны' }, { text: 'Регистрация оформлена' }, { text: 'Переезжаете — регистрируйтесь снова', small: 'Тоже в течение 3 дней на новом месте', next: true }] },
   },
   en: {
-    c: [['Flat', 'Living in a flat?', 'Then you register yourself — within 3 days of moving in.'],
+    c: [['Flat', 'Living in a flat?', 'The owner of the flat registers you — within 3 days of moving in.'],
         ['Documents', 'Get the documents ready', 'Your passport, the owner’s consent and the slip from your previous place, if you have one.'],
-        ['Online', 'Apply on emehmon.uz', 'Fill it in yourself — or go with the owner to the migration office.']],
+        ['Online', 'Apply on emehmon.uz', 'The owner applies, online or at the migration office. You cannot do it yourself.']],
     owner: 'Welcome! Here are your keys',
     dK: 'Registering in a flat', dH: 'What you need', d1: 'Passport', d2: 'Owner’s consent', d3: ['Slip from your previous place', 'if you have stayed somewhere already'],
     sH: 'Registration of the place of stay', sL1: 'Address', sV1: 'Tashkent, bldg 12, flat 34', sL2: 'Owner', sV2: 'consent attached ✓', sL3: 'Stay', sV3: '28.10 — 30.11', send: 'Submit', sOk: 'Registration done',
     final: { title: 'Done. Your stay is registered', items: [{ text: 'Documents ready' }, { text: 'Registration done' }, { text: 'Moving? Register again', small: 'Within 3 days at the new place, too', next: true }] },
   },
   uz: {
-    c: [['Kvartira', 'Kvartirada yashaysizmi?', 'Unda roʻyxatdan oʻzingiz oʻtasiz — koʻchib kelgandan keyin 3 kun ichida.'],
+    c: [['Kvartira', 'Kvartirada yashaysizmi?', 'Roʻyxatni uy egasi rasmiylashtiradi — koʻchib kelgandan keyin 3 kun ichida.'],
         ['Hujjatlar', 'Hujjatlarni tayyorlang', 'Pasport, uy egasining roziligi va oldingi joydan talon, agar boʻlsa.'],
-        ['Onlayn', 'emehmon.uz’da ariza', 'Oʻzingiz toʻldiring — yoki uy egasi bilan migratsiya boʻlimiga boring.']],
+        ['Onlayn', 'emehmon.uz’da ariza', 'Arizani uy egasi beradi — onlayn yoki migratsiya boʻlimida. Oʻzingiz bera olmaysiz.']],
     owner: 'Xush kelibsiz! Mana kalitlaringiz',
     dK: 'Kvartirada roʻyxatdan oʻtish', dH: 'Nima kerak', d1: 'Pasport', d2: 'Uy egasining roziligi', d3: ['Oldingi joydan talon', 'agar boshqa joyda turgan boʻlsangiz'],
     sH: 'Vaqtincha turgan joy boʻyicha roʻyxat', sL1: 'Manzil', sV1: 'Toshkent, 12-uy, 34-xonadon', sL2: 'Uy egasi', sV2: 'rozilik ilova qilingan ✓', sL3: 'Muddat', sV3: '28.10 — 30.11', send: 'Yuborish', sOk: 'Roʻyxat rasmiylashtirildi',

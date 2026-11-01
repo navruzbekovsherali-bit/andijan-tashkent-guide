@@ -56,7 +56,7 @@ Talablar Xalqaro havo transporti assotsiatsiyasi (IATA) qoidalariga asoslangan.
 
 1. Chiptani sotib olgandan keyin darhol **tashishni aviakompaniya bilan kelishib oling**: bortda hayvonlar uchun joylar soni cheklangan. Uzbekistan Airways qoidalari — [uzairways.com](https://www.uzairways.com) saytida.
 2. Agar uy hayvonini Oʻzbekistondan *olib chiqib ketayotgan* boʻlsangiz, **borish mamlakatining talablarini tekshiring**. Masalan, YeI mamlakatlari va BAA uchun quturishga qarshi antitanachalar testi kerak boʻlishi mumkin.
-3. Parvozdan 2–3 kun oldin davlat veterinariya klinikasida **vetguvohnoma (1-shakl) oling**.
+3. Parvozdan 1–5 kun oldin davlat veterinariya klinikasida **vetguvohnoma (1-shakl) oling**.
 4. **Aeroportga 3–4 soat oldin keling.** Avval terminalda veterinariya nazoratidan oʻting va xalqaro sertifikatni oling, keyin reysga roʻyxatdan oʻtishga boring.
 
 ## Oʻzbekistonda uy hayvoni bilan hayot

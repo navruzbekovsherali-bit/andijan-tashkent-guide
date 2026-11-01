@@ -6,12 +6,12 @@ section: work
 order: 20
 checked: 2026-10-26
 tldr:
-  - 'Maosh oyiga 3 marta toʻlanadi: 12-sanagacha, 25-sanagacha va 31-sanada.'
+  - 'Maosh oyiga 3 marta toʻlanadi: 12-sanagacha, 25-sanagacha va oyning oxirgi ish kunida.'
   - 'Daromad oklad va KPI boʻyicha mukofotlardan iborat.'
   - 'Toʻlovlar soʻmda HUMO kartasiga, JShDS — 12%.'
 faq:
   - q: 'Maosh qachon toʻlanadi?'
-    a: 'Oyiga uch marta: 12-sanagacha — avans, 25-sanagacha — KPI, 31-sanada — ish haqi.'
+    a: 'Oyiga uch marta: 12-sanagacha — avans, 25-sanagacha — KPI, oyning oxirgi ish kunida — ish haqi.'
   - q: 'Maoshdan qanday soliq ushlab qolinadi?'
     a: 'Jismoniy shaxslardan olinadigan daromad soligʻi (JShDS) qatʼiy 12% stavkada.'
   - q: 'Maosh qaysi kartaga tushadi?'
@@ -30,7 +30,7 @@ Maosh **oyiga 3 marta** toʻlanadi:
 |---|---|
 | 12-sanagacha | avans |
 | 25-sanagacha | KPI |
-| 31-sanada | ish haqi |
+| oyning oxirgi ish kunida | ish haqi |
 
 Bundan tashqari, har oyning 1-sanasida xoʻjalik mollari uchun moddiy yordam hisoblanadi.
 
