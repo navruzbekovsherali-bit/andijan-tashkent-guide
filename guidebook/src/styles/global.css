@@ -486,15 +486,13 @@ a:hover .topic-meta .round-arrow {
     min-width: 300px;
   }
 }
-/* the mark draws itself once: ring sweeps, the H settles in */
+/* the mark draws itself once: first the H is written from the bottom up, then the ring grows out of both stems */
 .js .hero-mark .bm-ring {
   stroke-dasharray: 1;
-  animation: ring-in 1400ms var(--ease-io) 150ms both;
+  animation: ring-in 1200ms var(--ease-io) 850ms both;
 }
 .js .hero-mark .bm-h {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: h-in 900ms var(--ease) 700ms both;
+  animation: h-in 750ms var(--ease) 150ms both;
 }
 .js .hero-name,
 .js .hero-title,
@@ -524,8 +522,10 @@ a:hover .topic-meta .round-arrow {
 }
 @keyframes h-in {
   from {
-    opacity: 0;
-    transform: translate(-12%, 18%);
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
   }
 }
 @keyframes rise {
