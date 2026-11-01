@@ -565,6 +565,8 @@ const REELS: Record<
     poster: 'video/hotel-ru-poster.webp',
     srcEn: 'video/hotel-en.mp4',
     posterEn: 'video/hotel-en-poster.webp',
+    srcUz: 'video/hotel-uz.mp4',
+    posterUz: 'video/hotel-uz-poster.webp',
     ru: ['Отель и регистрация', 'Из аэропорта в отель, регистрация на ресепшене и талон — за 30 секунд.', 'Анимация гайдбука'],
     en: ['Hotel and registration', 'From the airport to the hotel, registration at reception and the slip — in 30 seconds.', 'Guidebook animation'],
     uz: ['Mehmonxona va roʻyxatdan oʻtish', 'Aeroportdan mehmonxonaga, resepshnda roʻyxatdan oʻtish va talon — 30 soniyada.', 'Qoʻllanma animatsiyasi'],
@@ -574,6 +576,8 @@ const REELS: Record<
     poster: 'video/arrival-ru-poster.webp',
     srcEn: 'video/arrival-en.mp4',
     posterEn: 'video/arrival-en-poster.webp',
+    srcUz: 'video/arrival-uz.mp4',
+    posterUz: 'video/arrival-uz-poster.webp',
     ru: ['Прилёт: первые 15 минут', 'Таможня и SIM-карта — что делать сразу после посадки, за 30 секунд.', 'Анимация гайдбука'],
     en: ['Arrival: the first 15 minutes', 'Customs and a SIM card — what to do right after landing, in 30 seconds.', 'Guidebook animation'],
     uz: ['Yetib kelish: dastlabki 15 daqiqa', 'Bojxona va SIM-karta — qoʻngandan keyin darhol nima qilish kerak, 30 soniyada.', 'Qoʻllanma animatsiyasi'],
@@ -594,7 +598,7 @@ const REELS: Record<
   },
 };
 
-/** Guidebook animations (video-src/arrival): RU, EN and UZ titles, with original music (music.py). */
+/** Guidebook animations (video-src/arrival): RU, EN and UZ files, with original music (music.py). */
 const FILMS: Record<string, [[string, string], [string, string], [string, string]]> = {
   apartment: [['Квартира: регистрация', 'Документы и заявка на emehmon.uz — за 25 секунд.'], ['Flat: registration', 'Documents and an application on emehmon.uz — in 25 seconds.'], ['Kvartira: roʻyxatdan oʻtish', 'Hujjatlar va emehmon.uz’dagi ariza — 25 soniyada.']],
   imei: [['Регистрация IMEI', '*#06#, заявка на uzimei.uz и проверка статуса — за 30 секунд.'], ['IMEI registration', '*#06#, an application on uzimei.uz and the status check — in 30 seconds.'], ['IMEI roʻyxatdan oʻtkazish', '*#06#, uzimei.uz’dagi ariza va holatni tekshirish — 30 soniyada.']],
@@ -615,6 +619,8 @@ for (const [name, [ru, en, uz]] of Object.entries(FILMS)) {
     poster: `video/${name}-ru-poster.webp`,
     srcEn: `video/${name}-en.mp4`,
     posterEn: `video/${name}-en-poster.webp`,
+    srcUz: `video/${name}-uz.mp4`,
+    posterUz: `video/${name}-uz-poster.webp`,
     ru: [ru[0], ru[1], 'Анимация гайдбука'],
     en: [en[0], en[1], 'Guidebook animation'],
     uz: [uz[0], uz[1], 'Qoʻllanma animatsiyasi'],

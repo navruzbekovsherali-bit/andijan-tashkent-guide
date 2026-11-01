@@ -7,7 +7,7 @@
   "Arrival" film for the guidebook: landing → customs (declare the phone) → SIM card.
   Every frame is a pure function of time: render(t) places everything, so the film can be
   rendered frame by frame (render.cjs) and also played live in a browser (open with ?play).
-  Stage 1080×1920 (9:16). Language: ?lang=ru (default) or ?lang=en.
+  Stage 1080×1920 (9:16). Language: ?lang=ru (default), ?lang=en or ?lang=uz.
 -->
 <style>
   @font-face { font-family: 'Onest'; src: url('../../node_modules/@fontsource-variable/onest/files/onest-cyrillic-wght-normal.woff2') format('woff2'); font-weight: 100 900; unicode-range: U+0400-04FF; }
@@ -270,8 +270,18 @@ const TEXT = {
     noNet: 'No network', search: 'Searching…', ok: 'Connected', okSub: 'Calls and mobile data are ready', op: 'UZ', smsFrom: 'Operator', sms: 'Welcome to Uzbekistan!',
     fH: 'Done. You are connected', f1: 'Phone declared', f2: 'SIM card bought', f3: ['Next: register your stay', 'Within 3 days — a hotel does it for you'], fTag: 'Employee guidebook',
   },
+  uz: {
+    tag: 'QOʻLLANMA', arr: 'KELISH', g1: 'YASHIL', g2: 'deklaratsiyasiz', r1: 'QIZIL', r2: 'deklaratsiya bilan', kiosk: 'SIM-kartalar',
+    c0: ['Yetib kelish', 'Siz yetib keldingiz', 'Aeroportdagi dastlabki 15 daqiqa — bosqichma-bosqich.'],
+    c1: ['1-qadam · Bojxona', 'Qizil yoʻlak', 'Telefonni deklaratsiya qiling. Deklaratsiyasiz IMEI roʻyxati narxining 30% ini tashkil qiladi.'],
+    c2: ['2-qadam · Aloqa', 'SIM-karta sotib oling', 'Operatorlar peshtaxtalari aeroportning oʻzida. Pasportni oling va norezident ekaningizni ayting.'],
+    dK: 'Bojxona deklaratsiyasi', dH: 'Nimani olib kiryapsiz', dL1: 'Buyum', dV1: 'Mobil telefon', dL2: 'Soni', dV2: '1 dona', imei: '35 1234 •• 4821', stamp: 'DEKLARATSIYA QILINDI',
+    noNet: 'Tarmoq yoʻq', search: 'Qidirilmoqda…', ok: 'Ulandi', okSub: 'Qoʻngʻiroqlar va mobil internet tayyor', op: 'UZ', smsFrom: 'Operator', sms: 'Oʻzbekistonga xush kelibsiz!',
+    fH: 'Tayyor. Siz aloqadasiz', f1: 'Telefon deklaratsiya qilindi', f2: 'SIM-karta sotib olindi', f3: ['Keyingisi: turgan joy boʻyicha roʻyxat', '3 kun ichida — mehmonxonada buni siz uchun qilishadi'], fTag: 'Xodim qoʻllanmasi',
+  },
 };
-const lang = new URLSearchParams(location.search).get('lang') === 'en' ? 'en' : 'ru';
+const q = new URLSearchParams(location.search).get('lang');
+const lang = q === 'en' || q === 'uz' ? q : 'ru';
 const T = TEXT[lang];
 document.documentElement.lang = lang;
 const $ = (id) => document.getElementById(id);

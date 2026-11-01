@@ -127,6 +127,15 @@ const T = init({
     gK: 'Hamkor Bank', gH: 'Card application', gS: 'Signature',
     final: { title: 'Your salary card is ready', items: [{ text: 'Documents ready' }, { text: 'Branch visit — 10–15 minutes' }, { text: 'Card in hand' }, { text: 'Get the Hamkorbank app', small: 'Sign up with your card, PIN and fingerprint', next: true }] },
   },
+  uz: {
+    c: [['1-qadam', 'Hujjatlarni tayyorlang', 'Avval anketani toʻldirib, imzolang va moslashuv mutaxassisiga yuboring.'],
+        ['2-qadam', 'Filialga boring', 'Tashrifni moslashuv mutaxassisi belgilaydi. Imzolash 10–15 daqiqa oladi.'],
+        ['3-qadam', 'Karta tayyor', 'Butun jarayon 1–2 kun oladi. Keyingisi — Hamkorbank ilovasi.']],
+    dK: 'Maosh kartasi', dH: 'Hujjatlar', docs: ['Pasport (asl nusxa)', 'Turgan joy boʻyicha roʻyxat', 'JShShIR', 'Anketa va ariza'], sent: 'Anketa moslashuv mutaxassisiga yuborildi',
+    hello: 'Assalomu alaykum!', minutes: 'daq',
+    gK: 'Hamkor Bank', gH: 'Karta uchun ariza', gS: 'Imzo',
+    final: { title: 'Maosh kartangiz tayyor', items: [{ text: 'Hujjatlar tayyor' }, { text: 'Filialga tashrif — 10–15 daqiqa' }, { text: 'Karta qoʻlingizda' }, { text: 'Hamkorbank ilovasini oʻrnating', small: 'Karta, PIN-kod va barmoq izi bilan roʻyxatdan oʻting', next: true }] },
+  },
 });
 $('stage').insertAdjacentHTML('beforeend', person('me', { bag: false }));
 for (const k of ['dK', 'dH', 'gK', 'gH', 'gS']) $(k).textContent = T[k];

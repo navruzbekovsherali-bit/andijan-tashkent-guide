@@ -104,6 +104,13 @@ const T = init({
     hours: '05:00 — 00:00', kassa: 'TICKETS', atto: 'Transport card', price: '2,500 sum', priceSmall: 'by card',
     final: { title: 'You are on your way', items: [{ text: 'Atto card bought' }, { text: '2,500 sum a ride' }, { text: 'Stations like an underground museum' }, { text: 'Taxi — only through an app', small: 'Yandex Go nationwide, MyTaxi in Tashkent', next: true }] },
   },
+  uz: {
+    c: [['Metro', 'Toshkent metrosi', 'Tez va tirbandliksiz. Taxminan 05:00 dan 00:00 gacha ishlaydi.'],
+        ['1-qadam', 'Atto kartasini oling', 'Metro kassasida. Koʻp martalik karta vaqt va pulni tejaydi.'],
+        ['2-qadam', 'Kartani tekkizing va yuring', '01.10.2026 dan: kartada 2500 soʻm, naqd 3000 soʻm.']],
+    hours: '05:00 — 00:00', kassa: 'KASSA', atto: 'Transport kartasi', price: '2500 soʻm', priceSmall: 'kartada',
+    final: { title: 'Yoʻlga chiqdingiz', items: [{ text: 'Atto kartasi olindi' }, { text: 'Bir safar — 2500 soʻm' }, { text: 'Bekatlar — yer osti muzeyi' }, { text: 'Taksi — faqat ilova orqali', small: 'Yandex Go butun mamlakatda, MyTaxi Toshkentda', next: true }] },
+  },
 });
 $('stage').insertAdjacentHTML('beforeend', person('me', { bag: false }));
 $('uworld').insertAdjacentHTML('beforeend', person('me2', { bag: false }));

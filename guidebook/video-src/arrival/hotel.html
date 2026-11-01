@@ -332,8 +332,19 @@ const TEXT = {
     tK: 'Registration slip', tH: 'Place of stay', tL1: 'Guest', tV1: 'SMITH JOHN', tL2: 'Address', tV2: 'Hotel, Tashkent', tL3: 'Period', tV3: '28.10 — 30.11', stamp: 'REGISTERED',
     fH: 'Done. Your stay is registered', f1: 'Checked in at the hotel', f2: 'Registration done, slip in hand', f3: ['Next: register your IMEI', 'On uzimei.uz, if you use a local SIM card'], fTag: 'Employee guidebook',
   },
+  uz: {
+    tag: 'QOʻLLANMA', air: 'AEROPORT', rec: 'RESEPSHN',
+    c0: ['1-qadam · Yoʻl', 'Aeroportdan mehmonxonaga', 'Taksini ilova orqali chaqiring: bu xavfsizroq va narx darhol koʻrinadi.'],
+    c1: ['2-qadam · Roʻyxat', 'Mehmonxonada roʻyxatdan oʻtish', 'Mehmonxona sizni 3 kun ichida roʻyxatdan oʻtkazadi. Pasportni bering va bajarilganini tekshiring.'],
+    c2: ['3-qadam · Talon', 'Roʻyxat talonini saqlang', 'Talonning chop etilgan nusxasini soʻrang — chiqib ketishda yoki koʻchishda kerak boʻladi.'],
+    b1: 'Iltimos, meni roʻyxatdan oʻtkazib qoʻya olasizmi?', b2: 'Albatta! Hozir rasmiylashtiraman',
+    sH: 'Xorijiy mehmonni roʻyxatga olish', sL1: 'Mehmon', sV1: 'SMITH JOHN', sL2: 'Pasport', sV2: '•••• 4567', sL3: 'Muddat', sV3: '28.10 — 30.11', sOk: 'Roʻyxat rasmiylashtirildi',
+    tK: 'Roʻyxat taloni', tH: 'Turgan joy', tL1: 'Mehmon', tV1: 'SMITH JOHN', tL2: 'Manzil', tV2: 'Mehmonxona, Toshkent', tL3: 'Davr', tV3: '28.10 — 30.11', stamp: 'ROʻYXATDAN OʻTDI',
+    fH: 'Tayyor. Siz roʻyxatdan oʻtdingiz', f1: 'Mehmonxonaga joylashdingiz', f2: 'Roʻyxat rasmiylashtirildi, talon qoʻlingizda', f3: ['Keyingisi: IMEI roʻyxati', 'uzimei.uz’da, agar mahalliy SIM-kartadan foydalansangiz'], fTag: 'Xodim qoʻllanmasi',
+  },
 };
-const lang = new URLSearchParams(location.search).get('lang') === 'en' ? 'en' : 'ru';
+const q = new URLSearchParams(location.search).get('lang');
+const lang = q === 'en' || q === 'uz' ? q : 'ru';
 const T = TEXT[lang];
 document.documentElement.lang = lang;
 const $ = (id) => document.getElementById(id);

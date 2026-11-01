@@ -122,6 +122,15 @@ const T = init({
     pK: 'Sick pay', pH: 'Who pays for which days', l1: 'Days 1–5 — the bank', l1s: 'as your employer', l2: 'From day 6 — Social Insurance Fund', l2s: 'to your card via “Baraka”, with 6+ months of service',
     final: { title: 'Get well soon', items: [{ text: 'Manager and HR know' }, { text: 'Sick note opened by the doctor' }, { text: 'When it is closed, tell HR' }, { text: 'Need a day off, not ill?', small: 'Agree it with your manager 1–2 days ahead', next: true }] },
   },
+  uz: {
+    c: [['1-qadam', 'Kasalmisiz? Darhol xabar bering', 'Rahbar va HRga — imkon qadar erta. Keyin shifokorga boring.'],
+        ['2-qadam', 'Shifokor va elektron varaqa', 'Kasallik varaqasi faqat elektron — qogʻoz olib kelish shart emas.'],
+        ['3-qadam', 'Kim toʻlaydi', '01.07.2026 dan: 1–5-kunlar — bank, 6-kundan — Ijtimoiy sugʻurta jamgʻarmasi «Baraka» orqali.']],
+    who: 'Rahbar', m1: 'Xayrli tong! Mazam yoʻq, 38,2°', m2: 'Bugun shifokorga boraman, HR nusxada', m3: 'Tuzalib keting! Vazifalaringizni olib turamiz',
+    clinic: 'Poliklinika', sBar: 'Elektron kasallik varaqasi', sH: 'Kasallik varaqasi', sL1: 'Bemor', sV1: 'KARIMOV ALISHER', sL2: 'Ochildi', sV2: '28.10.2026', sOk: 'Elektron shaklda berildi',
+    pK: 'Nafaqa', pH: 'Qaysi kunlarni kim toʻlaydi', l1: '1–5-kunlar — bank', l1s: 'ish beruvchi sifatida', l2: '6-kundan — Ijtimoiy sugʻurta jamgʻarmasi', l2s: 'kartangizga «Baraka» orqali, 6 oydan ortiq stajda',
+    final: { title: 'Tezroq tuzalib keting', items: [{ text: 'Rahbar va HR xabardor' }, { text: 'Varaqani shifokor ochdi' }, { text: 'Yopilganda HRga ayting' }, { text: 'Kasal emas, javob kerakmi?', small: 'Rahbar bilan 1–2 kun oldin kelishing', next: true }] },
+  },
 });
 $('clinic').insertAdjacentHTML('beforeend', person('me', { bag: false }));
 for (const k of ['who', 'sBar', 'sH', 'sL1', 'sL2', 'sOk', 'pK', 'pH', 'l1', 'l1s', 'l2', 'l2s']) $(k).textContent = T[k];

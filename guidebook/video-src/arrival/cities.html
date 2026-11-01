@@ -66,6 +66,20 @@ const T = init({
     },
     final: { title: 'Where to go at the weekend', items: [{ text: 'Samarkand — ≈ 2 h' }, { text: 'Bukhara — ≈ 4 h' }, { text: 'Khiva — ≈ 7.5 h' }, { text: 'Tickets on eticket.railway.uz', small: 'Buy early — they sell out fast', next: true }] },
   },
+  uz: {
+    names: { tashkent: 'Toshkent', samarkand: 'Samarqand', bukhara: 'Buxoro', khiva: 'Xiva', andijan: 'Andijon' },
+    c: [['Samarqand', 'Registon va Shohi Zinda', 'Toshkentdan «Afrosiyob» tezyurar poyezdida.'],
+        ['Buxoro', 'Poi Kalon va eski shahar', 'Toshkentdan taxminan 4 soat 10 daqiqa, Samarqanddan 1,5 soat.'],
+        ['Xiva', 'Devorlar ichidagi muzey-shahar', '05.05.2026 dan tezyurar poyezd taxminan 7,5 soatda. Yoki Urganchgacha samolyotda.'],
+        ['Andijon', 'Qamchiq dovoni orqali', 'Dovondagi tunnel orqali poyezdda — yoki samolyotda.']],
+    cards: {
+      samarkand: ['Samarqand', 'Registon, Shohi Zinda va Samarqand palovi', '≈ 2 soat 10 – 2 soat 30'],
+      bukhara: ['Buxoro', 'Poi Kalon va hunarmandlar', '≈ 4 soat 10'],
+      khiva: ['Xiva', 'Ichan qalʼa — devorlar ichidagi shahar', '≈ 7,5 soat'],
+      andijan: ['Andijon', 'Fargʻona vodiysi, ikkinchi uyimiz', 'Qamchiq'],
+    },
+    final: { title: 'Dam olish kuni qayerga borish mumkin', items: [{ text: 'Samarqand — ≈ 2 soat' }, { text: 'Buxoro — ≈ 4 soat' }, { text: 'Xiva — ≈ 7,5 soat' }, { text: 'Chiptalar eticket.railway.uz’da', small: 'Oldindan oling — tez tugaydi', next: true }] },
+  },
 }, { segs: 4 });
 $('dots').innerHTML = Object.entries(CITIES).map(([k, [x, y]]) => `<g id="c-${k}"><circle class="dot" cx="${x}" cy="${y}" r="18"/><text class="city-l" x="${x + LABEL[k][0]}" y="${y + LABEL[k][1]}" text-anchor="middle">${T.names[k]}</text></g>`).join('');
 $('cimgs').innerHTML = ['samarkand', 'bukhara', 'khiva', 'andijan'].map((k) => `<img id="img-${k}" src="../../public/photos/${k}-800.webp" alt="" />`).join('');

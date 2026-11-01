@@ -75,6 +75,14 @@ const T = init({
     nK: 'Emergency services', nH: 'If you need them directly', nums: [['101', 'Fire'], ['102', 'Police'], ['103', 'Ambulance'], ['104', 'Gas leak'], ['1050', 'Rescue (MChS)']], save: 'Save to contacts', saved: 'Saved ✓',
     final: { title: 'You are ready', items: [{ text: '112 — for any emergency' }, { text: 'Numbers saved' }, { text: 'Emergency ambulance is free' }, { text: 'Install MyGov', small: 'Document status and certificates online', next: true }] },
   },
+  uz: {
+    c: [['Asosiysi', 'Bitta raqam — 112', 'Har qanday favqulodda holat uchun yagona xizmat. Kecha-kunduz.'],
+        ['Nima deyish kerak', 'Nima boʻldi va qayerdasiz', 'Qisqa va aniq. Yirik shaharlarda operatorlar koʻpincha rus va ingliz tilini tushunadi.'],
+        ['Raqamlar', 'Xizmatlarning toʻgʻridan-toʻgʻri raqamlari', 'Ularni yetib kelgan zahoti telefoningizga saqlang.']],
+    callS: 'Qoʻngʻiroq…', op: '112, eshitaman', h1: 'Nima boʻldi', h1s: 'bir-ikki gap bilan', h2: 'Qayerdasiz', h2s: 'manzil yoki moʻljal; yoningizdagilardan yordam soʻrang',
+    nK: 'Favqulodda xizmatlar', nH: 'Toʻgʻridan-toʻgʻri kerak boʻlsa', nums: [['101', 'Oʻt oʻchirish'], ['102', 'Militsiya'], ['103', 'Tez yordam'], ['104', 'Gaz xizmati'], ['1050', 'FVV']], save: 'Kontaktlarga saqlash', saved: 'Saqlandi ✓',
+    final: { title: 'Siz tayyorsiz', items: [{ text: '112 — har qanday holat uchun' }, { text: 'Raqamlar saqlandi' }, { text: 'Favqulodda tez yordam bepul' }, { text: 'MyGov’ni oʻrnating', small: 'Hujjatlar holati va maʼlumotnomalar onlayn', next: true }] },
+  },
 });
 const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'];
 $('keys').innerHTML = KEYS.map((k) => `<span data-k="${k}">${k}</span>`).join('');

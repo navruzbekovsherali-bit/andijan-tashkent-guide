@@ -69,19 +69,20 @@
   let T = {};
   /** Builds the header, progress, caption and final screen from the film's texts. */
   function init(texts, { segs = 3 } = {}) {
-    const lang = new URLSearchParams(location.search).get('lang') === 'en' ? 'en' : 'ru';
+    const q = new URLSearchParams(location.search).get('lang');
+    const lang = q === 'en' || q === 'uz' ? q : 'ru';
     T = texts[lang];
     document.documentElement.lang = lang;
     const stage = $('stage');
     stage.insertAdjacentHTML('afterbegin', `
-      <div class="head">${MARK}<b>Hamkor Bank</b><span>${lang === 'en' ? 'GUIDEBOOK' : 'ГАЙДБУК'}</span></div>
+      <div class="head">${MARK}<b>Hamkor Bank</b><span>${{ ru: 'ГАЙДБУК', en: 'GUIDEBOOK', uz: 'QOʻLLANMA' }[lang]}</span></div>
       <div class="segs" id="segs">${'<i><b></b></i>'.repeat(segs)}</div>`);
     stage.insertAdjacentHTML('beforeend', `
       <div class="cap" id="cap"><span class="k" id="capK"></span><h2 id="capH"></h2><p id="capP"></p></div>
       <div class="final" id="final">
         <h2 id="fH">${T.final.title}</h2>
         ${T.final.items.map((it, i) => `<div class="done${it.next ? ' next' : ''}" id="f${i}"><span class="c">${it.next ? NEXT : TICK}</span><span>${it.text}${it.small ? `<small>${it.small}</small>` : ''}</span></div>`).join('')}
-        <div class="brand" id="fBrand">${MARK}<div><b>Hamkor Bank</b><span>${lang === 'en' ? 'Employee guidebook' : 'Гайдбук сотрудника'}</span></div></div>
+        <div class="brand" id="fBrand">${MARK}<div><b>Hamkor Bank</b><span>${{ ru: 'Гайдбук сотрудника', en: 'Employee guidebook', uz: 'Xodim qoʻllanmasi' }[lang]}</span></div></div>
       </div>`);
     return T;
   }

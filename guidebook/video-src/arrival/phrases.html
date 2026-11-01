@@ -80,6 +80,13 @@ const T = init({
     say: [['Assalomu alaykum!', 'Hello'], ['Salom!', 'Hi'], ['Qancha turadi?', 'How much is it?'], ['Rahmat! Baraka toping', 'Thank you! May it bring blessings'], ['Shu yerda to‘xtang', 'Stop here, please'], ['Rahmat!', 'Thank you!']],
     final: { title: 'A few words go a long way', items: [{ text: 'Assalomu alaykum — hello' }, { text: 'Rahmat — thank you' }, { text: 'Qancha turadi? — how much?' }, { text: 'All the phrases are in the article', small: '“Useful Uzbek phrases”', next: true }] },
   },
+  uz: {
+    c: [['Salomlashish', 'Assalomu alaykum', 'Salomlashganda oʻng qoʻlni yurakka qoʻying — hurmat belgisi.'],
+        ['Bozorda', 'Qancha turadi?', 'Xariddan keyin esa «Baraka toping» deng — yaxshi tilak.'],
+        ['Taksida', 'Shu yerda toʻxtang', 'Manzil uchun telefondagi xaritada nuqtani koʻrsatish kifoya.']],
+    say: [['Assalomu alaykum!', 'Hurmat bilan salom'], ['Salom!', 'Doʻstona salom'], ['Qancha turadi?', 'Narxni soʻrash'], ['Rahmat! Baraka toping', 'Rahmat va yaxshi tilak'], ['Shu yerda toʻxtang', 'Toʻxtashni soʻrash'], ['Rahmat!', 'Minnatdorchilik']],
+    final: { title: 'Bir necha soʻz koʻp narsani hal qiladi', items: [{ text: 'Assalomu alaykum — salom' }, { text: 'Rahmat — minnatdorchilik' }, { text: 'Qancha turadi? — narx' }, { text: 'Barcha iboralar maqolada', small: '«Mahalliylardek gaplashamiz»', next: true }] },
+  },
 });
 $('s1').insertAdjacentHTML('beforeend', person('me', { bag: false }) + person('col', { bag: false, jacket: '#1aa752' }));
 $('s2').insertAdjacentHTML('beforeend', person('me2', { bag: false }));

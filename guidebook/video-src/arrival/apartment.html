@@ -105,6 +105,15 @@ const T = init({
     sH: 'Registration of the place of stay', sL1: 'Address', sV1: 'Tashkent, bldg 12, flat 34', sL2: 'Owner', sV2: 'consent attached ✓', sL3: 'Stay', sV3: '28.10 — 30.11', send: 'Submit', sOk: 'Registration done',
     final: { title: 'Done. Your stay is registered', items: [{ text: 'Documents ready' }, { text: 'Registration done' }, { text: 'Moving? Register again', small: 'Within 3 days at the new place, too', next: true }] },
   },
+  uz: {
+    c: [['Kvartira', 'Kvartirada yashaysizmi?', 'Unda roʻyxatdan oʻzingiz oʻtasiz — koʻchib kelgandan keyin 3 kun ichida.'],
+        ['Hujjatlar', 'Hujjatlarni tayyorlang', 'Pasport, uy egasining roziligi va oldingi joydan talon, agar boʻlsa.'],
+        ['Onlayn', 'emehmon.uz’da ariza', 'Oʻzingiz toʻldiring — yoki uy egasi bilan migratsiya boʻlimiga boring.']],
+    owner: 'Xush kelibsiz! Mana kalitlaringiz',
+    dK: 'Kvartirada roʻyxatdan oʻtish', dH: 'Nima kerak', d1: 'Pasport', d2: 'Uy egasining roziligi', d3: ['Oldingi joydan talon', 'agar boshqa joyda turgan boʻlsangiz'],
+    sH: 'Vaqtincha turgan joy boʻyicha roʻyxat', sL1: 'Manzil', sV1: 'Toshkent, 12-uy, 34-xonadon', sL2: 'Uy egasi', sV2: 'rozilik ilova qilingan ✓', sL3: 'Muddat', sV3: '28.10 — 30.11', send: 'Yuborish', sOk: 'Roʻyxat rasmiylashtirildi',
+    final: { title: 'Tayyor. Siz roʻyxatdan oʻtdingiz', items: [{ text: 'Hujjatlar tayyor' }, { text: 'Roʻyxat rasmiylashtirildi' }, { text: 'Koʻchyapsizmi? Qayta roʻyxatdan oʻting', small: 'Yangi joyda ham 3 kun ichida', next: true }] },
+  },
 });
 document.getElementById('stage').insertAdjacentHTML('beforeend', person('me') + person('owner', { bag: false, jacket: '#4a524f', hair: '#6b726f', z: 5 }));
 for (const k of ['dK', 'dH', 'sH', 'sL1', 'sL2', 'sL3', 'sOk']) $(k).textContent = T[k];

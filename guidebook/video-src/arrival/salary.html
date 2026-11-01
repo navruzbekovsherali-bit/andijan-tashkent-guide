@@ -60,6 +60,15 @@ const T = init({
     push1: 'Salary credited', push1s: 'to your card · in sums', push2: 'Advance credited', push3: 'KPI bonus', push4: 'Salary',
     final: { title: 'Pay on schedule', items: [{ text: 'Expats — by the 10th' }, { text: 'Local hires — 12, 25 and 31' }, { text: 'Income tax — 12%' }, { text: 'Salary and bonuses — as in your offer', small: 'Ask HR about payments', next: true }] },
   },
+  uz: {
+    c: [['Maosh', 'Pul qachon tushadi', 'Soʻmda kartangizga toʻlanadi. Daromad soligʻi — 12%.'],
+        ['Ekspatlar', 'Oyiga bir marta', 'Odatda 10-sanagacha. Offer net boʻlsa, 12% soliqni bank qoplaydi.'],
+        ['Mahalliy xodimlar', 'Oyiga uch marta', 'Avans 12-sanagacha, KPI 25-sanagacha, ish haqi 31-sanada.']],
+    mon: 'Oktabr 2026', wd: ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya'], expat: 'Ekspatlar', local: 'Mahalliy xodimlar',
+    l10: '10-gacha', l12: 'avans', l25: 'KPI', l31: 'ish haqi', tax: 'Soliq 12%',
+    push1: 'Maosh tushdi', push1s: 'kartaga · soʻmda', push2: 'Avans tushdi', push3: 'KPI mukofoti', push4: 'Ish haqi',
+    final: { title: 'Maosh jadval boʻyicha', items: [{ text: 'Ekspatlar — 10-sanagacha' }, { text: 'Mahalliy xodimlar — 12, 25 va 31' }, { text: 'Daromad soligʻi — 12%' }, { text: 'Oklad va mukofotlar — offer boʻyicha', small: 'Toʻlovlar haqida HRdan soʻrang', next: true }] },
+  },
 });
 $('mon').textContent = T.mon; $('tax').textContent = T.tax;
 // October 2026 starts on a Thursday.

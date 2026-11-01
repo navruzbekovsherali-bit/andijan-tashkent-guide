@@ -64,7 +64,7 @@
     <svg class="abs" width="200" height="420" style="left:30px;top:766px"><path class="line" d="M100 414 V230"/><circle cx="100" cy="170" r="84" fill="#bfe3c9" stroke="#0e1a18" stroke-width="6"/></svg>
   </div>
 
-  <div class="pinfl" id="pinfl"><small>ПИНФЛ · PINFL</small><b id="pnum"></b></div>
+  <div class="pinfl" id="pinfl"><small id="pinflL">ПИНФЛ · PINFL</small><b id="pnum"></b></div>
   <div class="tiles" id="tiles"></div>
 </div>
 <script src="film.js"></script>
@@ -93,10 +93,21 @@ const T = init({
     tiles: [['OneID', 'government services'], ['E-signature', 'digital signature'], ['Taxes', 'tax services'], ['Bank', 'apps and services']],
     final: { title: 'Your documents are in progress', items: [{ text: 'The bank gets the permit' }, { text: 'Documents to HR on time' }, { text: 'PINFL received' }, { text: 'Timing and procedure — ask HR', small: 'Specialists have a simplified procedure', next: true }] },
   },
+  uz: {
+    c: [['Nima kerak', 'Ikkita hujjat', 'Bankning xorijliklarni jalb qilishga ruxsatnomasi va ishlash huquqingizni tasdiqlovchi hujjat.'],
+        ['Sizning qismingiz', 'Hujjatlar va tez javoblar', 'Jarayonni bank HR boʻlimi olib boradi. Hujjatlarni oldindan tayyorlang va kechiktirmay javob bering.'],
+        ['JShShIR', 'JShShIR oling', 'Davlat xizmatlari markazida yoki migratsiya boʻlimida shaxsan, pasport bilan.']],
+    aK: '1-hujjat', aH: 'Ish beruvchining ruxsatnomasi', aW: 'Uni bank oladi',
+    bK: '2-hujjat', bH: 'Ishlash huquqini tasdiqlash', bW: 'Hujjatlaringiz bilan',
+    who: 'Bank HR', m1: 'Assalomu alaykum! Pasportingiz skanini yubora olasizmi?', m2: 'pasport.pdf', m3: 'Hozir yuboraman. Yana nima kerak?', m4: 'Rahmat! Qolganini oʻzimiz qilamiz',
+    center: 'Davlat xizmatlari', pinflL: 'JShShIR · PINFL',
+    tiles: [['OneID', 'davlat xizmatlari'], ['ERI', 'elektron imzo'], ['Soliqlar', 'soliq xizmatlari'], ['Bank', 'ilovalar va xizmatlar']],
+    final: { title: 'Hujjatlaringiz jarayonda', items: [{ text: 'Ruxsatnomani bank oladi' }, { text: 'Hujjatlar HRga oʻz vaqtida' }, { text: 'JShShIR olindi' }, { text: 'Muddat va tartib — HRdan', small: 'Mutaxassislar uchun soddalashtirilgan tartib bor', next: true }] },
+  },
 });
 $('center').insertAdjacentHTML('beforeend', person('me', { bag: false }));
 for (const k of ['aK', 'aH', 'aW', 'bK', 'bH', 'bW', 'who']) $(k).textContent = T[k];
-$('cT').textContent = T.center; $('m2t').textContent = T.m2;
+$('cT').textContent = T.center; if (T.pinflL) $('pinflL').textContent = T.pinflL; $('m2t').textContent = T.m2;
 $('tiles').innerHTML = T.tiles.map((x, i) => `<div id="tl${i}">${x[0]}<em>${x[1]}</em></div>`).join('');
 
 const IN = 15.2;

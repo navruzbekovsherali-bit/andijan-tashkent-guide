@@ -133,6 +133,18 @@ const T = init({
     slots: [['12:30', 'Lunch', 'Your Buddy shows you where to eat and introduces the team'], ['14:00', 'Meeting your manager', 'Tasks, projects and access to systems'], ['16:00', 'Questions and answers', 'Your onboarding plan for the first months']],
     final: { title: 'First day done', items: [{ text: 'Pass received' }, { text: 'Documents signed' }, { text: 'Workplace ready' }, { text: 'Take it easy', small: 'Day one is for getting to know people, not for records', next: true }] },
   },
+  uz: {
+    c: [['Ertalab', 'Birinchi kuningiz', '08:30 ga keling. Sizni HR moslashuv mutaxassisi yoki Buddy kutib oladi.'],
+        ['Tanishuv', 'Ekskursiya va ruxsatnoma', 'Buddy bilan tanishuv, ofis boʻylab sayr va ruxsatnoma — 10:00 gacha.'],
+        ['Rasmiylashtirish', 'Hujjatlar va ish joyi', 'Mehnat shartnomasi, anketalar va ish joyini sozlash.'],
+        ['Kun', 'Rejaning davomi', 'Buddy bilan tushlik, rahbar bilan uchrashuv va tizimlarga kirish.']],
+    hello: 'Jamoaga xush kelibsiz!',
+    pName: 'Yangi hamkasb', pRole: 'Hamkor Bank', pStrip: 'RUXSATNOMA',
+    dK: 'Rasmiylashtirish', dH: '10:00 dan 12:00 gacha', dL1: 'Hujjatlar', v1: 'Mehnat shartnomasi', dL2: 'Anketalar', v2: 'Toʻldirildi', dL3: 'Ish joyi', v3: 'Kompyuter sozlandi',
+    plK: 'Kun rejasi', plH: 'Tushlikdan keyin',
+    slots: [['12:30', 'Tushlik', 'Buddy qayerda ovqatlanishni koʻrsatadi va jamoa bilan tanishtiradi'], ['14:00', 'Rahbar bilan uchrashuv', 'Vazifalar, loyihalar va tizimlarga kirish'], ['16:00', 'Savol-javob', 'Dastlabki oylar uchun moslashuv rejasi']],
+    final: { title: 'Birinchi kun yakunlandi', items: [{ text: 'Ruxsatnoma olindi' }, { text: 'Hujjatlar imzolandi' }, { text: 'Ish joyi tayyor' }, { text: 'Xotirjam boʻling', small: 'Birinchi kun — tanishuv uchun, rekordlar uchun emas', next: true }] },
+  },
 }, { segs: 4 });
 $('stage').insertAdjacentHTML('beforeend', person('me', { bag: false }) + person('hr', { bag: false, jacket: '#1aa752', z: 5 }));
 $('iworld').insertAdjacentHTML('beforeend', person('me2', { bag: false }) + person('buddy', { bag: false, jacket: '#1aa752' }));
