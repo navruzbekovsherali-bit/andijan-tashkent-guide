@@ -39,6 +39,9 @@ In addition, financial assistance for household goods is paid on the 1st.
 - **Base salary** — the fixed part.
 - **Bonuses** — depend on your individual KPIs, project results or your unit's performance.
 
+
+<div class="calc" data-calc="tax"></div>
+
 ## Taxes and currency
 
 - Payments are made in the national currency — **soums** — to a **HUMO** card.

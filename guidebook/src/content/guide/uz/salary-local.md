@@ -39,6 +39,9 @@ Bundan tashqari, har oyning 1-sanasida xoʻjalik mollari uchun moddiy yordam his
 - **Oklad** — asosiy qism.
 - **Mukofotlar** — shaxsiy KPIlaringiz, loyihalar natijalari yoki boʻlinma samaradorligiga bogʻliq.
 
+
+<div class="calc" data-calc="tax"></div>
+
 ## Soliqlar va valyuta
 
 - Toʻlovlar milliy valyutada — **soʻmda** — **HUMO** kartasiga amalga oshiriladi.

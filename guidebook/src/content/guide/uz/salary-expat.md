@@ -35,6 +35,9 @@ Maosh **oyiga 1 marta**, odatda **10-sanagacha** toʻlanadi.
 - **Oklad** — asosiy qism, summasi offeringizda koʻrsatilgan.
 - **Mukofotlar** — shaxsiy KPIlaringiz, loyihalar natijalari yoki boʻlinma samaradorligiga bogʻliq. Shartlar offerda koʻrsatilgan.
 
+
+<div class="calc" data-calc="tax"></div>
+
 ## Soliqlar va valyuta
 
 - Mamlakat ichidagi toʻlovlar **soʻmda** **HUMO** yoki **Uzcard** kartasiga amalga oshiriladi.

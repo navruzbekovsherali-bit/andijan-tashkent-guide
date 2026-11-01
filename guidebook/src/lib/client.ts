@@ -397,6 +397,7 @@ export function initSite() {
     checklists,
     countdown,
     todayWidgets,
+    taxCalc,
     stories,
     offline,
     dockLens,
@@ -815,6 +816,35 @@ function rates(row: HTMLElement, T: (typeof TODAY_TX)['ru']) {
     })
     .catch(() => {})
     .finally(() => clearTimeout(timer));
+}
+
+
+/* ---------- Salary pages: gross → on your card, after the flat 12% income tax ---------- */
+const CALC_TX = {
+  ru: { k: 'Калькулятор', h: 'Сколько придёт на карту', gross: 'Начислено, сум', net: 'На карту', tax: 'НДФЛ 12%', note: 'Если сумма в вашем оффере указана «на руки» (net), налог платит банк.', locale: 'ru-RU' },
+  en: { k: 'Calculator', h: 'What reaches your card', gross: 'Gross, soums', net: 'To your card', tax: 'Income tax 12%', note: 'If the amount in your offer is net, the bank pays the tax.', locale: 'en-GB' },
+  uz: { k: 'Kalkulyator', h: 'Kartaga qancha tushadi', gross: 'Hisoblangan, soʻm', net: 'Kartaga', tax: 'JShDS 12%', note: 'Agar offeringizdagi summa «qoʻlga» (net) koʻrsatilgan boʻlsa, soliqni bank toʻlaydi.', locale: 'uz-UZ' },
+};
+function taxCalc() {
+  document.querySelectorAll<HTMLElement>('[data-calc="tax"]').forEach((box) => {
+    const T = CALC_TX[pageLang()];
+    const fmt = (n: number) => Math.round(n).toLocaleString(T.locale);
+    box.innerHTML = `<p class="calc-k">${T.k}</p><h3>${T.h}</h3>
+      <label class="calc-in"><span>${T.gross}</span><input inputmode="numeric" autocomplete="off" value="10 000 000" aria-label="${T.gross}"></label>
+      <div class="calc-out"><div><span>${T.tax}</span><b data-k="tax"></b></div><div class="calc-net"><span>${T.net}</span><b data-k="net"></b></div></div>
+      <div class="calc-bar"><i data-k="bar"></i></div><p class="calc-note">${T.note}</p>`;
+    const input = box.querySelector('input')!;
+    const out = (k: string) => box.querySelector<HTMLElement>(`[data-k="${k}"]`)!;
+    const paint = () => {
+      const g = Number(input.value.replace(/\D/g, '')) || 0;
+      input.value = g ? fmt(g) : '';
+      out('tax').textContent = fmt(g * 0.12);
+      out('net').textContent = fmt(g * 0.88);
+      out('bar').style.transform = `scaleX(${g ? 0.88 : 0})`;
+    };
+    input.addEventListener('input', paint);
+    paint();
+  });
 }
 
 /* ---------- Home: "videos of the week" — stories you tap through, like on a phone ---------- */

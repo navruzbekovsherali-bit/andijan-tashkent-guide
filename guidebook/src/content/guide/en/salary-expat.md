@@ -35,6 +35,9 @@ Salary is paid **once a month**, usually **by the 10th**.
 - **Base salary:** the fixed part. The amount is in your offer.
 - **Bonuses:** depend on your individual KPIs, project results or your unit's performance. The terms are in your offer.
 
+
+<div class="calc" data-calc="tax"></div>
+
 ## Taxes and currency
 
 - Payments inside the country are made in **soums** to a **HUMO** or **Uzcard** card.
