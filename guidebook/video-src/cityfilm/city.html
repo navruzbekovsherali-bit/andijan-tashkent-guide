@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>City film</title>
+<!--
+  City film, 1920×1080: licensed photographs (photos/, credits-*.json) with a slow camera move,
+  a caption for each place and a closing card that credits every photographer.
+  render-city.cjs calls window.setup({ city, lang, photos }) and then render(t) frame by frame.
+-->
+<style>
+  @font-face { font-family: 'Onest'; src: url('../../node_modules/@fontsource-variable/onest/files/onest-cyrillic-wght-normal.woff2') format('woff2'); font-weight: 100 900; unicode-range: U+0400-04FF; }
+  @font-face { font-family: 'Onest'; src: url('../../node_modules/@fontsource-variable/onest/files/onest-latin-wght-normal.woff2') format('woff2'); font-weight: 100 900; }
+  @font-face { font-family: 'Onest'; src: url('../../node_modules/@fontsource-variable/onest/files/onest-latin-ext-wght-normal.woff2') format('woff2'); font-weight: 100 900; unicode-range: U+0100-024F, U+02B0-02FF; }
+  @font-face { font-family: 'Manrope'; src: url('../../node_modules/@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2') format('woff2'); font-weight: 200 800; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #000; }
+  .stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #0a2e2a; font-family: 'Onest', system-ui, sans-serif; color: #fff; }
+  .shot { position: absolute; inset: 0; overflow: hidden; opacity: 0; }
+  .shot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; will-change: transform; }
+  /* a soft shade at the bottom so captions always read */
+  .shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgb(0 0 0 / 0.28) 0%, transparent 22%, transparent 55%, rgb(5 30 26 / 0.62) 100%); z-index: 2; }
+  .head { position: absolute; left: 72px; right: 72px; top: 56px; display: flex; align-items: center; gap: 16px; z-index: 5; }
+  .head svg { width: 46px; height: 46px; }
+  .head b { font-family: 'Manrope', 'Onest'; font-weight: 800; font-size: 30px; letter-spacing: -0.03em; }
+  .head span { margin-left: auto; font-size: 22px; font-weight: 650; letter-spacing: 0.08em; opacity: 0.85; }
+  .bars { position: absolute; left: 72px; right: 72px; top: 128px; display: flex; gap: 10px; z-index: 5; }
+  .bars i { flex: 1; height: 6px; border-radius: 6px; background: rgb(255 255 255 / 0.25); overflow: hidden; }
+  .bars i b { display: block; height: 100%; background: #fff; transform-origin: 0 50%; transform: scaleX(0); }
+  .title { position: absolute; left: 72px; bottom: 150px; z-index: 5; }
+  .title small { display: block; font-size: 30px; font-weight: 650; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.85; }
+  .title h1 { margin: 10px 0 0; font-size: 168px; line-height: 0.95; font-weight: 800; letter-spacing: -0.045em; text-shadow: 0 6px 40px rgb(0 0 0 / 0.35); }
+  /* the place caption: a pane of glass */
+  .cap {
+    position: absolute; left: 72px; bottom: 72px; z-index: 5; display: flex; align-items: center; gap: 22px;
+    padding: 20px 34px 20px 20px; border-radius: 999px;
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.26), rgb(255 255 255 / 0.1));
+    backdrop-filter: blur(22px) saturate(1.8) brightness(1.05);
+    box-shadow: inset 0 1.5px 0.5px rgb(255 255 255 / 0.75), inset 0 0 0 1.5px rgb(255 255 255 / 0.2), 0 20px 50px -20px rgb(0 0 0 / 0.55);
+  }
+  .cap i { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; background: #fff; color: #0a2e2a; font-style: normal; font-weight: 800; font-size: 26px; }
+  .cap span { font-size: 40px; font-weight: 700; letter-spacing: -0.02em; }
+  .final { position: absolute; inset: 0; z-index: 8; padding: 120px 140px; background: radial-gradient(70% 90% at 80% 0%, #1a6b4f 0%, transparent 60%), linear-gradient(160deg, #0d3a34, #0a2e2a 60%); transform: translateY(100%); }
+  .final .mk { width: 92px; height: 92px; }
+  .final h2 { margin: 44px 0 0; font-size: 104px; line-height: 1; font-weight: 800; letter-spacing: -0.04em; }
+  .final p { margin: 22px 0 0; max-width: 1200px; font-size: 38px; line-height: 1.35; opacity: 0.85; }
+  .credits { position: absolute; left: 140px; right: 140px; bottom: 90px; font-size: 21px; line-height: 1.55; opacity: 0.62; }
+  .credits b { font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div id="shots"></div>
+  <div class="shade"></div>
+  <div class="head" id="head"></div>
+  <div class="bars" id="bars"></div>
+  <div class="title" id="title"><small id="kick"></small><h1 id="city"></h1></div>
+  <div class="cap" id="cap"><i id="capN"></i><span id="capT"></span></div>
+  <div class="final" id="final"><div class="mk" id="fMark"></div><h2 id="fH"></h2><p id="fP"></p><div class="credits" id="credits"></div></div>
+</div>
+<script>
+const MARK = '<svg viewBox="270 270 1390 1390"><circle cx="965" cy="965" r="616.5" fill="none" stroke="#1aa752" stroke-width="137" stroke-dasharray="1500 300 1500 572"/><polygon points="1215,476 1440,466 1125,1307 902,1307 1007,1023 880,1023 720,1480 495,1465 812,622 1033,622 928,908 1052,908" fill="#1aa752"/></svg>';
+const TEXT = {
+  ru: { tag: 'ГАЙДБУК', kick: 'Добро пожаловать в', credit: 'Фото', more: 'Как добраться, что посмотреть и где поесть — в статье гайдбука.',
+        names: { tashkent: 'Ташкент', andijan: 'Андижан', samarkand: 'Самарканд', bukhara: 'Бухара', khiva: 'Хива', mountains: 'Горы' },
+        heads: { mountains: 'Горы рядом с Ташкентом' } },
+  en: { tag: 'GUIDEBOOK', kick: 'Welcome to', credit: 'Photos', more: 'How to get there, what to see and where to eat — in the guidebook article.',
+        names: { tashkent: 'Tashkent', andijan: 'Andijan', samarkand: 'Samarkand', bukhara: 'Bukhara', khiva: 'Khiva', mountains: 'The mountains' },
+        heads: { mountains: 'Mountains near Tashkent' } },
+  uz: { tag: 'QOʻLLANMA', kick: 'Xush kelibsiz:', credit: 'Suratlar', more: 'Qanday borish, nimani koʻrish va qayerda ovqatlanish — qoʻllanma maqolasida.',
+        names: { tashkent: 'Toshkent', andijan: 'Andijon', samarkand: 'Samarqand', bukhara: 'Buxoro', khiva: 'Xiva', mountains: 'Togʻlar' },
+        heads: { mountains: 'Toshkent yaqinidagi togʻlar' } },
+};
+const D = 4.2;     // seconds per photo
+const X = 0.9;     // crossfade
+const FIN = 4.8;   // closing card
+let S = null;
+const $ = (id) => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const out = (x) => 1 - Math.pow(1 - x, 3);
+const p = (t, a, b, e = ease) => e(clamp((t - a) / (b - a)));
+
+window.setup = function ({ city, lang, photos }) {
+  const T = TEXT[lang];
+  document.documentElement.lang = lang;
+  S = { city, lang, photos, T, n: photos.length };
+  $('shots').innerHTML = photos.map((ph, i) => `<div class="shot" id="s${i}"><img src="photos/${ph.file}" alt=""></div>`).join('');
+  $('head').innerHTML = `${MARK}<b>Hamkor Bank</b><span>${T.tag}</span>`;
+  $('bars').innerHTML = '<i><b></b></i>'.repeat(photos.length);
+  $('kick').textContent = T.kick;
+  $('city').textContent = T.names[city];
+  $('fMark').innerHTML = MARK;
+  $('fH').textContent = T.heads[city] || T.names[city];
+  $('fP').textContent = T.more;
+  $('credits').innerHTML = `<b>${T.credit}:</b> ` + photos.map((ph) => `${ph.place[lang]} — ${ph.author}, ${ph.license}`).join(' · ') + ' · Wikimedia Commons';
+  window.DUR = S.n * D + FIN;
+  return Promise.all([...document.images].map((im) => im.decode().catch(() => {})));
+};
+
+window.render = function (t) {
+  const { n } = S;
+  const end = n * D;
+  for (let i = 0; i < n; i++) {
+    const a = i * D;
+    const vis = i === 0 ? 1 - p(t, a + D, a + D + X) : p(t, a, a + X) * (i === n - 1 ? 1 : 1 - p(t, a + D, a + D + X));
+    const k = clamp((t - a + X) / (D + 2 * X));
+    // alternate the camera: push in towards the right, then towards the left
+    const dir = i % 2 ? -1 : 1;
+    const sc = 1.06 + k * 0.1;
+    const img = $(`s${i}`);
+    img.style.opacity = t < a - 0.01 && i ? 0 : vis;
+    img.firstChild.style.transform = `scale(${sc}) translateX(${dir * (k - 0.5) * 2.4}%)`;
+  }
+  // title over the first photo
+  const ti = p(t, 0.2, 1.1, out) * (1 - p(t, 3.0, 3.7));
+  $('title').style.opacity = ti;
+  $('title').style.transform = `translateY(${(1 - p(t, 0.2, 1.1, out)) * 40}px)`;
+  // place captions from the first photo's second half on
+  const idx = clamp(Math.floor(t / D), 0, n - 1);
+  const ca = idx * D + (idx === 0 ? 3.5 : 0.5);
+  const cv = p(t, ca, ca + 0.6, out) * (1 - p(t, idx * D + D - 0.1, idx * D + D + 0.4));
+  $('capN').textContent = String(idx + 1).padStart(2, '0');
+  $('capT').textContent = S.photos[idx].place[S.lang];
+  $('cap').style.opacity = t < end ? cv : 0;
+  $('cap').style.transform = `translateY(${(1 - cv) * 30}px)`;
+  [...$('bars').children].forEach((b, i) => (b.firstChild.style.transform = `scaleX(${clamp((t - i * D) / D)})`));
+  // closing card slides up
+  const f = p(t, end - 0.2, end + 0.7);
+  $('final').style.transform = `translateY(${(1 - f) * 100}%)`;
+  const fh = p(t, end + 0.5, end + 1.2, out);
+  for (const id of ['fMark', 'fH', 'fP']) { $(id).style.opacity = fh; $(id).style.transform = `translateY(${(1 - fh) * 30}px)`; }
+  $('credits').style.opacity = 0.62 * p(t, end + 1.0, end + 1.6);
+};
+</script>
+</body>
+</html>

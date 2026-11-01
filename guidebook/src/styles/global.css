@@ -2392,17 +2392,17 @@ input[type='search']::-webkit-search-cancel-button {
 .photo-frame.is-loaded img {
   opacity: 0;
 }
-.photo-frame iframe {
+.photo-frame video {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  border: 0;
-  opacity: 0;
-  transition: opacity 500ms var(--ease) 120ms;
+  object-fit: cover;
+  background: #0b0f0e;
+  animation: video-in 400ms var(--ease) both;
 }
-.photo-frame.is-loaded iframe {
-  opacity: 1;
+@keyframes video-in {
+  from { opacity: 0; }
 }
 .play {
   position: absolute;
@@ -2490,17 +2490,10 @@ input[type='search']::-webkit-search-cancel-button {
 @media (prefers-reduced-motion: reduce) {
   .photo-frame,
   .photo-frame img,
-  .photo-frame iframe {
+  .photo-frame video {
     transition: none;
+    animation: none;
   }
-}
-
-.video-out {
-  display: inline-block;
-  margin-top: 8px;
-  font-size: var(--t-small);
-  font-weight: 600;
-  color: var(--brand-ink);
 }
 
 /* ---------- Home: ask first, then browse ---------- */

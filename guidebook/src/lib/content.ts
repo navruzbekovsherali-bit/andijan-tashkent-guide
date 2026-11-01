@@ -62,14 +62,14 @@ export const PAGE_PHOTO: Record<string, string> = {
 /** Pages whose lists are things to do: each item gets a tick that is remembered on this device. */
 export const CHECKLISTS = ['packing', 'arrival-72h', 'first-day-week', 'relocation-budget'];
 
-/** City videos from the owner's Notion guidebook (YouTube ids), played inline over the head photo. */
+/** City films (video-src/cityfilm, our own renders from licensed photos), played in place over the head photo. */
 export const PAGE_VIDEO: Record<string, string> = {
-  samarkand: 'w0JULzjgUcs',
-  bukhara: '_ZH1WsIr2Zk',
-  khiva: 'MNx5gJntshQ',
-  tashkent: 'NG5aQFOiOrU',
-  andijan: '1kyocWKc5_w',
-  mountains: 'ZZ5lBkcy6PQ',
+  samarkand: 'samarkand',
+  bukhara: 'bukhara',
+  khiva: 'khiva',
+  tashkent: 'tashkent',
+  andijan: 'andijan',
+  mountains: 'mountains',
 };
 /** Cities strip on the home page, in travel order. */
 export const CITY_CARDS = [

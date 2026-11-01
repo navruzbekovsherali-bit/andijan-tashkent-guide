@@ -502,43 +502,37 @@ function cameFromHere() {
   return history.length > 1 && trail.length > 1 && trail[trail.length - 1] === location.pathname;
 }
 
-/* ---------- City films: the photo is the poster, the film opens in its place ---------- */
+/* ---------- City films: the photo is the poster, the film plays in its place ---------- */
 function playVideo(btn: HTMLButtonElement) {
   const frame = btn.closest<HTMLElement>('.photo-frame');
   if (!frame || frame.classList.contains('is-playing')) return;
-  const id = btn.dataset.play!;
-  const lang = document.documentElement.lang || 'ru';
-  const iframe = document.createElement('iframe');
-  iframe.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?playsinline=1&rel=0&modestbranding=1&hl=${lang}&cc_lang_pref=${lang}`;
-  iframe.title = btn.getAttribute('aria-label') || 'Video';
-  iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
-  iframe.allowFullscreen = true;
-  // YouTube refuses to play without knowing which site embeds it; some hosts strip that by default.
-  iframe.referrerPolicy = 'strict-origin-when-cross-origin';
-  iframe.addEventListener('load', () => frame.classList.add('is-loaded'), { once: true });
+  const lang = pageLang();
+  const name = `video/city-${btn.dataset.play}-${lang}`;
+  const video = document.createElement('video');
+  video.src = `${base() || '/'}${name}.mp4`;
+  video.poster = `${base() || '/'}${name}-poster.webp`;
+  video.controls = true;
+  video.playsInline = true;
+  video.preload = 'auto';
+  video.setAttribute('aria-label', btn.getAttribute('aria-label') || 'Video');
+  video.addEventListener('playing', () => frame.classList.add('is-loaded'), { once: true });
+  video.addEventListener('ended', () => close.click(), { once: true });
   const close = document.createElement('button');
   close.type = 'button';
   close.className = 'video-close';
   close.dataset.stop = '';
-  close.setAttribute('aria-label', lang === 'en' ? 'Close the video' : lang === 'uz' ? 'Videoni yopish' : 'Закрыть видео');
+  close.setAttribute('aria-label', { ru: 'Закрыть видео', en: 'Close the video', uz: 'Videoni yopish' }[lang]);
   close.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
-  const out = document.createElement('a');
-  out.className = 'video-out';
-  out.href = `https://www.youtube.com/watch?v=${encodeURIComponent(id)}`;
-  out.target = '_blank';
-  out.rel = 'noopener';
-  out.textContent = lang === 'en' ? 'Not playing? Open on YouTube ↗' : lang === 'uz' ? 'Ochilmayaptimi? YouTube’da ochish ↗' : 'Не играет? Открыть на YouTube ↗';
-  frame.after(out);
-  frame.append(iframe, close);
+  frame.append(video, close);
   frame.classList.add('is-playing');
-  close.focus({ preventScroll: true });
+  // started by the tap itself, so phones allow sound
+  video.play().catch(() => {});
 }
 
 function stopVideo(btn: HTMLButtonElement) {
   const frame = btn.closest<HTMLElement>('.photo-frame');
   if (!frame) return;
-  frame.querySelector('iframe')?.remove();
-  if (frame.nextElementSibling?.classList.contains('video-out')) frame.nextElementSibling.remove();
+  frame.querySelector('video')?.remove();
   btn.remove();
   frame.classList.remove('is-playing', 'is-loaded');
   frame.querySelector<HTMLElement>('[data-play]')?.focus({ preventScroll: true });
