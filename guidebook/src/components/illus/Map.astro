@@ -1,3 +1,8 @@
+---
+const { lang = 'ru' } = Astro.props as { lang?: 'ru' | 'en' | 'uz' };
+const L = { ru: ['Ташкент', 'Андижан'], en: ['Tashkent', 'Andijan'], uz: ['Toshkent', 'Andijon'] }[lang];
+---
+
 <svg class="illus illus-map" viewBox="0 0 320 220" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <mask id="illus-map-route" maskUnits="userSpaceOnUse" x="0" y="0" width="320" height="220">
@@ -20,7 +25,7 @@
       <path class="b-n" d="M0 0C-4-6-9-10-9-16a9 9 0 0 1 18 0c0 6-5 10-9 16Z" />
       <circle class="b-w b-nos" cy="-16" r="3.5" />
     </g>
-    <text class="b-t b-lab1" x="0" y="17" text-anchor="middle">Ташкент</text>
+    <text class="b-t b-lab1" x="0" y="17" text-anchor="middle">{L[0]}</text>
   </g>
   <g transform="translate(236 128)">
     <circle class="b-ring" r="8" />
@@ -29,6 +34,6 @@
       <path class="b-m b-k" d="M0 0C-4-6-9-10-9-16a9 9 0 0 1 18 0c0 6-5 10-9 16Z" />
       <circle class="b-n b-nos" cy="-16" r="3.5" />
     </g>
-    <text class="b-t b-lab2" x="0" y="17" text-anchor="middle">Андижан</text>
+    <text class="b-t b-lab2" x="0" y="17" text-anchor="middle">{L[1]}</text>
   </g>
 </svg>

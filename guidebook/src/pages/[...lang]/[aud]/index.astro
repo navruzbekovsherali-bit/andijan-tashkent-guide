@@ -62,7 +62,7 @@ const numbered = groups.map((g) => ({ ...g, steps: g.pages.map((p) => ({ p, n: +
       numbered.map((g) => (
         <section class="chapter" id={g.id}>
           <div class="chapter-head">
-            <Illus name={illusOf(g.id)} />
+            <Illus name={illusOf(g.id)} lang={lang} />
             <h2>
               <a href={url(lang, `/topic/${g.id}/`)}>{SECTIONS[g.id].title[lang]}</a>
             </h2>

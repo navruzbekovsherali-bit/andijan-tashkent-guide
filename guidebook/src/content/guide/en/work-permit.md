@@ -7,11 +7,11 @@ order: 30
 checked: 2026-10-26
 needsConfirmation: true
 sources:
-  - title: 'Постановление Кабинета Министров № 244 от 25.03.2019'
+  - title: 'Cabinet of Ministers Resolution No. 244 of 25.03.2019'
     url: 'https://lex.uz/ru/docs/4251566'
-  - title: 'Постановление Президента ПП-4008 от 07.11.2018'
+  - title: 'Presidential Resolution PP-4008 of 07.11.2018'
     url: 'https://lex.uz/ru/docs/4045563'
-  - title: 'Госуслуга на my.gov.uz'
+  - title: 'Government service on my.gov.uz'
     url: 'https://my.gov.uz/ru/service/267'
 tldr:
   - 'To work at the bank, you need the employer''s permit to hire foreign staff and confirmation of your right to work.'

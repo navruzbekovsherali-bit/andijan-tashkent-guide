@@ -7,7 +7,7 @@ order: 10
 checked: 2026-10-26
 needsConfirmation: true
 sources:
-  - title: 'Государственный таможенный комитет'
+  - title: 'State Customs Committee'
     url: 'https://customs.uz'
 tldr:
   - 'Your passport must be valid for at least 6 more months on the day you enter the country.'

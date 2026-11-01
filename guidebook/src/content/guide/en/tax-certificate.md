@@ -6,7 +6,7 @@ section: work
 order: 60
 checked: 2026-10-26
 sources:
-  - title: 'Единый портал госуслуг my.gov.uz'
+  - title: 'Single government services portal my.gov.uz'
     url: 'https://my.gov.uz/ru/spheres/18'
 tldr:
   - 'The quick way is online: my3.soliq.uz or my.gov.uz, logging in with OneID. The certificate is generated immediately.'

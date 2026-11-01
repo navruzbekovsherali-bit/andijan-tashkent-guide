@@ -34,7 +34,7 @@ const next = index >= 0 && index < groups.length - 1 ? groups[index + 1] : undef
         <h1>{title}</h1>
         <p class="lead">{articles(lang, pages.length)}</p>
       </div>
-      <Illus name={illusOf(id)} />
+      <Illus name={illusOf(id)} lang={lang} />
     </div>
   </header>
 

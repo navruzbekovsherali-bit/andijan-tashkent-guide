@@ -7,9 +7,9 @@ order: 40
 checked: 2026-10-26
 needsConfirmation: true
 sources:
-  - title: 'Трудовой кодекс Республики Узбекистан'
+  - title: 'Labour Code of the Republic of Uzbekistan'
     url: 'https://lex.uz/ru/docs/6257291'
-  - title: 'Пособие по временной нетрудоспособности (ПКМ № 314)'
+  - title: 'Temporary disability benefit (Cabinet of Ministers Resolution No. 314)'
     url: 'https://uzbekistan.uz/en/advice/673/document/2961'
 tldr:
   - 'If you fall ill, tell your manager and HR straight away, then see a doctor.'

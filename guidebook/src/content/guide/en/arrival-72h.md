@@ -7,11 +7,11 @@ order: 20
 checked: 2026-10-26
 needsConfirmation: true
 sources:
-  - title: 'Закон о регистрации иностранных граждан ЗРУ-1074'
+  - title: 'Law on the registration of foreign citizens ZRU-1074'
     url: 'https://lex.uz/ru/docs/7627933'
-  - title: 'E-mehmon — регистрация иностранных граждан'
+  - title: 'E-mehmon — registration of foreign citizens'
     url: 'https://emehmon.uz'
-  - title: 'UZIMEI — регистрация мобильных устройств'
+  - title: 'UZIMEI — mobile device registration'
     url: 'https://uzimei.uz'
 tldr:
   - 'At the airport, declare your phone in the "red channel". Otherwise you will pay 30% of its price when you register the IMEI.'

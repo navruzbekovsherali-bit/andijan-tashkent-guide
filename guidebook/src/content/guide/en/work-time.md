@@ -7,13 +7,13 @@ order: 10
 checked: 2026-10-26
 needsConfirmation: true
 sources:
-  - title: 'Трудовой кодекс Республики Узбекистан'
+  - title: 'Labour Code of the Republic of Uzbekistan'
     url: 'https://lex.uz/ru/docs/6257291'
-  - title: 'Указ о праздничных и выходных днях в 2026 году (УП-257)'
+  - title: 'Decree on public holidays and days off in 2026 (UP-257)'
     url: 'https://lex.uz/ru/docs/7938924'
-  - title: 'Сайт Президента Республики Узбекистан'
+  - title: 'Website of the President of the Republic of Uzbekistan'
     url: 'https://president.uz/ru/lists/view/8832'
-  - title: 'Отпуск: разъяснение на gov.uz'
+  - title: 'Annual leave: explanation on gov.uz'
     url: 'https://gov.uz/ru/advice/673/document/2993'
 tldr:
   - 'Five-day week: 08:30 to 17:30, lunch 12:30 to 13:30, weekends are Saturday and Sunday.'

@@ -7,15 +7,15 @@ order: 20
 checked: 2026-10-26
 needsConfirmation: true
 sources:
-  - title: 'Посольство США в Узбекистане'
+  - title: 'US Embassy in Uzbekistan'
     url: 'https://uz.usembassy.gov'
-  - title: 'Посольство Великобритании в Ташкенте'
+  - title: 'British Embassy Tashkent'
     url: 'https://www.gov.uk/world/organisations/british-embassy-tashkent'
-  - title: 'Посольство Германии в Ташкенте'
+  - title: 'German Embassy in Tashkent'
     url: 'https://taschkent.diplo.de'
-  - title: 'Посольство Франции в Узбекистане'
+  - title: 'French Embassy in Uzbekistan'
     url: 'https://uz.ambafrance.org'
-  - title: 'Посольство России в Узбекистане'
+  - title: 'Russian Embassy in Uzbekistan'
     url: 'https://uzbekistan.mid.ru'
 tldr:
   - 'The single emergency number is 112. It works 24 hours a day.'

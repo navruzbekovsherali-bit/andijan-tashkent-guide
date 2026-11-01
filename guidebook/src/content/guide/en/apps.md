@@ -7,9 +7,9 @@ order: 40
 checked: 2026-10-26
 needsConfirmation: true
 sources:
-  - title: 'UZIMEI — регистрация мобильных устройств'
+  - title: 'UZIMEI — mobile device registration'
     url: 'https://uzimei.uz'
-  - title: 'Единый портал госуслуг'
+  - title: 'Single government services portal'
     url: 'https://my.gov.uz'
 tldr:
   - 'Buy a local SIM card first: most services are linked to an Uzbek phone number.'

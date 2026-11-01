@@ -6,11 +6,11 @@ section: country
 order: 50
 checked: 2026-10-26
 sources:
-  - title: 'Андижан — культурная столица тюркского мира 2026 (Минкультуры)'
+  - title: 'Andijan — cultural capital of the Turkic world 2026 (Ministry of Culture)'
     url: 'https://gov.uz/ru/madaniyat/news/view/183217'
-  - title: 'Агентство статистики'
+  - title: 'Statistics Agency'
     url: 'https://stat.uz'
-  - title: 'Ж/д билеты'
+  - title: 'Train tickets'
     url: 'https://eticket.railway.uz'
 tldr:
   - 'In 2026 Andijan is the Cultural Capital of the Turkic World.'

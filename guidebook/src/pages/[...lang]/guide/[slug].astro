@@ -72,7 +72,7 @@ const photoId = slug === 'emergency' ? undefined : PAGE_PHOTO[slug];
           )}
         </div>
       </div>
-      {slug === 'emergency' ? <Sos lang={lang} /> : !photoId && <Illus name={illusOf(data.section, slug)} />}
+      {slug === 'emergency' ? <Sos lang={lang} /> : !photoId && <Illus name={illusOf(data.section, slug)} lang={lang} />}
     </div>
   </header>
 
