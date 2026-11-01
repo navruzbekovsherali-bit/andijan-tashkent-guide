@@ -118,6 +118,9 @@ const here = Astro.url.pathname;
           <a href={url(lang, '/expat/')} data-nav="expat">{tr('expatShort')}</a>
           <a href={url(lang, '/faq/')} data-nav="faq">{tr('faq')}</a>
         </nav>
+        <nav class="tb-lang" aria-label="Язык · Language · Til">
+          {LANGS.map((l) => <a href={url(l, path)} aria-current={l === lang ? 'true' : undefined} hreflang={l} lang={l}>{({ ru: 'RU', en: 'EN', uz: 'UZ' } as const)[l]}</a>)}
+        </nav>
         <button class="tb-icon" type="button" data-sheet="search" aria-label={tr('search')}><Icon name="search" /></button>
         <button class="tb-icon tb-menu" type="button" data-sheet="drawer" aria-label={tr('menu')}><Icon name="menu" /></button>
       </div>

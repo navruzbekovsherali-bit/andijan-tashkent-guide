@@ -3737,3 +3737,57 @@ html[data-view='expat'] .q-aud {
     background: rgb(10 46 42 / 0.72);
   }
 }
+
+/* language switch in the top bar: always in sight, one tap */
+.tb-lang {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  margin-right: 2px;
+  border-radius: 999px;
+  background: rgb(14 26 24 / 0.06);
+}
+.tb-lang a {
+  display: grid;
+  place-items: center;
+  min-width: 36px;
+  height: 32px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: inherit;
+  opacity: 0.7;
+  text-decoration: none;
+  transition: background-color 200ms, opacity 200ms;
+}
+.tb-lang a:hover {
+  opacity: 1;
+}
+.tb-lang a[aria-current='true'] {
+  background: var(--ink);
+  color: #fff;
+  opacity: 1;
+}
+/* a 44px tap target around the 32px pill */
+.tb-lang a {
+  position: relative;
+}
+.tb-lang a::after {
+  content: '';
+  position: absolute;
+  inset: -6px -1px;
+}
+.topbar-in.is-dark .tb-lang {
+  background: rgb(255 255 255 / 0.1);
+}
+.topbar-in.is-dark .tb-lang a[aria-current='true'] {
+  background: #fff;
+  color: var(--night);
+}
+@media (max-width: 360px) {
+  .brand-name {
+    display: none;
+  }
+}
