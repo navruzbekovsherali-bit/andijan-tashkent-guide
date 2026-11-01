@@ -75,7 +75,14 @@ def get(url, binary=False, tries=20):
         try:
             with urllib.request.urlopen(req, timeout=60) as r:
                 data = r.read()
-                return data if binary else json.loads(data)
+                if binary:
+                    return data
+                body = json.loads(data)
+                if 'error' not in body:
+                    return body
+                time.sleep(wait)  # the API throttles with an error body instead of a 429
+                wait = min(wait * 2, 180)
+                continue
         except urllib.error.HTTPError as e:
             if e.code != 429:
                 raise
@@ -122,7 +129,7 @@ def main():
                 break
             try:
                 found = pick(terms, used)
-            except RuntimeError as e:
+            except (RuntimeError, KeyError) as e:
                 print('  skip:', terms, e, flush=True)
                 continue
             if not found:

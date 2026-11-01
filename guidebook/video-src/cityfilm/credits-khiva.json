@@ -1,0 +1,67 @@
+[
+  {
+    "file": "khiva-1.jpg",
+    "city": "khiva",
+    "place": {
+      "ru": "Минарет Кальта-Минор",
+      "en": "Kalta Minor minaret",
+      "uz": "Kalta Minor minorasi"
+    },
+    "author": "Bgag",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:Kalta_Minor_01.jpg"
+  },
+  {
+    "file": "khiva-2.jpg",
+    "city": "khiva",
+    "place": {
+      "ru": "Стены Ичан-Калы",
+      "en": "Itchan Kala walls",
+      "uz": "Ichan qalʼa devorlari"
+    },
+    "author": "Petar Milošević",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:%D0%A1%D1%82%D0%B5%D0%BD%D0%B0_%D0%98%D1%87%D0%B0%D0%BD-%D0%9A%D0%B0%D0%BB%D1%8B_(Ichan-kal%E2%80%99a_devori,_Itchan_Kala_walls).jpg"
+  },
+  {
+    "file": "khiva-3.jpg",
+    "city": "khiva",
+    "place": {
+      "ru": "Минарет Ислам-Ходжа",
+      "en": "Islam Khodja minaret",
+      "uz": "Islomxoʻja minorasi"
+    },
+    "author": "Bgag",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:Islam_Khodja_Madrasa_07.jpg"
+  },
+  {
+    "file": "khiva-4.jpg",
+    "city": "khiva",
+    "place": {
+      "ru": "Мечеть Джума",
+      "en": "Juma mosque",
+      "uz": "Juma masjidi"
+    },
+    "author": "Bgag",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:Juma_Mosque_(Khiva)_01.jpg"
+  },
+  {
+    "file": "khiva-5.jpg",
+    "city": "khiva",
+    "place": {
+      "ru": "Куня-Арк",
+      "en": "Kunya-Ark",
+      "uz": "Koʻhna Ark"
+    },
+    "author": "Petar Milošević",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Konya_Ark_towers_(%D0%A6%D0%B8%D1%82%D0%B0%D0%B4%D0%B5%D0%BB%D1%8C_%D0%9A%D1%83%D0%BD%D1%8F-%D0%90%D1%80%D0%BA,_Ko%CA%BBhna_ark),_Itchan_Kala,_Khiva.jpg"
+  }
+]
