@@ -33,3 +33,5 @@ node scripts/make-preview.mjs   # предпросмотр с относител
 
 ## Публикация (Vercel)
 Новый проект → репозиторий `andijan-tashkent-guide` → **Root Directory: `guidebook`** → Deploy. Настройки Astro Vercel определит сам.
+
+Сейчас сайт живёт на **https://hamkor-guidebook.vercel.app**. В проекте Vercel `hamkor-guidebook` боевой веткой (Settings → Environments → Production → Branch Tracking) указана `claude/uzbek-bank-guidebook-site-c48izv`: каждый push в неё обновляет сайт за 1–2 минуты. Откатиться можно в Deployments → Promote на прошлой сборке.
