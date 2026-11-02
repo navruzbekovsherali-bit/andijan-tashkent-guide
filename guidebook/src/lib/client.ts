@@ -654,7 +654,7 @@ function reels() {
     const poster = (lang === 'en' ? r.posterEn : lang === 'uz' ? r.posterUz : undefined) ?? r.poster;
     host.innerHTML = `
       <figure class="reel">
-        <div class="reel-phone">
+        <div class="reel-screen">
           <video src="${root}${src}" poster="${root}${poster}" muted playsinline loop preload="none" aria-label="${escapeHtml(title)}"></video>
           <button type="button" class="reel-toggle" aria-label="${L.play}"><span class="reel-play"></span></button>
           <button type="button" class="reel-sound" aria-pressed="false" aria-label="${L.on}">
@@ -855,7 +855,7 @@ const STORY_ORDER: [string, string][] = [
   ['worktime', 'work-time'], ['trips', 'business-trips'], ['tax', 'tax-certificate'], ['medicine', 'medicine'], ['culture', 'culture'],
   ['packing', 'packing'], ['emergency', 'emergency'], ['phrases', 'phrases'], ['cities', 'uzbekistan'], ['history', 'about-bank'], ['cards', 'bank-card'],
 ];
-const STORY_TX = { ru: { open: 'Читать статью', close: 'Закрыть', next: 'Дальше' }, en: { open: 'Read the article', close: 'Close', next: 'Next' }, uz: { open: 'Maqolani oʻqish', close: 'Yopish', next: 'Keyingi' } };
+const STORY_TX = { ru: { open: 'Статья', close: 'Закрыть', next: 'Дальше' }, en: { open: 'Article', close: 'Close', next: 'Next' }, uz: { open: 'Maqola', close: 'Yopish', next: 'Keyingi' } };
 
 function stories() {
   const strip = document.querySelector<HTMLElement>('[data-stories]');
@@ -899,12 +899,20 @@ function openStories(items: { key: string; title: string; lead: string; src: str
   box.setAttribute('aria-modal', 'true');
   box.innerHTML = `<div class="sv-scrim" data-close></div>
     <div class="sv-frame">
-      <div class="sv-bars">${items.map(() => '<i><b></b></i>').join('')}</div>
-      <video playsinline preload="auto"></video>
-      <button type="button" class="sv-prev" aria-label="←"></button>
-      <button type="button" class="sv-next" aria-label="${T.next}"></button>
-      <button type="button" class="sv-close" data-close aria-label="${T.close}"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
-      <div class="sv-foot"><b></b><span></span><a class="sv-open"></a></div>
+      <div class="sv-head">
+        <div class="sv-bars">${items.map(() => '<i><b></b></i>').join('')}</div>
+        <button type="button" class="sv-close" data-close aria-label="${T.close}"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+      </div>
+      <div class="sv-stage">
+        <video playsinline preload="auto"></video>
+        <button type="button" class="sv-prev" aria-label="←"></button>
+        <button type="button" class="sv-next" aria-label="${T.next}"></button>
+      </div>
+      <div class="sv-foot">
+        <button type="button" class="sv-more" aria-expanded="false"><b></b><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="m6 15 6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <a class="sv-open"></a>
+        <span class="sv-lead"></span>
+      </div>
     </div>`;
   document.body.append(box);
   document.documentElement.classList.add('has-story');
@@ -923,12 +931,19 @@ function openStories(items: { key: string; title: string; lead: string; src: str
     video.src = it.src;
     video.poster = it.poster;
     video.play().catch(() => {});
-    box.querySelector('.sv-foot b')!.textContent = it.title;
-    box.querySelector('.sv-foot span')!.textContent = it.lead;
+    box.querySelector('.sv-more b')!.textContent = it.title;
+    box.querySelector('.sv-lead')!.textContent = it.lead;
     const open = box.querySelector<HTMLAnchorElement>('.sv-open')!;
     open.href = href(`/guide/${it.slug}/`);
-    open.textContent = T.open;
+    open.textContent = `${T.open} →`;
   };
+  // the caption stays one small line; tapping the title unfolds the summary
+  const more = box.querySelector<HTMLButtonElement>('.sv-more')!;
+  more.addEventListener('click', () => {
+    const on = !box.classList.contains('is-more');
+    box.classList.toggle('is-more', on);
+    more.setAttribute('aria-expanded', String(on));
+  });
   video.addEventListener('timeupdate', () => bars[i]?.style.setProperty('--p', String(video.currentTime / (video.duration || 1))));
   video.addEventListener('ended', () => show(i + 1));
   box.querySelector('.sv-next')!.addEventListener('click', () => show(i + 1));
