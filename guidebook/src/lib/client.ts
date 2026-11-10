@@ -397,6 +397,8 @@ export function initSite() {
     cityDepth,
     checklists,
     countdown,
+    expatPath,
+    installCard,
     todayWidgets,
     taxCalc,
     stories,
@@ -752,8 +754,18 @@ function todayWidgets() {
     }
     total += Number(store.get(`gb-check-n:${slug}`) || 0);
   }
-  const first = aud === 'expat' ? 'arrival-72h' : 'first-day-week';
-  cards.push(`<a class="w-card w-steps" href="${href(`/guide/${first}/`)}">
+  let stepsHref = href('/guide/first-day-week/');
+  if (aud === 'expat') {
+    // expats follow the route on their hub page: its ticks are the steps
+    try {
+      done = (JSON.parse(store.get('gb-path') || '[]') as string[]).length;
+    } catch {
+      done = 0;
+    }
+    total = Number(store.get('gb-path-n') || 16);
+    stepsHref = href('/expat/');
+  }
+  cards.push(`<a class="w-card w-steps" href="${stepsHref}">
     <span class="w-k">${T.steps}</span>
     <b class="w-big">${total ? `${done} <small>${T.stepsOf} ${total}</small>` : '0%'}</b>
     <span class="w-s">${total ? '' : T.stepsNone}</span>
@@ -1605,6 +1617,125 @@ function countdown() {
   input.value = store.get('gb-start') || '';
   input.addEventListener('change', show);
   show();
+}
+
+/* ---------- Expat hub: the route as one line; ticks are kept on this device ---------- */
+function expatPath() {
+  const box = document.querySelector<HTMLElement>('[data-path]');
+  if (!box) return;
+  let done: string[] = [];
+  try {
+    done = JSON.parse(store.get('gb-path') || '[]');
+  } catch {
+    /* nothing saved yet */
+  }
+  const ticks = Array.from(box.querySelectorAll<HTMLButtonElement>('.path-tick'));
+  const stages = Array.from(box.querySelectorAll<HTMLElement>('.path-stage'));
+  const count = box.querySelector<HTMLElement>('[data-path-done]')!;
+  const bar = box.querySelector<HTMLElement>('[data-path-bar]')!;
+  const all = box.querySelector<HTMLElement>('.path-all')!;
+  store.set('gb-path-n', String(ticks.length));
+  const paint = () => {
+    ticks.forEach((b) => {
+      const on = done.includes(b.dataset.step!);
+      b.setAttribute('aria-pressed', String(on));
+      b.closest('li')!.classList.toggle('is-done', on);
+    });
+    let current = false;
+    stages.forEach((st) => {
+      const full = Array.from(st.querySelectorAll<HTMLButtonElement>('.path-tick')).every((b) => done.includes(b.dataset.step!));
+      st.classList.toggle('is-done', full);
+      st.classList.toggle('is-current', !full && !current);
+      if (!full) current = true;
+    });
+    const n = ticks.filter((b) => done.includes(b.dataset.step!)).length;
+    count.textContent = String(n);
+    bar.style.setProperty('--p', String(n / ticks.length));
+    all.hidden = n < ticks.length;
+  };
+  ticks.forEach((b) =>
+    b.addEventListener('click', () => {
+      const id = b.dataset.step!;
+      done = done.includes(id) ? done.filter((x) => x !== id) : [...done, id];
+      store.set('gb-path', JSON.stringify(done));
+      paint();
+    }),
+  );
+  paint();
+}
+
+/* ---------- Home: "put the guidebook on your phone" — the browser's own install prompt where there is one,
+   plain steps where there is not (iPhone) ---------- */
+const INSTALL_TX = {
+  ru: {
+    title: 'Гайдбук на экране телефона',
+    lead: 'Открывается как приложение. Важные страницы работают и без интернета.',
+    btn: 'Установить',
+    hide: 'Скрыть',
+    ios: ['Откройте эту страницу в Safari', 'Нажмите «Поделиться» — квадрат со стрелкой вверх', 'Выберите «На экран „Домой“» и нажмите «Добавить»'],
+    android: ['Откройте меню браузера — три точки', 'Выберите «Установить приложение» или «Добавить на главный экран»'],
+    desktop: ['Нажмите значок установки в адресной строке', 'Или откройте меню браузера и выберите «Установить»'],
+  },
+  en: {
+    title: 'The guidebook on your home screen',
+    lead: 'Opens like an app. The key pages work without a connection, too.',
+    btn: 'Install',
+    hide: 'Hide',
+    ios: ['Open this page in Safari', 'Tap Share — the square with an arrow', 'Choose “Add to Home Screen”, then “Add”'],
+    android: ['Open the browser menu — three dots', 'Choose “Install app” or “Add to Home screen”'],
+    desktop: ['Click the install icon in the address bar', 'Or open the browser menu and choose “Install”'],
+  },
+  uz: {
+    title: 'Qoʻllanma telefon ekranida',
+    lead: 'Ilova kabi ochiladi. Muhim sahifalar internetsiz ham ishlaydi.',
+    btn: 'Oʻrnatish',
+    hide: 'Yashirish',
+    ios: ['Bu sahifani Safari’da oching', '«Ulashish» tugmasini bosing — yuqoriga strelkali kvadrat', '«Bosh ekranga qoʻshish»ni tanlang va «Qoʻshish»ni bosing'],
+    android: ['Brauzer menyusini oching — uch nuqta', '«Ilovani oʻrnatish» yoki «Bosh ekranga qoʻshish»ni tanlang'],
+    desktop: ['Manzil satridagi oʻrnatish belgisini bosing', 'Yoki brauzer menyusidan «Oʻrnatish»ni tanlang'],
+  },
+};
+type InstallEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
+function installCard() {
+  const host = document.querySelector<HTMLElement>('[data-install]');
+  if (!host) return;
+  const nav = navigator as Navigator & { standalone?: boolean };
+  if (matchMedia('(display-mode: standalone)').matches || nav.standalone === true || store.get('gb-install-hide') === '1') return;
+  const T = INSTALL_TX[pageLang()];
+  const ua = navigator.userAgent;
+  const ios = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const steps = ios ? T.ios : /Android/.test(ua) ? T.android : T.desktop;
+  host.innerHTML = `<div class="install">
+    <span class="install-ic" aria-hidden="true"><svg viewBox="0 0 48 48" width="30" height="30"><rect x="12" y="4" width="24" height="40" rx="6" fill="none" stroke="currentColor" stroke-width="3"/><path d="M24 14v12m0 0-5-5m5 5 5-5M19 33h10" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    <div class="install-tx"><b>${T.title}</b><span>${T.lead}</span></div>
+    <button type="button" class="install-btn" aria-expanded="false">${T.btn}</button>
+    <button type="button" class="install-x" aria-label="${T.hide}"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+    <ol class="install-how" hidden>${steps.map((x) => `<li>${escapeHtml(x)}</li>`).join('')}</ol>
+  </div>`;
+  const w = window as Window & { __gbInstall?: InstallEvent };
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    w.__gbInstall = e as InstallEvent;
+  });
+  window.addEventListener('appinstalled', () => host.replaceChildren());
+  const btn = host.querySelector<HTMLButtonElement>('.install-btn')!;
+  const how = host.querySelector<HTMLElement>('.install-how')!;
+  btn.addEventListener('click', async () => {
+    const ev = w.__gbInstall;
+    if (ev) {
+      await ev.prompt();
+      const choice = await ev.userChoice.catch(() => ({ outcome: 'dismissed' }));
+      w.__gbInstall = undefined;
+      if (choice.outcome === 'accepted') host.replaceChildren();
+      return;
+    }
+    how.hidden = !how.hidden;
+    btn.setAttribute('aria-expanded', String(!how.hidden));
+  });
+  host.querySelector('.install-x')!.addEventListener('click', () => {
+    store.set('gb-install-hide', '1');
+    host.replaceChildren();
+  });
 }
 
 /* ---------- Offline: emergency numbers and the pages you opened work without a connection ---------- */

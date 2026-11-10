@@ -54,6 +54,11 @@ const here = Astro.url.pathname;
       (function () {
         var d = document.documentElement;
         d.classList.add('js');
+        // keep the browser's install offer until the page asks for it (see installCard in client.ts)
+        window.addEventListener('beforeinstallprompt', function (e) {
+          e.preventDefault();
+          window.__gbInstall = e;
+        });
         try {
           var au = localStorage.getItem('gb-audience');
           if (au && d.dataset.audience === 'both') d.dataset.pref = au;

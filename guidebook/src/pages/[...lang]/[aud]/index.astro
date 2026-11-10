@@ -4,6 +4,7 @@ import Guide from '../../../components/Guide.astro';
 import Illus from '../../../components/Illus.astro';
 import Icon from '../../../components/Icon.astro';
 import { LANGS, DEFAULT_LANG, t, url, type Lang } from '../../../lib/i18n';
+import { EXPAT_PATH, PATH_TX } from '../../../lib/path';
 import { getPages, forAudience, groupBySection, SECTIONS, illusOf, HUB_ORDER, type Audience } from '../../../lib/content';
 
 export function getStaticPaths() {
@@ -34,6 +35,8 @@ const hello: Record<Audience, Record<Lang, string>> = {
     uz: 'Yuqoridan pastga yuring: avval yigʻilish va dastlabki 72 soat.',
   },
 };
+const P = PATH_TX[lang];
+const pathTotal = EXPAT_PATH.reduce((a, s) => a + s.steps.length, 0);
 // Steps are numbered through the whole route: the order is the advice.
 let n = 0;
 const numbered = groups.map((g) => ({ ...g, steps: g.pages.map((p) => ({ p, n: ++n })) }));
@@ -49,6 +52,53 @@ const numbered = groups.map((g) => ({ ...g, steps: g.pages.map((p) => ({ p, n: +
       </Guide>
     </div>
   </header>
+
+  {
+    aud === 'expat' && (
+      <section class="path" data-path data-all={P.all} aria-labelledby="path-h">
+        <div class="wrap">
+          <div class="path-top">
+            <div>
+              <h2 class="h2" id="path-h">{P.title}</h2>
+              <p class="path-lead">{P.lead}</p>
+            </div>
+            <p class="path-count" aria-live="polite">
+              <b data-path-done>0</b> {P.of} {pathTotal} <span>{P.done}</span>
+              <span class="path-meter"><i data-path-bar /></span>
+            </p>
+          </div>
+          <ol class="path-stages">
+            {EXPAT_PATH.map((st, i) => (
+              <li class="path-stage" data-stage={st.id}>
+                <span class="path-dot" aria-hidden="true">
+                  <b>{i + 1}</b>
+                  <Icon name="check" size={18} />
+                </span>
+                <div class="path-head">
+                  <h3>{st.title[lang]}</h3>
+                  <span class="path-when">{st.when[lang]}</span>
+                </div>
+                <ul class="path-steps">
+                  {st.steps.map((step) => (
+                    <li>
+                      <button type="button" class="path-tick" data-step={step.id} aria-pressed="false" aria-label={`${P.mark}: ${step.title[lang]}`}>
+                        <Icon name="check" size={16} />
+                      </button>
+                      <a href={url(lang, `/guide/${step.slug}/`)}>
+                        <strong>{step.title[lang]}</strong>
+                        <span>{step.hint[lang]}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ol>
+          <p class="path-all" hidden>{P.all}</p>
+        </div>
+      </section>
+    )
+  }
 
   <section class="stories-block hub-stories" aria-label={tr('videoWeek')}>
     <div class="wrap"><p class="label">{tr('videoWeek')}</p></div>

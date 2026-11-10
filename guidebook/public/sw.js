@@ -1,7 +1,7 @@
 /* Offline for the guidebook: the pages that matter on arrival are kept ready, every page you open is kept
    too, and when there is no connection the last saved copy is shown. */
-const CACHE = 'gb-v1';
-const CORE = ['/', '/guide/emergency/', '/guide/arrival-72h/', '/guide/contacts/', '/guide/first-day-week/', '/faq/',
+const CACHE = 'gb-v2';
+const CORE = ['/', '/guide/emergency/', '/guide/arrival-72h/', '/guide/contacts/', '/guide/first-day-week/', '/guide/registration/', '/guide/visa/', '/expat/', '/faq/',
   '/en/', '/en/guide/emergency/', '/en/guide/arrival-72h/', '/en/guide/contacts/'];
 
 self.addEventListener('install', (e) => {
@@ -31,6 +31,8 @@ self.addEventListener('fetch', (e) => {
     );
     return;
   }
+  // Films are streamed, never cached: they are large, are fetched in ranges and do get replaced.
+  if (url.pathname.startsWith('/video/') && url.pathname.endsWith('.mp4')) return;
   // Styles, scripts, fonts, photos: saved once, served from the cache.
   e.respondWith(
     caches.match(req).then(
