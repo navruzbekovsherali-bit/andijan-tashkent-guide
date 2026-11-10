@@ -69,7 +69,7 @@ Bu dastlabki kunlar uchun eng muhim sahifa. Bosqichlarni tartib bilan bajaring: 
 
 <div class="video-reel" data-reel="imei"></div>
 
-1. **Roʻyxat rasmiylashtirilganini tekshiring.** Muddat — yetib kelgandan keyin 3 kun. Har safar yangi joyga koʻchganda roʻyxat qaytadan, shuningdek 3 kun ichida rasmiylashtiriladi.
+1. **Roʻyxat rasmiylashtirilganini tekshiring.** Muddat — yetib kelgandan keyin 3 kun. Har safar yangi joyga koʻchganda roʻyxat qaytadan, shuningdek 3 kun ichida rasmiylashtiriladi — batafsil [«Roʻyxat: 3 kun qoidasi»](../registration/) sahifasida.
 2. Agar mahalliy SIM-kartadan foydalansangiz, **telefon IMEI’sini** [uzimei.uz](https://uzimei.uz) saytida **roʻyxatdan oʻtkazing**. Holatni `*1170#` buyrugʻi bilan, IMEI’ni SMS orqali 1170 raqamiga yuborib, uzimei.uz yoki my.gov.uz saytida tekshirish mumkin.
 3. **Hujjatlarni saqlang:** bojxona deklaratsiyasi, roʻyxatga olish taloni, ijara shartnomasi.
 

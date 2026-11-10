@@ -615,6 +615,8 @@ const FILMS: Record<string, [[string, string], [string, string], [string, string
   tax: [['Справка о доходах', 'Онлайн за минуту или через ЭДО за 15–30 дней.'], ['Income certificate', 'Online in a minute, or through the EDMS in 15–30 days.'], ['Daromad maʼlumotnomasi', 'Onlayn bir daqiqada yoki EHA orqali 15–30 kunda.']],
   culture: [['Культурный код', 'Чай, хлеб и приветствие — три правила гостеприимства.'], ['The cultural code', 'Tea, bread and a greeting — three rules of hospitality.'], ['Madaniy kod', 'Choy, non va salomlashish — mehmondoʻstlikning uch qoidasi.']],
   medicine: [['Если нужен врач', '103, клиники и страховка, антибиотики по рецепту.'], ['If you need a doctor', '103, clinics and insurance, antibiotics on prescription.'], ['Shifokor kerak boʻlsa', '103, klinikalar va sugʻurta, antibiotiklar retsept bilan.']],
+  visa: [['Виза в Узбекистан', 'Анкета на visa.mfa.uz, подача через банк и консульство.'], ['Your visa for Uzbekistan', 'The form on visa.mfa.uz, filing through the bank, and the consulate.'], ['Oʻzbekistonga viza', 'visa.mfa.uz’dagi anketa, bank orqali topshirish va konsullik.']],
+  stay: [['Правило 3 дней', 'Регистрация после прилёта и после каждого переезда.'], ['The 3-day rule', 'Registration after you arrive and after every move.'], ['3 kun qoidasi', 'Kelgandan keyin va har bir koʻchishdan keyin roʻyxat.']],
   cities: [['Путешествие по Узбекистану', 'Ташкент, Самарканд, Бухара, Хива и Андижан на одной карте.'], ['Travelling around Uzbekistan', 'Tashkent, Samarkand, Bukhara, Khiva and Andijan on one map.'], ['Oʻzbekiston boʻylab sayohat', 'Toshkent, Samarqand, Buxoro, Xiva va Andijon bitta xaritada.']],
 };
 for (const [name, [ru, en, uz]] of Object.entries(FILMS)) {
@@ -850,7 +852,7 @@ function taxCalc() {
 
 /* ---------- Home: "videos of the week" — stories you tap through, like on a phone ---------- */
 const STORY_ORDER: [string, string][] = [
-  ['arrival', 'arrival-72h'], ['hotel', 'arrival-72h'], ['firstday', 'first-day-week'], ['card', 'bank-card'], ['salary', 'salary-local'],
+  ['visa', 'visa'], ['arrival', 'arrival-72h'], ['stay', 'registration'], ['hotel', 'arrival-72h'], ['firstday', 'first-day-week'], ['card', 'bank-card'], ['salary', 'salary-local'],
   ['metro', 'transport'], ['imei', 'arrival-72h'], ['apartment', 'arrival-72h'], ['sickleave', 'sick-leave'], ['permit', 'work-permit'],
   ['worktime', 'work-time'], ['trips', 'business-trips'], ['tax', 'tax-certificate'], ['medicine', 'medicine'], ['culture', 'culture'],
   ['packing', 'packing'], ['emergency', 'emergency'], ['phrases', 'phrases'], ['cities', 'uzbekistan'], ['history', 'about-bank'], ['cards', 'bank-card'],
@@ -865,7 +867,7 @@ function stories() {
   const pick = (r: (typeof REELS)[string], k: 'src' | 'poster') =>
     (lang === 'en' ? r[k === 'src' ? 'srcEn' : 'posterEn'] : lang === 'uz' ? r[k === 'src' ? 'srcUz' : 'posterUz'] : undefined) ?? r[k];
   // local staff do not need the arrival stories (customs, hotel, IMEI, flat, permit, packing)
-  const ARRIVAL = ['arrival', 'hotel', 'imei', 'apartment', 'permit', 'packing', 'metro'];
+  const ARRIVAL = ['visa', 'stay', 'arrival', 'hotel', 'imei', 'apartment', 'permit', 'packing', 'metro'];
   const only = strip.dataset.stories;
   const items = STORY_ORDER.filter(([k]) => REELS[k] && !(only === 'local' && ARRIVAL.includes(k))).map(([k, slug]) => {
     const r = REELS[k];
@@ -1456,7 +1458,7 @@ function countUp(root: HTMLElement) {
   if (!nums.length) return;
   const run = (el: HTMLElement) => {
     const text = el.textContent || '';
-    const m = text.match(/\d[\d\s ]*(?:[.,]\d+)?/);
+    const m = text.match(/\d(?:[\d\s ]*\d)?(?:[.,]\d+)?/); // keep the space before the unit out of the number
     if (!m) return;
     const raw = m[0];
     const target = parseFloat(raw.replace(/[\s ]/g, '').replace(',', '.'));

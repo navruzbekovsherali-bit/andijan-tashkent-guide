@@ -69,7 +69,7 @@ This is the most important page for your first days. Follow the steps in order. 
 
 <div class="video-reel" data-reel="imei"></div>
 
-1. **Check that your registration is done.** The deadline is 3 days after arrival. Every time you move to a new address, you register again, also within 3 days.
+1. **Check that your registration is done.** The deadline is 3 days after arrival. Every time you move to a new address, you register again, also within 3 days — see [“Registration: the 3-day rule”](../registration/).
 2. **Register your phone's IMEI** on [uzimei.uz](https://uzimei.uz) if you use a local SIM card. You can check the status by dialling `*1170#`, by sending your IMEI by SMS to 1170, on uzimei.uz or on my.gov.uz.
 3. **Keep your documents:** customs declaration, registration slip, rental agreement.
 

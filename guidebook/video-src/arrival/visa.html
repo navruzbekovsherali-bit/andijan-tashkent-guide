@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Visa film</title>
+<!-- "Visa" film: the form on visa.mfa.uz with a 3×4 photo and the passport, the bank files it with the Foreign Ministry,
+     10–15 working days, the visa is collected at the consulate and the fee is paid by the employee. -->
+<link rel="stylesheet" href="film.css" />
+<style>
+  .bg { position: absolute; inset: 0; background: radial-gradient(70% 40% at 50% 34%, #e3ebf5, transparent 70%), linear-gradient(180deg, #edf2f7 0%, #f3f5f1 100%); }
+  .screen .row div { font-size: 40px; }
+  .ups { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 26px; }
+  .up { position: relative; height: 230px; border-radius: 26px; border: 4px dashed #c4ccd6; display: grid; place-items: center; overflow: hidden; }
+  .up .lbl { position: absolute; left: 0; right: 0; bottom: 16px; text-align: center; font-size: 28px; font-weight: 700; color: var(--ink-3); }
+  .up .pic { position: absolute; inset: 16px 16px 92px; border-radius: 14px; display: grid; place-items: center; }
+  .up .upbar { position: absolute; left: 24px; right: 24px; bottom: 66px; height: 10px; border-radius: 5px; background: #e8ecf1; overflow: hidden; }
+  .up .upbar b { display: block; height: 100%; background: var(--brand); transform-origin: 0 50%; transform: scaleX(0); }
+  .up.on { border-style: solid; border-color: var(--brand); }
+  .scan { position: absolute; left: 40px; right: 40px; height: 6px; border-radius: 3px; background: var(--brand); box-shadow: 0 0 30px 8px rgb(26 167 82 / 0.35); z-index: 3; }
+  .spec { position: absolute; left: 110px; right: 110px; top: 300px; z-index: 17; display: flex; align-items: center; gap: 26px; padding: 26px 30px; border-radius: 34px; background: #fff; box-shadow: 0 40px 80px -36px rgb(10 46 42 / 0.5); }
+  .spec .av { flex: none; width: 104px; height: 104px; border-radius: 50%; background: #e6f5ec; display: grid; place-items: center; }
+  .spec b { display: block; font-size: 40px; letter-spacing: -0.02em; }
+  .spec span { font-size: 30px; color: var(--ink-3); }
+  .sheet { position: absolute; z-index: 19; width: 250px; height: 320px; padding: 30px 26px; border-radius: 18px; background: #fff; box-shadow: 0 30px 60px -24px rgb(10 46 42 / 0.5), inset 0 0 0 3px rgb(14 26 24 / 0.1); }
+  .sheet b { display: block; font-size: 30px; margin-bottom: 18px; }
+  .sheet i { display: block; height: 12px; margin-top: 14px; border-radius: 6px; background: #e6e9ee; }
+  .sheet .ph { position: absolute; right: 22px; bottom: 26px; width: 66px; height: 88px; border-radius: 8px; background: #dfe9f3; }
+  .bank { position: absolute; left: 80px; top: 640px; z-index: 12; width: 330px; padding: 30px; border-radius: 34px; background: var(--night); color: #fff; box-shadow: 0 40px 80px -36px rgb(10 46 42 / 0.6); }
+  .bank svg { width: 84px; height: 84px; }
+  .bank b { display: block; margin-top: 16px; font-size: 36px; }
+  .bank span { display: block; margin-top: 6px; font-size: 26px; color: #a9c2bc; line-height: 1.25; }
+  .mfa { position: absolute; left: 540px; top: 560px; z-index: 11; width: 470px; }
+  .mfaL { position: absolute; left: 540px; width: 470px; top: 1040px; z-index: 12; text-align: center; font-size: 30px; font-weight: 750; }
+  .envl { position: absolute; z-index: 14; width: 170px; height: 116px; border-radius: 14px; background: #fff; box-shadow: 0 20px 40px -16px rgb(10 46 42 / 0.5), inset 0 0 0 4px var(--ink); }
+  .envl::before { content: ''; position: absolute; left: 8px; right: 8px; top: 6px; height: 60px; border-bottom: 4px solid var(--ink); border-radius: 0 0 50% 50% / 0 0 100% 100%; }
+  .envl::after { content: ''; position: absolute; left: 66px; top: 52px; width: 38px; height: 38px; border-radius: 50%; background: var(--brand); }
+  .got { position: absolute; left: 540px; width: 470px; top: 470px; z-index: 13; display: flex; align-items: center; justify-content: center; gap: 16px; padding: 18px 20px; border-radius: 999px; background: #e6f5ec; color: var(--brand-ink); font-size: 32px; font-weight: 750; }
+  .got i { display: grid; place-items: center; width: 50px; height: 50px; border-radius: 50%; background: var(--brand); }
+  .cal { position: absolute; left: 110px; width: 860px; top: 290px; z-index: 18; padding: 46px 56px 52px; border-radius: 44px; background: radial-gradient(80% 70% at 100% 0%, #1d6b52, transparent 70%), var(--night); color: #fff; box-shadow: 0 60px 120px -40px rgb(10 46 42 / 0.6); }
+  .cal small { display: block; font-size: 28px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #a9c2bc; }
+  .cal .big { margin-top: 10px; font-size: 150px; line-height: 0.95; font-weight: 800; letter-spacing: -0.05em; }
+  .cal .big em { font-style: normal; font-size: 48px; margin-left: 12px; letter-spacing: -0.02em; }
+  .grid15 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 30px; }
+  .grid15 i { height: 34px; border-radius: 10px; background: rgb(255 255 255 / 0.14); }
+  .grid15 i.on { background: var(--brand); }
+  .pass { position: absolute; left: 90px; top: 760px; z-index: 16; width: 420px; height: 520px; padding: 34px; border-radius: 26px; background: #fff; box-shadow: 0 40px 80px -30px rgb(10 46 42 / 0.55), inset 0 0 0 3px rgb(14 26 24 / 0.1); }
+  .pass .vs { position: absolute; inset: 34px; border-radius: 16px; padding: 26px; background: linear-gradient(135deg, #e7f1fb, #eef7ef); box-shadow: inset 0 0 0 3px #b9cde0; }
+  .pass .vs b { display: block; font-size: 36px; letter-spacing: 0.06em; color: #1b4f8f; }
+  .pass .vs small { display: block; margin-top: 6px; font-size: 24px; color: var(--ink-3); letter-spacing: 0.04em; }
+  .pass .vs .ph { position: absolute; left: 26px; bottom: 30px; width: 110px; height: 146px; border-radius: 10px; background: #d9e3ec; }
+  .pass .vs i { position: absolute; left: 160px; right: 26px; height: 12px; border-radius: 6px; background: #c9d6e2; }
+  .pass .stamp { right: 30px; bottom: 210px; font-size: 40px; }
+  .fee { position: absolute; left: 550px; right: 70px; top: 820px; z-index: 17; padding: 32px 34px; border-radius: 34px; background: #fff; box-shadow: 0 40px 80px -30px rgb(200 55 45 / 0.45), inset 0 0 0 4px var(--red); }
+  .fee .ic { display: grid; place-items: center; width: 74px; height: 74px; border-radius: 20px; background: var(--red); color: #fff; font-size: 44px; font-weight: 800; }
+  .fee b { display: block; margin-top: 20px; font-size: 38px; line-height: 1.15; letter-spacing: -0.02em; }
+  .fee span { display: block; margin-top: 12px; font-size: 30px; line-height: 1.3; color: var(--red); font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="bg"></div>
+
+  <!-- 1. the form on visa.mfa.uz -->
+  <div class="screen" id="form" style="top:280px">
+    <div class="bar"><i></i><span>visa.mfa.uz</span></div>
+    <div class="body" style="position:relative">
+      <div class="scan" id="scan"></div>
+      <h4 id="formH"></h4>
+      <div class="row"><label id="l1"></label><div id="v1"></div></div>
+      <div class="row"><label id="l2"></label><div id="v2"></div></div>
+      <div class="ups">
+        <div class="up" id="u1"><div class="pic" id="u1p" style="background:#dfe9f3"><svg viewBox="0 0 100 120" height="104"><circle cx="50" cy="42" r="22" fill="#fff" stroke="#0e1a18" stroke-width="5"/><path d="M14 120 Q14 76 50 76 Q86 76 86 120" fill="#0b4a43" stroke="#0e1a18" stroke-width="5"/></svg></div><div class="upbar"><b id="u1b"></b></div><span class="lbl" id="u1l"></span></div>
+        <div class="up" id="u2"><div class="pic" id="u2p" style="background:#0b4a43"><svg viewBox="0 0 100 120" height="100"><circle cx="50" cy="50" r="24" fill="none" stroke="#e6c86a" stroke-width="5"/><path d="M26 98 H74" stroke="#e6c86a" stroke-width="6" stroke-linecap="round"/></svg></div><div class="upbar"><b id="u2b"></b></div><span class="lbl" id="u2l"></span></div>
+      </div>
+      <div class="okline" id="okline"><span style="display:grid;place-items:center;width:62px;height:62px;border-radius:50%;background:var(--brand)"><svg viewBox="0 0 24 24" width="40"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b id="ok"></b></div>
+    </div>
+  </div>
+
+  <!-- 2. to the adaptation specialist, then the bank files it with the Foreign Ministry -->
+  <div class="spec" id="spec"><span class="av"><svg viewBox="0 0 100 100" width="80"><circle cx="50" cy="36" r="18" fill="#fff" stroke="#0e1a18" stroke-width="5"/><path d="M18 96 Q18 62 50 62 Q82 62 82 96" fill="#1aa752" stroke="#0e1a18" stroke-width="5"/></svg></span><div><b id="spB"></b><span id="spS"></span></div></div>
+  <div class="sheet" id="sheet"><b id="shB"></b><i></i><i style="width:80%"></i><i style="width:60%"></i><i style="width:70%"></i><span class="ph"></span></div>
+  <div class="bank" id="bank"><svg viewBox="270 270 1390 1390"><circle cx="965" cy="965" r="616.5" fill="none" stroke="#1aa752" stroke-width="137" stroke-dasharray="1500 300 1500 572"/><polygon points="1215,476 1440,466 1125,1307 902,1307 1007,1023 880,1023 720,1480 495,1465 812,622 1033,622 928,908 1052,908" fill="#1aa752"/></svg><b>Hamkor Bank</b><span id="bkS"></span></div>
+  <svg class="mfa" id="mfa" viewBox="0 0 470 470">
+    <path d="M30 150 L235 40 L440 150 Z" fill="#fff" stroke="#0e1a18" stroke-width="6" stroke-linejoin="round"/>
+    <rect x="50" y="150" width="370" height="26" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+    <g fill="#eaf1ee" stroke="#0e1a18" stroke-width="6"><rect x="78" y="176" width="44" height="220"/><rect x="170" y="176" width="44" height="220"/><rect x="256" y="176" width="44" height="220"/><rect x="348" y="176" width="44" height="220"/></g>
+    <rect x="30" y="396" width="410" height="30" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+    <path d="M0 450 H470" stroke="#0e1a18" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="235" cy="104" r="20" fill="#1aa752"/>
+  </svg>
+  <div class="mfaL" id="mfaL"></div>
+  <div class="envl" id="envl"></div>
+  <div class="got" id="got"><i><svg viewBox="0 0 24 24" width="30"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></i><span id="gotT"></span></div>
+
+  <!-- 3. 10–15 working days, the visa, the fee -->
+  <div class="cal" id="cal"><small id="calK"></small><div class="big">10–15<em id="calD"></em></div><div class="grid15" id="g15"></div></div>
+  <div class="pass" id="pass"><div class="vs"><b>VISA</b><small>O‘ZBEKISTON · UZBEKISTAN</small><span class="ph"></span><i style="bottom:150px"></i><i style="bottom:116px;right:80px"></i><i style="bottom:82px"></i><i style="bottom:48px;right:120px"></i></div><div class="stamp" id="vstamp"></div></div>
+  <div class="fee" id="fee"><span class="ic">$</span><b id="feeB"></b><span id="feeS"></span></div>
+</div>
+<script src="film.js"></script>
+<script>
+const { p, fade, $, set, typ, caret, card, init, captions, progress, final, play, easeOut, easeInOut, back, stamp, TICK } = Film;
+const T = init({
+  ru: {
+    c: [['Шаги 1–2 · Анкета', 'Анкета на visa.mfa.uz', 'Загрузите фото 3×4 и паспорт, затем проверьте каждое поле.'],
+        ['Шаги 3–4 · Банк', 'Банк подаст документы в МИД', 'Готовую анкету — специалисту по адаптации. Пакет в МИД отправит банк.'],
+        ['Шаги 5–6 · Виза', 'Через 10–15 рабочих дней', 'Заберите визу в консульстве Узбекистана в своей стране.']],
+    fH: 'Визовая анкета', l1: 'Фамилия, имя', v1: 'SMITH JOHN', l2: 'Паспорт', v2: 'N 1234567 · до 2032', u1: 'Фото 3×4', u2: 'Паспорт', ok: 'Данные проверены',
+    spB: 'Специалист по адаптации', spS: 'получил вашу анкету', shB: 'Анкета', bkS: 'Отдел подбора и адаптации', mfaL: 'МИД Республики Узбекистан', got: 'Документы поданы',
+    calK: 'Ответ о готовности через', calD: 'раб. дней', vstamp: 'ГОТОВО', feeB: 'Консульский сбор платите вы', feeS: 'Банк его не оплачивает и не возмещает',
+    final: { title: 'Виза — шаг за шагом', items: [{ text: 'Анкета заполнена и проверена' }, { text: 'Передана специалисту по адаптации' }, { text: 'Банк подал документы в МИД' }, { text: 'Сбор в консульстве — за ваш счёт', small: 'Банк его не оплачивает', next: true }] },
+  },
+  en: {
+    c: [['Steps 1–2 · The form', 'The form on visa.mfa.uz', 'Upload a 3×4 photo and your passport, then check every field.'],
+        ['Steps 3–4 · The bank', 'The bank files it with the Ministry', 'Give the finished form to the adaptation specialist. The bank sends the package.'],
+        ['Steps 5–6 · The visa', 'In 10–15 working days', 'Collect the visa at the Uzbek consulate in your own country.']],
+    fH: 'Visa application form', l1: 'Surname, name', v1: 'SMITH JOHN', l2: 'Passport', v2: 'N 1234567 · until 2032', u1: '3×4 photo', u2: 'Passport', ok: 'All details checked',
+    spB: 'Adaptation specialist', spS: 'has your form', shB: 'Form', bkS: 'Recruitment and adaptation team', mfaL: 'Ministry of Foreign Affairs of Uzbekistan', got: 'Documents filed',
+    calK: 'Answer on readiness in', calD: 'working days', vstamp: 'READY', feeB: 'You pay the consular fee', feeS: 'The bank neither pays nor refunds it',
+    final: { title: 'Your visa, step by step', items: [{ text: 'Form filled in and checked' }, { text: 'Handed to the adaptation specialist' }, { text: 'The bank filed it with the Ministry' }, { text: 'The consular fee is yours to pay', small: 'The bank does not cover it', next: true }] },
+  },
+  uz: {
+    c: [['1–2-qadam · Anketa', 'visa.mfa.uz’da anketa', '3×4 rasm va pasportni yuklang, soʻng har bir maydonni tekshiring.'],
+        ['3–4-qadam · Bank', 'Bank hujjatlarni TIVga topshiradi', 'Tayyor anketani moslashuv mutaxassisiga bering. Paketni bank yuboradi.'],
+        ['5–6-qadam · Viza', '10–15 ish kunida', 'Vizani oʻz mamlakatingizdagi Oʻzbekiston konsulligidan oling.']],
+    fH: 'Viza anketasi', l1: 'Familiya, ism', v1: 'SMITH JOHN', l2: 'Pasport', v2: 'N 1234567 · 2032 gacha', u1: '3×4 rasm', u2: 'Pasport', ok: 'Maʼlumotlar tekshirildi',
+    spB: 'Moslashuv mutaxassisi', spS: 'anketangizni oldi', shB: 'Anketa', bkS: 'Tanlash va moslashuv boʻlimi', mfaL: 'Oʻzbekiston Respublikasi TIV', got: 'Hujjatlar topshirildi',
+    calK: 'Tayyorligi haqida javob', calD: 'ish kuni', vstamp: 'TAYYOR', feeB: 'Konsullik yigʻimini oʻzingiz toʻlaysiz', feeS: 'Bank uni toʻlamaydi va qoplamaydi',
+    final: { title: 'Viza — qadamma-qadam', items: [{ text: 'Anketa toʻldirilgan va tekshirilgan' }, { text: 'Moslashuv mutaxassisiga berilgan' }, { text: 'Bank hujjatlarni TIVga topshirdi' }, { text: 'Konsullik yigʻimi — oʻz hisobingizdan', small: 'Bank uni toʻlamaydi', next: true }] },
+  },
+});
+for (const k of ['fH', 'l1', 'l2', 'ok', 'spB', 'spS', 'shB', 'bkS', 'mfaL', 'calK', 'calD', 'vstamp', 'feeB', 'feeS']) $(k === "fH" ? "formH" : k).textContent = T[k];
+$('u1l').textContent = T.u1; $('u2l').textContent = T.u2; $('gotT').textContent = T.got;
+$('g15').innerHTML = '<i></i>'.repeat(15);
+
+function render(t) {
+  // 1. the form: type, upload, check
+  card('form', t, 0.2, 8.6);
+  $('v1').innerHTML = typ(t, T.v1, 1.1, 1.9) + caret(t, 1.1, 1.9);
+  $('v2').innerHTML = typ(t, T.v2, 2.1, 3.2) + caret(t, 2.1, 3.2);
+  [['u1', 3.5], ['u2', 4.5]].forEach(([id, a]) => {
+    const up = p(t, a, a + 0.8, easeOut);
+    set(`${id}b`, { transform: `scaleX(${up})` });
+    set(`${id}p`, { opacity: p(t, a, a + 0.3), transform: `translateY(${(1 - p(t, a, a + 0.5, back)) * -160}px)` });
+    $(id).classList.toggle('on', t > a + 0.8);
+  });
+  const sc = p(t, 5.8, 7.0, easeInOut);
+  set('scan', { top: `${90 + sc * 640}px`, opacity: t > 5.8 && t < 7.1 ? 1 : 0 });
+  const ok = p(t, 7.1, 7.5, back);
+  set('okline', { opacity: t < 7.1 ? 0 : 1, transform: `scale(${0.85 + ok * 0.15})`, transformOrigin: '0 50%' });
+
+  // 2. sheet to the specialist, then from the bank to the Ministry
+  const spIn = p(t, 8.8, 9.5, back), spOut = p(t, 16.0, 16.5);
+  set('spec', { opacity: t < 8.8 ? 0 : 1 - spOut, transform: `translateY(${(1 - spIn) * -300}px)` });
+  const sh = p(t, 9.0, 10.2, easeInOut), shTo = p(t, 11.6, 12.6, easeInOut);
+  set('sheet', { left: `${415 - shTo * 260}px`, top: `${1300 - sh * 680 + shTo * 60}px`, opacity: t < 9.0 ? 0 : 1 - p(t, 12.4, 12.7), transform: `rotate(${(1 - sh) * -10}deg) scale(${1 - shTo * 0.5})` });
+  const bk = fade(t, 11.0, 11.6, 16.0, 16.5);
+  set('bank', { opacity: bk, transform: `translateX(${(1 - p(t, 11.0, 11.6, back)) * -500}px)` });
+  const mf = fade(t, 11.2, 11.8, 16.0, 16.5);
+  set('mfa', { opacity: mf, transform: `translateY(${(1 - p(t, 11.2, 11.8, back)) * 120}px)` });
+  set('mfaL', { opacity: mf });
+  const ev = p(t, 12.8, 14.2, easeInOut);
+  set('envl', { left: `${160 + ev * 530}px`, top: `${720 - Math.sin(ev * Math.PI) * 300 + ev * 60}px`, opacity: t < 12.8 ? 0 : 1 - p(t, 14.1, 14.4), transform: `rotate(${-10 + ev * 20}deg) scale(${1 - ev * 0.3})` });
+  const g = p(t, 14.4, 14.8, back);
+  set('got', { opacity: t < 14.4 ? 0 : 1 - spOut, transform: `scale(${0.8 + g * 0.2})` });
+
+  // 3. the wait, the visa, the fee
+  card('cal', t, 16.6, 24.8);
+  [...$('g15').children].forEach((d, i) => d.classList.toggle('on', t > 17.6 + i * 0.12 && (i < 10 || t > 19.2 + (i - 10) * 0.18)));
+  const ps = fade(t, 19.8, 20.4, 24.4, 24.8);
+  set('pass', { opacity: ps, transform: `translateY(${(1 - p(t, 19.8, 20.4, back)) * 300}px) rotate(-3deg)` });
+  stamp('vstamp', t, 20.9, -10);
+  const fe = fade(t, 21.6, 22.2, 24.4, 24.8);
+  set('fee', { opacity: fe, transform: `translateX(${(1 - p(t, 21.6, 22.2, back)) * 400}px)` });
+
+  captions(t, [[T.c[0], 0.3, 8.4], [T.c[1], 8.8, 16.2], [T.c[2], 16.6, 24.6]]);
+  progress(t, [[0, 8.6], [8.6, 16.4], [16.4, 24.8]]);
+  final(t, 25.0);
+}
+play(render, 31.5);
+</script>
+</body>
+</html>

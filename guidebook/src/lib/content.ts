@@ -44,6 +44,8 @@ const PAGE_ILLUS: Record<string, IllusName> = {
   limits: 'card',
   'business-trips': 'plane',
   packing: 'plane',
+  visa: 'docs',
+  registration: 'house',
   tashkent: 'map',
   andijan: 'map',
 };
@@ -60,7 +62,7 @@ export const PAGE_PHOTO: Record<string, string> = {
   uzbekistan: 'samarkand-2',
 };
 /** Pages whose lists are things to do: each item gets a tick that is remembered on this device. */
-export const CHECKLISTS = ['packing', 'arrival-72h', 'first-day-week', 'relocation-budget'];
+export const CHECKLISTS = ['visa', 'packing', 'arrival-72h', 'first-day-week', 'relocation-budget'];
 
 /** City films (video-src/cityfilm, our own renders from licensed photos), played in place over the head photo. */
 export const PAGE_VIDEO: Record<string, string> = {

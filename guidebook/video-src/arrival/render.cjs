@@ -37,7 +37,7 @@ const path = require('path');
   }
   const out = path.resolve(__dirname, `../../public/video/${film}-${lang}.mp4`);
   execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', master, '-vf', 'scale=720:1280', '-c:v', 'libx264', '-crf', '25', '-preset', 'slow', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-c:a', 'aac', '-b:a', '112k', out]);
-  execFileSync('ffmpeg', ['-v', 'error', '-y', '-ss', String({ hotel: 20.4, arrival: 14.8, apartment: 17.8, firstday: 9.0, imei: 12.0, worktime: 11.5, trips: 5.6, tax: 6.0, culture: 3.6, medicine: 5.2 }[film] ?? 10), '-i', master, '-frames:v', '1', '-vf', 'scale=720:1280', '-q:v', '80', out.replace('.mp4', '-poster.webp')]);
+  execFileSync('ffmpeg', ['-v', 'error', '-y', '-ss', String({ hotel: 20.4, arrival: 14.8, apartment: 17.8, firstday: 9.0, imei: 12.0, worktime: 11.5, trips: 5.6, tax: 6.0, culture: 3.6, medicine: 5.2, visa: 22.6, stay: 13.9 }[film] ?? 10), '-i', master, '-frames:v', '1', '-vf', 'scale=720:1280', '-q:v', '80', out.replace('.mp4', '-poster.webp')]);
   fs.rmSync(dir, { recursive: true, force: true });
   console.log(lang, 'frames', frames, '→', out, '| master', master);
 })();

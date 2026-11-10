@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Three-day rule film</title>
+<!-- "The 3-day rule" film: the hotel registers you within 3 days of arrival; every move (another hotel, a flat)
+     means a new registration within 3 days, in a flat the owner does it; late means a fine, unpaid means expulsion. -->
+<link rel="stylesheet" href="film.css" />
+<style>
+  .sign { font: 800 44px 'Onest'; letter-spacing: 0.08em; }
+  .pips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 6px; }
+  .pips span { display: grid; place-items: center; height: 92px; border-radius: 22px; background: var(--paper-2); font-size: 30px; font-weight: 750; color: var(--ink-3); }
+  .pips span.on { background: var(--brand); color: #fff; }
+  .pips.four { grid-template-columns: repeat(4, 1fr); }
+  .pips span.late { background: var(--red); color: #fff; }
+  .card { padding-bottom: 50px; }
+  .card h3 { margin-bottom: 26px; font-size: 52px; }
+  .ok { display: flex; align-items: center; gap: 20px; margin-top: 28px; font-size: 38px; font-weight: 750; color: var(--brand-ink); }
+  .ok i { flex: none; display: grid; place-items: center; width: 60px; height: 60px; border-radius: 50%; background: var(--brand); }
+  .fine { box-shadow: 0 60px 120px -40px rgb(200 55 45 / 0.5), inset 0 0 0 5px var(--red); }
+  .fine small { color: var(--red); }
+  .fine .row div { color: var(--ink); }
+  .fine .row div em { font-style: normal; color: var(--red); }
+  .fine .stamp { top: 44px; right: 50px; bottom: auto; }
+  .tint { position: absolute; inset: 0; z-index: 9; background: radial-gradient(80% 60% at 50% 40%, rgb(200 55 45 / 0.16), rgb(200 55 45 / 0.06)); }
+  .move { position: absolute; z-index: 12; top: 300px; left: 0; right: 0; display: flex; justify-content: center; }
+  .move span { display: flex; align-items: center; gap: 16px; padding: 20px 30px; border-radius: 999px; background: #fff; box-shadow: 0 30px 60px -30px rgb(10 46 42 / 0.5); font-size: 36px; font-weight: 750; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="world" id="world">
+    <div class="ground"></div>
+    <!-- the hotel -->
+    <svg class="abs" width="520" height="560" style="left:500px;top:626px">
+      <rect x="20" y="70" width="480" height="484" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <rect x="120" y="10" width="280" height="76" rx="14" fill="#0a2e2a"/>
+      <text id="hotelT" x="260" y="64" text-anchor="middle" class="sign" fill="#fff"></text>
+      <g fill="#dfeef5" stroke="#0e1a18" stroke-width="5">
+        <rect x="60" y="120" width="90" height="80"/><rect x="215" y="120" width="90" height="80"/><rect x="370" y="120" width="90" height="80"/>
+        <rect x="60" y="240" width="90" height="80"/><rect x="215" y="240" width="90" height="80"/><rect x="370" y="240" width="90" height="80"/>
+      </g>
+      <rect x="190" y="390" width="140" height="164" fill="#cfe0d8" stroke="#0e1a18" stroke-width="6"/>
+      <path d="M170 380 H350" stroke="#1aa752" stroke-width="12" stroke-linecap="round"/>
+    </svg>
+    <!-- a tree between -->
+    <svg class="abs" width="200" height="420" style="left:1180px;top:766px"><path class="line" d="M100 414 V230"/><circle cx="100" cy="170" r="90" fill="#bfe3c9" stroke="#0e1a18" stroke-width="6"/></svg>
+    <!-- the block of flats -->
+    <svg class="abs" width="560" height="860" style="left:1660px;top:326px">
+      <rect x="20" y="20" width="520" height="834" fill="#fff" stroke="#0e1a18" stroke-width="6"/>
+      <g fill="#dfe9e4" stroke="#0e1a18" stroke-width="5">
+        <rect x="70" y="80" width="110" height="100"/><rect x="225" y="80" width="110" height="100"/><rect x="380" y="80" width="110" height="100"/>
+        <rect x="70" y="240" width="110" height="100"/><rect x="380" y="240" width="110" height="100"/>
+        <rect x="70" y="400" width="110" height="100"/><rect x="225" y="400" width="110" height="100"/><rect x="380" y="400" width="110" height="100"/>
+      </g>
+      <rect id="flatWin" x="225" y="240" width="110" height="100" fill="#ffe7a3" stroke="#0e1a18" stroke-width="5"/>
+      <rect x="200" y="680" width="160" height="174" fill="#cfe0d8" stroke="#0e1a18" stroke-width="6"/>
+      <path d="M200 660 H360" stroke="#1aa752" stroke-width="12" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="tint" id="tint"></div>
+
+  <div class="move" id="move"><span><svg viewBox="0 0 24 24" width="36"><path d="M4 12h14M13 6l6 6-6 6" fill="none" stroke="#1aa752" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><b id="moveT"></b></span></div>
+
+  <div class="card" id="h1"><small id="h1K"></small><h3 id="h1H"></h3><div class="pips" id="p1"></div><div class="ok" id="ok1"><i></i><span id="ok1T"></span></div></div>
+  <div class="card" id="h2"><small id="h2K"></small><h3 id="h2H"></h3><div class="pips" id="p2"></div><div class="ok" id="ok2"><i></i><span id="ok2T"></span></div></div>
+  <div class="card fine" id="h3"><small id="h3K"></small><h3 id="h3H"></h3><div class="pips four" id="p3"></div>
+    <div class="row"><label id="r1L"></label><div id="r1V"></div></div>
+    <div class="row"><label id="r2L"></label><div><em id="r2V"></em></div></div>
+    <div class="stamp" id="fst"></div>
+  </div>
+
+  <div class="bubble them" id="b1"></div>
+</div>
+<script src="film.js"></script>
+<script>
+const { p, key, fade, $, set, card, person, walk, init, captions, progress, final, play, TICK, easeOut, back, stamp } = Film;
+const T = init({
+  ru: {
+    c: [['Прилёт', 'Отель — за 3 дня', 'Регистрацию оформляет отель. При выезде возьмите талон.'],
+        ['Переезд', 'Сменили жильё — заново', 'Другой отель или квартира — новая регистрация, тоже за 3 дня.'],
+        ['Важно', 'Не успели за 3 дня?', 'Штраф от 2,2 млн сум, а если не оплатить — высылка из страны.', 'red']],
+    hotel: 'ОТЕЛЬ', day: 'День', move: 'Переезд в квартиру',
+    h1K: 'После прилёта', h1H: 'Регистрация в отеле', ok1: 'Оформляет отель',
+    h2K: 'Новое место', h2H: 'Регистрация в квартире', ok2: 'Оформляет собственник жилья',
+    owner: 'Оформлю вам регистрацию', h3K: 'Опоздали с регистрацией', h3H: 'Последствия', r1L: 'Штраф', r1V: 'от 2,2 млн сум', r2L: 'Если не оплатить', r2V: 'высылка из страны', fst: 'ШТРАФ',
+    final: { title: 'Правило 3 дней', items: [{ text: 'Прилетели — регистрация за 3 дня' }, { text: 'Сменили отель — снова за 3 дня' }, { text: 'В квартире регистрирует собственник' }, { text: 'Не уверены — спросите', small: 'Специалист по адаптации поможет', next: true }] },
+  },
+  en: {
+    c: [['Arrival', 'The hotel — within 3 days', 'The hotel registers you. Ask for the slip when you check out.'],
+        ['Moving', 'Moved? Register again', 'Another hotel or a flat means a new registration, also within 3 days.'],
+        ['Important', 'Missed the 3 days?', 'A fine from 2.2 million soums, and if it is not paid — expulsion.', 'red']],
+    hotel: 'HOTEL', day: 'Day', move: 'Moving into a flat',
+    h1K: 'After arrival', h1H: 'Registered at the hotel', ok1: 'The hotel does it',
+    h2K: 'A new place', h2H: 'Registered in the flat', ok2: 'The owner of the flat does it',
+    owner: 'I will register you', h3K: 'Registration late', h3H: 'What happens', r1L: 'Fine', r1V: 'from 2.2 million soums', r2L: 'If not paid', r2V: 'expulsion from the country', fst: 'FINE',
+    final: { title: 'The 3-day rule', items: [{ text: 'Arrived — registered within 3 days' }, { text: 'Changed hotel — again within 3 days' }, { text: 'In a flat, the owner registers you' }, { text: 'Not sure? Ask', small: 'The adaptation specialist will help', next: true }] },
+  },
+  uz: {
+    c: [['Kelish', 'Mehmonxona — 3 kunda', 'Roʻyxatni mehmonxona rasmiylashtiradi. Ketishda talonni oling.'],
+        ['Koʻchish', 'Joy oʻzgardi — qaytadan', 'Boshqa mehmonxona yoki kvartira — yangi roʻyxat, u ham 3 kunda.'],
+        ['Muhim', '3 kunda ulgurmadingizmi?', '2,2 mln soʻmdan jarima, toʻlanmasa — mamlakatdan chiqarib yuborish.', 'red']],
+    hotel: 'HOTEL', day: 'Kun', move: 'Kvartiraga koʻchish',
+    h1K: 'Kelgandan keyin', h1H: 'Mehmonxonada roʻyxat', ok1: 'Mehmonxona rasmiylashtiradi',
+    h2K: 'Yangi joy', h2H: 'Kvartirada roʻyxat', ok2: 'Uy egasi rasmiylashtiradi',
+    owner: 'Sizni roʻyxatdan oʻtkazaman', h3K: 'Roʻyxat kechikdi', h3H: 'Oqibatlari', r1L: 'Jarima', r1V: '2,2 mln soʻmdan', r2L: 'Toʻlanmasa', r2V: 'mamlakatdan chiqarib yuborish', fst: 'JARIMA',
+    final: { title: '3 kun qoidasi', items: [{ text: 'Keldingiz — 3 kunda roʻyxat' }, { text: 'Mehmonxona oʻzgardi — yana 3 kunda' }, { text: 'Kvartirada uy egasi roʻyxatga oladi' }, { text: 'Ishonchingiz komil emasmi? Soʻrang', small: 'Moslashuv mutaxassisi yordam beradi', next: true }] },
+  },
+});
+document.getElementById('stage').insertAdjacentHTML('beforeend', person('me') + person('owner', { bag: false, jacket: '#4a524f', hair: '#6b726f', z: 5 }));
+for (const k of ['h1K', 'h1H', 'h2K', 'h2H', 'h3K', 'h3H', 'r1L', 'r1V', 'r2L', 'r2V', 'fst']) $(k).textContent = T[k];
+$('ok1T').textContent = T.ok1; $('ok2T').textContent = T.ok2; $('moveT').textContent = T.move; $('b1').textContent = T.owner; $('hotelT').textContent = T.hotel;
+document.querySelectorAll('.ok i').forEach((i) => (i.innerHTML = TICK.replace('<svg', '<svg width="38"')));
+const pip = (n) => Array.from({ length: n }, (_, i) => `<span>${T.day} ${i + 1}</span>`).join('');
+$('p1').innerHTML = pip(3); $('p2').innerHTML = pip(3); $('p3').innerHTML = pip(4);
+
+function render(t) {
+  const cam = key(t, [[0, 0], [8.4, 0], [10.6, 1150], [30, 1150]]);
+  set('world', { transform: `translateX(${-cam}px)` });
+  // arrive at the hotel and go in
+  walk('me', t, [[0, -160], [2.4, 700], [3.6, 760], [7.8, 760], [10.8, 1700], [30, 1700]], { cam, show: t < 3.3 ? 1 : t < 7.8 ? 0 : p(t, 7.8, 8.1) });
+  walk('owner', t, [[0, 2050], [30, 2050]], { cam, face: -1, show: t > 8.4 ? 1 : 0, arm: -Math.max(p(t, 11.0, 11.4) - p(t, 13.6, 14.0), 0) * 60 });
+  const b = fade(t, 11.0, 11.4, 14.0, 14.4);
+  set('b1', { right: '60px', top: '745px', opacity: b, transform: `translateY(${(1 - b) * 20}px) scale(${0.92 + b * 0.08})`, transformOrigin: '100% 100%' });
+  set('flatWin', { opacity: 0.6 + 0.4 * Math.abs(Math.sin(t * 1.5)) });
+  // 1. the hotel registers you
+  card('h1', t, 2.8, 7.6);
+  [...$('p1').children].forEach((s, i) => s.classList.toggle('on', t > 3.8 + i * 0.45));
+  const o1 = p(t, 5.4, 5.8, back);
+  set('ok1', { opacity: t < 5.4 ? 0 : 1, transform: `scale(${0.85 + o1 * 0.15})`, transformOrigin: '0 50%' });
+  // moving
+  const mv = fade(t, 8.2, 8.6, 10.4, 10.8);
+  set('move', { opacity: mv, transform: `translateY(${(1 - mv) * -30}px)` });
+  // 2. a new place, the owner registers you
+  card('h2', t, 10.9, 14.8);
+  [...$('p2').children].forEach((s, i) => s.classList.toggle('on', t > 11.9 + i * 0.4));
+  const o2 = p(t, 13.3, 13.7, back);
+  set('ok2', { opacity: t < 13.3 ? 0 : 1, transform: `scale(${0.85 + o2 * 0.15})`, transformOrigin: '0 50%' });
+  // 3. late: day 4 turns red, fine, expulsion
+  set('tint', { opacity: fade(t, 15.0, 15.6, 21.8, 22.3) });
+  card('h3', t, 15.0, 22.2);
+  [...$('p3').children].forEach((s, i) => { s.classList.toggle('on', i < 3 && t > 15.9 + i * 0.3); s.classList.toggle('late', i === 3 && t > 17.0); });
+  stamp('fst', t, 18.6, -8);
+
+  captions(t, [[T.c[0], 0.3, 7.6], [T.c[1], 7.9, 14.7], [T.c[2], 15.0, 22.1, 'red']]);
+  progress(t, [[0, 7.7], [7.7, 14.8], [14.8, 22.2]]);
+  final(t, 22.4);
+}
+play(render, 29.5);
+</script>
+</body>
+</html>
