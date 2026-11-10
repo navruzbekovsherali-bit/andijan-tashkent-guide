@@ -4126,32 +4126,33 @@ body:has(.topbar.is-hidden) .chapter-bar {
   font-size: var(--t-small);
   color: var(--ink-2);
 }
-/* payday: deep green with a ring that closes as the day approaches */
-.w-pay {
+/* public holidays: a plain list of dates, deep green */
+.w-hol {
+  width: min(82vw, 320px);
+  gap: 0;
   background: radial-gradient(90% 80% at 100% 0%, #1d6b52 0%, transparent 70%), var(--night);
   color: #fff;
   box-shadow: 0 18px 40px -24px rgb(10 46 42 / 0.8);
 }
-.w-pay .w-k,
-.w-pay .w-s {
+.w-hol .w-k {
+  margin-bottom: 8px;
   color: rgb(242 245 243 / 0.75);
 }
-.w-ring {
-  position: absolute;
-  right: 16px;
-  top: 16px;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: conic-gradient(var(--brand) calc(var(--p, 0) * 360deg), rgb(255 255 255 / 0.14) 0);
-  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 5px));
-  mask: radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 5px));
+.w-hl {
+  display: grid;
+  grid-template-columns: 6.2em 1fr;
+  gap: 10px;
+  padding: 5px 0;
+  border-top: 1px solid rgb(255 255 255 / 0.1);
+  font-size: var(--t-small);
+  line-height: 1.3;
 }
-.w-hol {
-  background: linear-gradient(160deg, #fff 40%, #eaf6ee);
+.w-hl b {
+  font-weight: 700;
+  white-space: nowrap;
 }
-.w-hol .w-big {
-  color: var(--brand-ink);
+.w-hl span {
+  color: rgb(242 245 243 / 0.8);
 }
 .w-meter {
   height: 8px;

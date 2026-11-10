@@ -712,69 +712,35 @@ function reels() {
 
 /* ---------- Home: "today for you" — payday, the next day off, my steps, exchange rates ---------- */
 const TODAY_TX = {
-  ru: { pay: 'До зарплаты', payToday: 'Зарплата сегодня', days: (n: number) => `${n} ${plural(n, 'день', 'дня', 'дней')}`, adv: 'аванс', kpi: 'KPI', sal: 'зарплата', exp: 'зарплата экспатам', hol: 'Ближайший выходной', holToday: 'Сегодня выходной', in: 'через', steps: 'Мои шаги', stepsOf: 'из', stepsNone: 'Начните с чек-листа', rate: 'Курс ЦБ', rateSrc: 'cbu.uz', locale: 'ru-RU' },
-  en: { pay: 'Until payday', payToday: 'Payday is today', days: (n: number) => `${n} ${n === 1 ? 'day' : 'days'}`, adv: 'advance', kpi: 'KPI', sal: 'salary', exp: 'expat salary', hol: 'Next day off', holToday: 'Today is a day off', in: 'in', steps: 'My steps', stepsOf: 'of', stepsNone: 'Start with the checklist', rate: 'Central Bank rate', rateSrc: 'cbu.uz', locale: 'en-GB' },
-  uz: { pay: 'Maoshgacha', payToday: 'Maosh bugun', days: (n: number) => `${n} kun`, adv: 'avans', kpi: 'KPI', sal: 'ish haqi', exp: 'ekspatlar maoshi', hol: 'Eng yaqin dam olish kuni', holToday: 'Bugun dam olish kuni', in: '', steps: 'Mening qadamlarim', stepsOf: '/', stepsNone: 'Chek-listdan boshlang', rate: 'MB kursi', rateSrc: 'cbu.uz', locale: 'uz-UZ' },
+  ru: { hol: 'Государственные праздники', steps: 'Мои шаги', stepsOf: 'из', stepsNone: 'Начните с чек-листа', rate: 'Курс ЦБ', rateSrc: 'cbu.uz', locale: 'ru-RU' },
+  en: { hol: 'Public holidays', steps: 'My steps', stepsOf: 'of', stepsNone: 'Start with the checklist', rate: 'Central Bank rate', rateSrc: 'cbu.uz', locale: 'en-GB' },
+  uz: { hol: 'Davlat bayramlari', steps: 'Mening qadamlarim', stepsOf: '/', stepsNone: 'Chek-listdan boshlang', rate: 'MB kursi', rateSrc: 'cbu.uz', locale: 'uz-UZ' },
 };
-function plural(n: number, one: string, few: string, many: string) {
-  const a = n % 10, b = n % 100;
-  return a === 1 && b !== 11 ? one : a >= 2 && a <= 4 && (b < 10 || b >= 20) ? few : many;
-}
-// Days off from the decree on holidays (2026) and the fixed public holidays of 2027.
-const HOLIDAYS: [string, string, string, string][] = [
-  ['2026-12-08', 'День Конституции', 'Constitution Day', 'Konstitutsiya kuni'],
-  ['2027-01-01', 'Новый год', 'New Year', 'Yangi yil'],
-  ['2027-03-08', 'Международный женский день', 'International Women’s Day', 'Xalqaro xotin-qizlar kuni'],
-  ['2027-03-21', 'Навруз', 'Navruz', 'Navroʻz'],
-  ['2027-05-09', 'День памяти и почестей', 'Day of Remembrance', 'Xotira va qadrlash kuni'],
-  ['2027-09-01', 'День независимости', 'Independence Day', 'Mustaqillik kuni'],
-  ['2027-10-01', 'День учителей и наставников', 'Teachers’ Day', 'Oʻqituvchi va murabbiylar kuni'],
-  ['2027-12-08', 'День Конституции', 'Constitution Day', 'Konstitutsiya kuni'],
+// Fixed public holidays, in calendar order: [month, day, ru, en, uz]. No countdowns — a list does not go stale.
+const HOLIDAYS: [number, number, string, string, string][] = [
+  [1, 1, 'Новый год', 'New Year', 'Yangi yil'],
+  [3, 8, 'Международный женский день', 'International Women’s Day', 'Xalqaro xotin-qizlar kuni'],
+  [3, 21, 'Навруз', 'Navruz', 'Navroʻz'],
+  [5, 9, 'День памяти и почестей', 'Day of Remembrance', 'Xotira va qadrlash kuni'],
+  [9, 1, 'День независимости', 'Independence Day', 'Mustaqillik kuni'],
+  [10, 1, 'День учителей и наставников', 'Teachers’ Day', 'Oʻqituvchi va murabbiylar kuni'],
+  [12, 8, 'День Конституции', 'Constitution Day', 'Konstitutsiya kuni'],
 ];
-
-function lastWorkingDay(y: number, m: number) {
-  const d = new Date(y, m + 1, 0);
-  while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() - 1);
-  return d;
-}
-function nextPay(aud: string, today: Date): [Date, string] {
-  const out: [Date, string][] = [];
-  for (let k = 0; k < 2; k++) {
-    const y = today.getFullYear(), m = today.getMonth() + k;
-    if (aud === 'expat') out.push([new Date(y, m, 10), 'exp']);
-    else out.push([new Date(y, m, 12), 'adv'], [new Date(y, m, 25), 'kpi'], [lastWorkingDay(y, m), 'sal']);
-  }
-  return out.filter(([d]) => d >= today).sort((a, b) => +a[0] - +b[0])[0];
-}
 
 function todayWidgets() {
   const row = document.querySelector<HTMLElement>('[data-widgets]');
   if (!row) return;
   const lang = pageLang();
   const T = TODAY_TX[lang];
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const dayMs = 86400000;
-  const fmt = (d: Date) => d.toLocaleDateString(T.locale, { day: 'numeric', month: 'long' });
   const aud = store.get('gb-audience') === 'expat' ? 'expat' : 'local';
   const cards: string[] = [];
 
-  const [pd, kind] = nextPay(aud, today);
-  const pn = Math.round((+pd - +today) / dayMs);
-  cards.push(`<a class="w-card w-pay" href="${href(`/guide/${aud === 'expat' ? 'salary-expat' : 'salary-local'}/`)}">
-    <span class="w-k">${pn === 0 ? T.payToday : T.pay}</span>
-    <b class="w-big">${pn === 0 ? fmt(pd) : T.days(pn)}</b>
-    <span class="w-s">${T[kind as 'adv' | 'kpi' | 'sal' | 'exp']} · ${fmt(pd)}</span>
-    <i class="w-ring" style="--p:${1 - Math.min(pn, 30) / 30}"></i></a>`);
-
-  const hol = HOLIDAYS.map(([d, ...names]) => [new Date(`${d}T00:00:00`), names[lang === 'en' ? 1 : lang === 'uz' ? 2 : 0]] as [Date, string]).find(([d]) => d >= today);
-  if (hol) {
-    const hn = Math.round((+hol[0] - +today) / dayMs);
-    cards.push(`<a class="w-card w-hol" href="${href('/guide/work-time/')}">
-      <span class="w-k">${hn === 0 ? T.holToday : T.hol}</span>
-      <b class="w-big">${fmt(hol[0])}</b>
-      <span class="w-s">${escapeHtml(hol[1])}${hn > 0 ? ` · ${T.in} ${T.days(hn)}`.replace(' ·  ', ' · ') : ''}</span></a>`);
-  }
+  // which days are public holidays — dates only, nothing counted from today
+  const hols = HOLIDAYS.map(([m, d, ...names]) => {
+    const date = new Date(2001, m - 1, d).toLocaleDateString(T.locale, { day: 'numeric', month: 'long' });
+    return `<span class="w-hl"><b>${date}</b><span>${escapeHtml(names[lang === 'en' ? 1 : lang === 'uz' ? 2 : 0])}</span></span>`;
+  });
+  cards.push(`<a class="w-card w-hol" href="${href('/guide/work-time/')}"><span class="w-k">${T.hol}</span>${hols.join('')}</a>`);
 
   const list = aud === 'expat' ? ['arrival-72h', 'packing', 'relocation-budget', 'first-day-week'] : ['first-day-week'];
   let done = 0, total = 0;
