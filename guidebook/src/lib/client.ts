@@ -818,10 +818,10 @@ function taxCalc() {
 
 /* ---------- Home: "videos of the week" — stories you tap through, like on a phone ---------- */
 const STORY_ORDER: [string, string][] = [
-  ['visa', 'visa'], ['arrival', 'arrival-72h'], ['stay', 'registration'], ['hotel', 'arrival-72h'], ['firstday', 'first-day-week'], ['card', 'bank-card'], ['salary', 'salary-local'],
+  ['history', 'about-bank'], ['cards', 'bank-card'], ['visa', 'visa'], ['arrival', 'arrival-72h'], ['stay', 'registration'], ['hotel', 'arrival-72h'], ['firstday', 'first-day-week'], ['card', 'bank-card'], ['salary', 'salary-local'],
   ['metro', 'transport'], ['imei', 'arrival-72h'], ['apartment', 'arrival-72h'], ['sickleave', 'sick-leave'], ['permit', 'work-permit'],
   ['worktime', 'work-time'], ['trips', 'business-trips'], ['tax', 'tax-certificate'], ['medicine', 'medicine'], ['culture', 'culture'],
-  ['packing', 'packing'], ['emergency', 'emergency'], ['phrases', 'phrases'], ['cities', 'uzbekistan'], ['history', 'about-bank'], ['cards', 'bank-card'],
+  ['packing', 'packing'], ['emergency', 'emergency'], ['phrases', 'phrases'], ['cities', 'uzbekistan'],
 ];
 const STORY_TX = { ru: { open: 'Статья', close: 'Закрыть', next: 'Дальше' }, en: { open: 'Article', close: 'Close', next: 'Next' }, uz: { open: 'Maqola', close: 'Yopish', next: 'Keyingi' } };
 

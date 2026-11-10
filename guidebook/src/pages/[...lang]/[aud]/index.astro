@@ -44,13 +44,6 @@ const numbered = groups.map((g) => ({ ...g, steps: g.pages.map((p) => ({ p, n: +
     <div class="wrap">
       <h1>{title}</h1>
       <p class="lead">{lead}</p>
-      <div class="countdown" data-countdown data-today={tr('startToday')} data-past={tr('startPast')} data-days={tr('daysShort')}>
-        <label>
-          <span>{tr('startAsk')}</span>
-          <input type="date" />
-        </label>
-        <p class="countdown-out" aria-live="polite" hidden><b></b> <span>{tr('startLeft')}</span></p>
-      </div>
       <Guide name={tr('guideName')}>
         <p>{hello[aud][lang]}</p>
       </Guide>
