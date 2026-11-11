@@ -398,6 +398,8 @@ export function initSite() {
     checklists,
     countdown,
     expatPath,
+    heroSearch,
+    textSize,
     installCard,
     todayWidgets,
     taxCalc,
@@ -1617,6 +1619,63 @@ function countdown() {
   input.value = store.get('gb-start') || '';
   input.addEventListener('change', show);
   show();
+}
+
+/* ---------- Home: the search field suggests what people look for; a tap searches for the word on show ---------- */
+function heroSearch() {
+  const btn = document.querySelector<HTMLButtonElement>('.hero-search[data-hints]');
+  if (!btn) return;
+  const tx = btn.querySelector<HTMLElement>('.hero-search-tx')!;
+  const rest = tx.dataset.rest || '';
+  const words = (btn.dataset.hints || '').split('|').filter(Boolean);
+  if (!words.length || reduceMotion()) return;
+  let i = -1;
+  const show = () => {
+    i = (i + 1) % (words.length + 1);
+    const word = i === words.length ? '' : words[i];
+    tx.classList.add('is-swap');
+    setTimeout(() => {
+      if (word) {
+        tx.innerHTML = `<b>${escapeHtml(word)}</b>`;
+        btn.dataset.q = word;
+      } else {
+        tx.textContent = rest;
+        delete btn.dataset.q;
+      }
+      tx.classList.remove('is-swap');
+    }, 240);
+  };
+  setTimeout(() => {
+    show();
+    setInterval(() => !document.hidden && show(), 2400);
+  }, 2600);
+}
+
+/* ---------- Articles: text size the reader picks, kept on the device ---------- */
+const TS_STEPS = [0.9, 1, 1.15, 1.3];
+function textSize() {
+  const box = document.querySelector<HTMLElement>('[data-textsize]');
+  if (!box) return;
+  const L = { ru: ['Уменьшить текст', 'Увеличить текст'], en: ['Smaller text', 'Larger text'], uz: ['Matnni kichraytirish', 'Matnni kattalashtirish'] }[pageLang()];
+  const [less, more] = Array.from(box.querySelectorAll<HTMLButtonElement>('button'));
+  less.setAttribute('aria-label', L[0]);
+  more.setAttribute('aria-label', L[1]);
+  const saved = Number(store.get('gb-ts'));
+  let i = Number.isInteger(saved) && saved >= 0 && saved < TS_STEPS.length && store.get('gb-ts') !== null && store.get('gb-ts') !== '' ? saved : 1;
+  const paint = () => {
+    if (TS_STEPS[i] === 1) document.documentElement.style.removeProperty('--ts');
+    else document.documentElement.style.setProperty('--ts', String(TS_STEPS[i]));
+    less.disabled = i === 0;
+    more.disabled = i === TS_STEPS.length - 1;
+  };
+  for (const b of [less, more])
+    b.addEventListener('click', () => {
+      i = Math.min(TS_STEPS.length - 1, Math.max(0, i + Number(b.dataset.ts)));
+      store.set('gb-ts', String(i));
+      paint();
+    });
+  box.hidden = false;
+  paint();
 }
 
 /* ---------- Expat hub: the route as one line; ticks are kept on this device ---------- */

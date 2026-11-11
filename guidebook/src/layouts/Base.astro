@@ -60,6 +60,9 @@ const here = Astro.url.pathname;
           window.__gbInstall = e;
         });
         try {
+          // reader's text size for articles, before the first paint (see textSize in client.ts)
+          var ts = [0.9, 1, 1.15, 1.3][+localStorage.getItem('gb-ts')];
+          if (ts && ts !== 1) d.style.setProperty('--ts', ts);
           var au = localStorage.getItem('gb-audience');
           if (au && d.dataset.audience === 'both') d.dataset.pref = au;
         } catch (e) {}

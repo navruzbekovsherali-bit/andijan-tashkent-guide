@@ -19,6 +19,12 @@ const popularSlugs = ['arrival-72h', 'first-day-week', 'work-time', 'salary-expa
 const popular = popularSlugs.map((s) => bySlug.get(s)).filter((p): p is NonNullable<typeof p> => Boolean(p));
 // The cities strip appears once the licensed photos are in place.
 const hasPhotos = Object.keys(import.meta.glob('../../data/photos.json')).length > 0;
+// Words the search field suggests in turn; a tap while one is shown searches for it.
+const searchHints: Record<string, string[]> = {
+  ru: ['регистрация', 'зарплата', 'больничный', 'виза', 'отпуск', 'IMEI'],
+  en: ['registration', 'salary', 'sick leave', 'visa', 'leave', 'IMEI'],
+  uz: ['roʻyxat', 'maosh', 'kasallik', 'viza', 'taʼtil', 'IMEI'],
+};
 const faqPreview = pages.flatMap((p) => p.entry.data.faq.slice(0, 1).map((f) => ({ ...f, slug: p.slug }))).slice(0, 6);
 ---
 
@@ -29,6 +35,17 @@ const faqPreview = pages.flatMap((p) => p.entry.data.faq.slice(0, 1).map((f) => 
       <p class="hero-name">Hamkor Bank</p>
       <h1 class="hero-title">{tr('heroTitle')}</h1>
       <p class="hero-lead">{tr('heroLead')}</p>
+      <button class="hero-search" type="button" data-sheet="search" data-hints={searchHints[lang].join('|')} aria-label={tr('search')}>
+        <Icon name="search" />
+        <span class="hero-search-tx" data-rest={tr('quickSearch')}>{tr('quickSearch')}</span>
+      </button>
+      <ul class="hero-chips">
+      <li><a class="qchip sos-chip" href={url(lang, '/guide/emergency/')}><span class="sos-dot" aria-hidden="true" />{tr('emergency')}</a></li>
+      <li><a class="qchip" href={url(lang, '/guide/first-day-week/')}>{tr('qFirstDay')}</a></li>
+      <li><button class="qchip" type="button" data-sheet="search" data-q={tr('qSalaryQ')}>{tr('qSalary')}</button></li>
+      <li><button class="qchip" type="button" data-sheet="search" data-q={tr('qRegQ')}>{tr('qReg')}</button></li>
+      <li><button class="qchip" type="button" data-sheet="search" data-q="IMEI">IMEI</button></li>
+    </ul>
       <div class="hero-actions">
         <a class="pill pill-mint" href={url(lang, '/local/')} data-choose="local">
           {tr('local')}
@@ -39,22 +56,6 @@ const faqPreview = pages.flatMap((p) => p.entry.data.faq.slice(0, 1).map((f) => 
           <span class="pill-arrow"><Icon name="arrow" size={18} /></span>
         </a>
       </div>
-    </div>
-  </section>
-
-  <section class="quick">
-    <div class="wrap">
-      <button class="quick-search" type="button" data-sheet="search">
-        <Icon name="search" />
-        <span>{tr('quickSearch')}</span>
-      </button>
-      <ul class="quick-chips">
-        <li><a class="qchip sos-chip" href={url(lang, '/guide/emergency/')}><span class="sos-dot" aria-hidden="true" />{tr('emergency')}</a></li>
-        <li><a class="qchip" href={url(lang, '/guide/first-day-week/')}>{tr('qFirstDay')}</a></li>
-        <li><button class="qchip" type="button" data-sheet="search" data-q={tr('qSalaryQ')}>{tr('qSalary')}</button></li>
-        <li><button class="qchip" type="button" data-sheet="search" data-q={tr('qRegQ')}>{tr('qReg')}</button></li>
-        <li><button class="qchip" type="button" data-sheet="search" data-q="IMEI">IMEI</button></li>
-      </ul>
     </div>
   </section>
 

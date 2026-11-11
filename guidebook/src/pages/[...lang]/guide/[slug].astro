@@ -62,6 +62,10 @@ const photoId = slug === 'emergency' ? undefined : PAGE_PHOTO[slug];
             {data.audience.length === 2 ? tr('both') : data.audience[0] === 'local' ? tr('localShort') : tr('expatShort')}
           </span>
           <span class="chip"><Icon name="clock" size={14} />{readingMinutes(entry.body)} {tr('minutes')}</span>
+          <span class="chip chip-ts" data-textsize hidden>
+            <button type="button" data-ts="-1">A<small>−</small></button>
+            <button type="button" data-ts="1">A<small>+</small></button>
+          </span>
         </div>
       </div>
       {slug === 'emergency' ? <Sos lang={lang} /> : !photoId && <Illus name={illusOf(data.section, slug)} lang={lang} />}

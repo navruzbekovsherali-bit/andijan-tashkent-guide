@@ -4973,3 +4973,132 @@ html.has-story .chapter-bar {
     padding-inline: 26px;
   }
 }
+
+
+/* ==========================================================================
+   Home: search on the first screen, with the quick links right under it
+   ========================================================================== */
+.hero-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 560px;
+  min-height: 60px;
+  margin-top: 24px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 22px 44px -22px rgb(0 0 0 / 0.65);
+  color: var(--ink-3);
+  font: inherit;
+  font-size: var(--t-ui);
+  text-align: left;
+  cursor: text;
+  transition: transform 200ms var(--ease);
+}
+.hero-search:active {
+  transform: scale(0.985);
+}
+.hero-search svg {
+  flex: none;
+  color: var(--ink);
+}
+.hero-search-tx {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  transition: opacity 220ms var(--ease), transform 220ms var(--ease);
+}
+.hero-search-tx.is-swap {
+  opacity: 0;
+  transform: translateY(6px);
+}
+.hero-search-tx b {
+  font-weight: 650;
+  color: var(--ink);
+}
+.hero-chips {
+  list-style: none;
+  display: flex;
+  gap: 8px;
+  max-width: 560px;
+  margin: 12px 0 0;
+  padding: 0 0 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent);
+  mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent);
+}
+.hero-chips::-webkit-scrollbar {
+  display: none;
+}
+.hero-chips li {
+  flex: none;
+}
+.hero .qchip {
+  background: rgb(255 255 255 / 0.12);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.16);
+  color: #fff;
+  white-space: nowrap;
+}
+.hero .qchip:hover {
+  background: rgb(255 255 255 / 0.2);
+}
+.hero .sos-chip {
+  background: rgb(255 107 94 / 0.2);
+  color: #ffe1dd;
+}
+.hero .sos-dot {
+  background: #ff6b5e;
+}
+.hero .hero-actions {
+  margin-top: 22px;
+}
+/* phones: the welcome line gives its room to the search field */
+@media (max-width: 559px) {
+  .hero .hero-lead {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Articles: text size picked by the reader (A− / A+)
+   ========================================================================== */
+.article-layout article {
+  zoom: var(--ts, 1);
+}
+.chip-ts {
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+}
+.chip-ts button {
+  min-width: 44px;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+.chip-ts button + button {
+  box-shadow: inset 1px 0 0 rgb(14 26 24 / 0.14);
+  font-size: 1.15em;
+}
+.chip-ts button small {
+  font-size: 0.8em;
+  margin-left: 1px;
+}
+.chip-ts button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+@media (hover: hover) {
+  .chip-ts button:not(:disabled):hover {
+    background: rgb(14 26 24 / 0.08);
+  }
+}
