@@ -5056,8 +5056,44 @@ html.has-story .chapter-bar {
 .hero .hero-actions {
   margin-top: 22px;
 }
-/* phones: the welcome line gives its room to the search field */
+/* phones: the welcome line stays, set a little tighter so the search and both doors still fit the first screen;
+   only very short screens let it go */
 @media (max-width: 559px) {
+  .hero .hero-lead {
+    margin-top: 10px;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+  .hero .hero-search {
+    margin-top: 18px;
+    min-height: 56px;
+  }
+  .hero .hero-actions {
+    margin-top: 16px;
+  }
+}
+/* shorter phone screens (a browser with both its bars showing): the mark and the gaps give way first */
+@media (max-width: 559px) and (max-height: 799px) {
+  .hero .hero-mark {
+    width: 60px;
+    margin-bottom: 16px;
+  }
+  .hero .hero-title {
+    margin-top: 12px;
+  }
+  .hero .hero-search {
+    margin-top: 14px;
+    min-height: 52px;
+  }
+  .hero .hero-chips {
+    margin-top: 10px;
+  }
+  .hero .hero-actions {
+    gap: 8px;
+    margin-top: 12px;
+  }
+}
+@media (max-width: 559px) and (max-height: 689px) {
   .hero .hero-lead {
     display: none;
   }
