@@ -22,7 +22,7 @@ This page covers the payment schedule, how your income is made up and taxes.
 
 ## When the money arrives
 
-<div class="video-reel" data-reel="salary"></div>
+<div class="video-reel" data-reel="salary" data-poster="local"></div>
 
 Salary is paid **3 times a month**:
 

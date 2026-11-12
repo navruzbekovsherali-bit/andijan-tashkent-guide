@@ -570,9 +570,9 @@ const REELS: Record<
     posterEn: 'video/hotel-en-poster.webp',
     srcUz: 'video/hotel-uz.mp4',
     posterUz: 'video/hotel-uz-poster.webp',
-    ru: ['Отель и регистрация', 'Из аэропорта в отель, регистрация на ресепшене и талон — за 30 секунд.', 'Анимация гайдбука'],
-    en: ['Hotel and registration', 'From the airport to the hotel, registration at reception and the slip — in 30 seconds.', 'Guidebook animation'],
-    uz: ['Mehmonxona va roʻyxatdan oʻtish', 'Aeroportdan mehmonxonaga, resepshnda roʻyxatdan oʻtish va talon — 30 soniyada.', 'Qoʻllanma animatsiyasi'],
+    ru: ['Отель и регистрация', 'Из аэропорта в отель, регистрация на ресепшене и талон — за 30 секунд.', ''],
+    en: ['Hotel and registration', 'From the airport to the hotel, registration at reception and the slip — in 30 seconds.', ''],
+    uz: ['Mehmonxona va roʻyxatdan oʻtish', 'Aeroportdan mehmonxonaga, resepshnda roʻyxatdan oʻtish va talon — 30 soniyada.', ''],
   },
   arrival: {
     src: 'video/arrival-ru.mp4',
@@ -581,9 +581,9 @@ const REELS: Record<
     posterEn: 'video/arrival-en-poster.webp',
     srcUz: 'video/arrival-uz.mp4',
     posterUz: 'video/arrival-uz-poster.webp',
-    ru: ['Прилёт: первые 15 минут', 'Таможня и SIM-карта — что делать сразу после посадки, за 30 секунд.', 'Анимация гайдбука'],
-    en: ['Arrival: the first 15 minutes', 'Customs and a SIM card — what to do right after landing, in 30 seconds.', 'Guidebook animation'],
-    uz: ['Yetib kelish: dastlabki 15 daqiqa', 'Bojxona va SIM-karta — qoʻngandan keyin darhol nima qilish kerak, 30 soniyada.', 'Qoʻllanma animatsiyasi'],
+    ru: ['Прилёт: первые 15 минут', 'Таможня и SIM-карта — что делать сразу после посадки, за 30 секунд.', ''],
+    en: ['Arrival: the first 15 minutes', 'Customs and a SIM card — what to do right after landing, in 30 seconds.', ''],
+    uz: ['Yetib kelish: dastlabki 15 daqiqa', 'Bojxona va SIM-karta — qoʻngandan keyin darhol nima qilish kerak, 30 soniyada.', ''],
   },
   history: {
     src: 'video/history-reel.mp4',
@@ -631,9 +631,9 @@ for (const [name, [ru, en, uz]] of Object.entries(FILMS)) {
     posterEn: `video/${name}-en-poster.webp`,
     srcUz: `video/${name}-uz.mp4`,
     posterUz: `video/${name}-uz-poster.webp`,
-    ru: [ru[0], ru[1], 'Анимация гайдбука'],
-    en: [en[0], en[1], 'Guidebook animation'],
-    uz: [uz[0], uz[1], 'Qoʻllanma animatsiyasi'],
+    ru: [ru[0], ru[1], ''],
+    en: [en[0], en[1], ''],
+    uz: [uz[0], uz[1], ''],
   };
 }
 
@@ -657,7 +657,9 @@ function reels() {
     const [title, lead, credit] = r[lang];
     const root = base() || '/';
     const src = (lang === 'en' ? r.srcEn : lang === 'uz' ? r.srcUz : undefined) ?? r.src;
-    const poster = (lang === 'en' ? r.posterEn : lang === 'uz' ? r.posterUz : undefined) ?? r.poster;
+    let poster = (lang === 'en' ? r.posterEn : lang === 'uz' ? r.posterUz : undefined) ?? r.poster;
+    // a page may ask for another still of the same film (the local salary page shows the local part)
+    if (host.dataset.poster) poster = poster.replace('-poster.webp', `-poster-${host.dataset.poster}.webp`);
     host.innerHTML = `
       <figure class="reel">
         <div class="reel-screen">
@@ -668,7 +670,7 @@ function reels() {
           </button>
           <span class="reel-bar"><i></i></span>
         </div>
-        <figcaption><strong>${escapeHtml(title)}</strong><span>${escapeHtml(lead)}</span><small>${escapeHtml(credit)}</small></figcaption>
+        <figcaption><strong>${escapeHtml(title)}</strong><span>${escapeHtml(lead)}</span>${credit ? `<small>${escapeHtml(credit)}</small>` : ''}</figcaption>
       </figure>`;
     const fig = host.querySelector<HTMLElement>('.reel')!;
     if (r.silent) host.querySelector('.reel-sound')?.remove();

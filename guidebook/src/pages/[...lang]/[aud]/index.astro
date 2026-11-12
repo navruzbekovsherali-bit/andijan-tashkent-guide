@@ -100,11 +100,6 @@ const numbered = groups.map((g) => ({ ...g, steps: g.pages.map((p) => ({ p, n: +
     )
   }
 
-  <section class="stories-block hub-stories" aria-label={tr('videoWeek')}>
-    <div class="wrap"><p class="label">{tr('videoWeek')}</p></div>
-    <div class="stories" data-stories={aud}></div>
-  </section>
-
   <div class="wrap">
     {
       numbered.map((g) => (
@@ -119,7 +114,6 @@ const numbered = groups.map((g) => ({ ...g, steps: g.pages.map((p) => ({ p, n: +
             {g.steps.map(({ p, n }) => (
               <li class="reveal row-in" style={`--i:${n % 6}`}>
                 <a href={url(lang, `/guide/${p.slug}/`)}>
-                  <span class="step-n">{String(n).padStart(2, '0')}</span>
                   <strong>{p.entry.data.title}</strong>
                   <span class="step-lead">{p.entry.data.description}</span>
                   <span class="round-arrow"><Icon name="arrow" size={16} /></span>

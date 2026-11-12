@@ -24,13 +24,15 @@ const title = SECTIONS[id].title[lang];
 const tag = (aud: string[]) => (aud.length === 2 ? tr('both') : aud[0] === 'local' ? tr('localShort') : tr('expatShort'));
 const prev = index > 0 ? groups[index - 1] : undefined;
 const next = index >= 0 && index < groups.length - 1 ? groups[index + 1] : undefined;
+// The audience tag only says something when the topic holds pages for different readers.
+const mixed = new Set(pages.map((p) => p.entry.data.audience.join('+'))).size > 1;
 ---
 
 <Base lang={lang} title={title} path={`/topic/${id}/`} current="topic" back={url(lang, '/#topics')}>
   <header class="page-head">
     <div class="wrap head-grid topic-head">
       <div>
-        <p class="label"><a href={url(lang, '/#topics')}>{tr('topics')}</a> · ( {String(index + 1).padStart(2, '0')} )</p>
+        <p class="label"><a href={url(lang, '/#topics')}>{tr('topics')}</a></p>
         <h1>{title}</h1>
         <p class="lead">{articles(lang, pages.length)}</p>
       </div>
@@ -44,10 +46,9 @@ const next = index >= 0 && index < groups.length - 1 ? groups[index + 1] : undef
         pages.map((p, n) => (
           <li class="reveal row-in" style={`--i:${n % 6}`}>
             <a href={url(lang, `/guide/${p.slug}/`)}>
-              <span class="step-n">{String(n + 1).padStart(2, '0')}</span>
               <strong>{p.entry.data.title}</strong>
               <span class="step-lead">{p.entry.data.description}</span>
-              {p.entry.data.audience.length === 1 && <span class="chip step-tag">{tag(p.entry.data.audience)}</span>}
+              {mixed && p.entry.data.audience.length === 1 && <span class="chip step-tag">{tag(p.entry.data.audience)}</span>}
               <span class="round-arrow"><Icon name="arrow" size={16} /></span>
             </a>
           </li>

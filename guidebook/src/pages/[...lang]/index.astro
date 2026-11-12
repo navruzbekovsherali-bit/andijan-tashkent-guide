@@ -86,7 +86,6 @@ const faqPreview = pages.flatMap((p) => p.entry.data.faq.slice(0, 1).map((f) => 
           groups.map((g, i) => (
             <li>
               <a class="topic-card reveal" href={url(lang, `/topic/${g.id}/`)}>
-                <span class="label">( {String(i + 1).padStart(2, '0')} )</span>
                 <Illus name={illusOf(g.id)} lang={lang} />
                 <span class="topic-title">{SECTIONS[g.id].title[lang]}</span>
                 <span class="topic-meta">

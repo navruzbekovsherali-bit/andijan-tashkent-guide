@@ -22,7 +22,7 @@ Bu sahifada — toʻlov shartlari, daromad tarkibi va soliqlar.
 
 ## Pul qachon tushadi
 
-<div class="video-reel" data-reel="salary"></div>
+<div class="video-reel" data-reel="salary" data-poster="local"></div>
 
 Maosh **oyiga 3 marta** toʻlanadi:
 

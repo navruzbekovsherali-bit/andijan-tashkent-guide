@@ -54,7 +54,7 @@ const photoId = slug === 'emergency' ? undefined : PAGE_PHOTO[slug];
   <header class:list={['page-head', { 'after-photo': photoId }]}>
     <div class="wrap head-grid">
       <div>
-        <p class="label"><a href={url(lang, `/topic/${data.section}/`)}>( {topicNo} ) {section.title[lang]}</a></p>
+        <p class="label"><a href={url(lang, `/topic/${data.section}/`)}>{section.title[lang]}</a></p>
         <h1>{data.title}</h1>
         <p class="lead">{data.description}</p>
         <div class="meta-row">

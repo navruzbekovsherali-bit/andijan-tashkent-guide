@@ -22,7 +22,7 @@ faq:
 
 ## Когда приходят деньги
 
-<div class="video-reel" data-reel="salary"></div>
+<div class="video-reel" data-reel="salary" data-poster="local"></div>
 
 Зарплата выплачивается **3 раза в месяц**:
 

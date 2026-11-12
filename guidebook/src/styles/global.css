@@ -5138,3 +5138,64 @@ html.has-story .chapter-bar {
     background: rgb(14 26 24 / 0.08);
   }
 }
+
+
+/* ==========================================================================
+   Quiet pass 1: fewer marks on every screen
+   ========================================================================== */
+/* list rows: the whole row is the link; a thin grey chevron instead of a black disc */
+.round-arrow {
+  width: 24px;
+  height: 24px;
+  background: none;
+  color: var(--ink-3);
+}
+.round-arrow svg {
+  width: 18px;
+  height: 18px;
+}
+a:hover > .round-arrow,
+a:hover .topic-meta .round-arrow {
+  transform: translateX(3px);
+  color: var(--ink);
+}
+.steps a {
+  grid-template-columns: 1fr auto;
+}
+.steps .step-lead,
+.steps .step-tag {
+  grid-column: 1;
+}
+.steps .round-arrow {
+  grid-column: 2;
+}
+/* phones: the dock already has the menu, the footer repeats it, the guide speaks in one plain line */
+@media (max-width: 959px) {
+  .tb-menu {
+    display: none;
+  }
+  .footer-links {
+    display: none;
+  }
+}
+@media (max-width: 559px) {
+  .guide {
+    display: block;
+    margin-top: 14px;
+  }
+  .guide .guide-avatar {
+    display: none;
+  }
+  .guide .guide-bubble {
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    color: var(--ink-2);
+    font-size: var(--t-small);
+  }
+  .guide .guide-bubble::before,
+  .guide .guide-bubble::after {
+    display: none;
+  }
+}

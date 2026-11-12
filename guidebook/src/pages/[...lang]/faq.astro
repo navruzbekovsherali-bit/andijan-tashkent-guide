@@ -20,7 +20,19 @@ const top = TOP.flatMap((s) => {
   return p && f ? [{ ...f, p }] : [];
 });
 const forWhom = (aud: string[]) => (aud.length === 2 ? '' : aud[0] === 'local' ? tr('localShort') : tr('expatShort'));
-const blocks = [{ id: 'top', title: tr('topQuestions'), items: top }, ...groups.map((g) => ({ id: g.id, title: SECTIONS[g.id].title[lang], items: g.items }))];
+// Every question appears once: the ones lifted to the top leave their topic, and the same question asked for the
+// same readers in two articles (the two school pages, say) is kept from the first.
+const topKeys = new Set(top.map((f) => `${f.p.slug}|${f.q}`));
+for (const g of groups) {
+  const seen = new Set<string>();
+  g.items = g.items.filter((f) => {
+    const key = `${f.q.trim().toLowerCase()}|${f.p.entry.data.audience.join('+')}`;
+    if (topKeys.has(`${f.p.slug}|${f.q}`) || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+const blocks = [{ id: 'top', title: tr('topQuestions'), items: top }, ...groups.filter((g) => g.items.length > 0).map((g) => ({ id: g.id, title: SECTIONS[g.id].title[lang], items: g.items }))];
 ---
 
 <Base lang={lang} title={tr('faq')} description={tr('faqLead')} path="/faq/" current="faq" back={url(lang, '/')}>
