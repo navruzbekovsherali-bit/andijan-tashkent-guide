@@ -16,7 +16,7 @@
   --white: #ffffff;
   --ink: #0e1a18;
   --ink-2: #4a524f; /* 7.6:1 on paper */
-  --ink-3: #636b68; /* 5.2:1 on paper */
+  --ink-3: #59615e; /* 6:1 on paper */
   --line: rgb(14 26 24 / 0.12);
   /* brand */
   --night: #0a2e2a; /* the bank's deep green, for dark sections */
@@ -149,7 +149,7 @@ svg {
   z-index: 100;
   padding: 12px 16px;
   border-radius: 999px;
-  background: var(--ink);
+  background: var(--night);
   color: #fff;
 }
 .skip:focus {
@@ -204,7 +204,7 @@ a:hover .topic-meta .round-arrow {
   transform: translateX(3px) rotate(-45deg);
 }
 .pill-dark {
-  background: var(--ink);
+  background: var(--night);
   color: #fff;
 }
 .pill-dark .pill-arrow {
@@ -232,7 +232,7 @@ a:hover .topic-meta .round-arrow {
 .round-arrow {
   width: 36px;
   height: 36px;
-  background: var(--ink);
+  background: var(--night);
   color: #fff;
 }
 .text-link {
@@ -283,7 +283,7 @@ a:hover .topic-meta .round-arrow {
   min-height: var(--tap);
   padding: 0 14px 0 10px;
   border-radius: 999px;
-  background: var(--ink);
+  background: var(--night);
   color: #fff;
   font-weight: 650;
   font-size: var(--t-small);
@@ -744,14 +744,14 @@ a:hover .topic-meta .round-arrow {
   height: 2px;
   margin: -1px 0 0 -6px;
   border-radius: 2px;
-  background: var(--ink);
+  background: var(--night);
 }
 .plus::after {
   transform: rotate(90deg);
   transition: transform 300ms var(--ease);
 }
 .faq-item[open] .plus {
-  background: var(--ink);
+  background: var(--night);
 }
 .faq-item[open] .plus::before,
 .faq-item[open] .plus::after {
@@ -1247,7 +1247,7 @@ article {
 }
 .pager .next {
   grid-column: 2;
-  background: var(--ink);
+  background: var(--night);
   color: #fff;
   text-align: right;
   align-items: flex-end;
@@ -1626,7 +1626,7 @@ article {
 }
 .seg [aria-pressed='true'],
 .seg [aria-current='true'] {
-  background: var(--ink);
+  background: var(--night);
   color: #fff;
 }
 .seg.three {
@@ -1869,7 +1869,7 @@ article {
   margin-inline: auto;
   padding: 9px;
   border-radius: 32px;
-  background: var(--ink);
+  background: var(--night);
   box-shadow: 0 24px 40px -24px rgb(10 46 42 / 0.6);
 }
 .pd-notch {
@@ -1881,7 +1881,7 @@ article {
   height: 14px;
   margin-left: -27px;
   border-radius: 99px;
-  background: var(--ink);
+  background: var(--night);
 }
 .pd-screen {
   height: 100%;
@@ -2073,7 +2073,7 @@ article {
   color: var(--ink);
 }
 .pill-light .pill-arrow {
-  background: var(--ink);
+  background: var(--night);
   color: #fff;
 }
 /* desktop: the mark takes the right half of the first screen */
@@ -3773,7 +3773,7 @@ html[data-view='expat'] .q-aud {
   opacity: 1;
 }
 .tb-lang a[aria-current='true'] {
-  background: var(--ink);
+  background: var(--night);
   color: #fff;
   opacity: 1;
 }
@@ -4039,7 +4039,7 @@ body:has(.topbar.is-hidden) .chapter-bar {
   color: var(--brand-ink);
 }
 .chapter-track a.is-active {
-  background: var(--ink);
+  background: var(--night);
   color: #fff;
 }
 .chapter-track a.is-active b {
@@ -5198,4 +5198,124 @@ a:hover .topic-meta .round-arrow {
   .guide .guide-bubble::after {
     display: none;
   }
+}
+
+
+/* ==========================================================================
+   Quiet pass 2: one calm visual system
+   - one dark colour (the bank's night green) and one accent
+   - at most one dark block on a screen: the film; summary, holidays, calculator sit on white
+   - cards: white with a hairline, no drop shadow; only the top bar and the dock float
+   - notes: one shape, a 3px stripe says which kind
+   ========================================================================== */
+:root {
+  --hairline: inset 0 0 0 1px rgb(14 26 24 / 0.1);
+  --amber: #b9770e;
+}
+
+/* the summary: the answer in five seconds, on white */
+.summary {
+  background: var(--white);
+  box-shadow: var(--hairline);
+  color: var(--ink);
+}
+.summary h2 {
+  color: var(--ink);
+}
+
+/* cards lie on the paper */
+.w-card,
+.install,
+.prose ul.facts > li,
+.path-steps li {
+  box-shadow: var(--hairline);
+}
+.prose ul.facts > li::before {
+  display: none;
+}
+
+/* public holidays: a light table */
+.w-hol {
+  background: var(--white);
+  color: var(--ink);
+}
+.w-hol .w-k {
+  color: var(--ink-3);
+}
+.w-hl {
+  border-top-color: var(--line);
+}
+.w-hl span {
+  color: var(--ink-2);
+}
+
+/* the salary calculator, on white: only the result is green */
+.calc {
+  background: var(--white);
+  box-shadow: var(--hairline);
+  color: var(--ink);
+}
+.calc-k,
+.calc-in,
+.calc-note {
+  color: var(--ink-3);
+}
+.calc-in input {
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--ink);
+}
+.calc-out div {
+  background: var(--paper);
+  color: var(--ink-2);
+}
+.calc-out b {
+  color: var(--ink);
+}
+.calc-out .calc-net {
+  background: var(--brand);
+  color: rgb(255 255 255 / 0.9);
+}
+.calc-out .calc-net b {
+  color: #fff;
+}
+.calc-bar {
+  background: var(--line);
+}
+
+/* notes: one shape; the stripe carries the meaning */
+.prose blockquote,
+.prose blockquote.is-warn,
+.prose blockquote.is-tip {
+  padding: 14px 18px 14px 20px;
+  border-left: 3px solid rgb(14 26 24 / 0.28);
+  border-radius: 0 var(--radius-s) var(--radius-s) 0;
+  background: var(--white);
+}
+.prose blockquote.is-warn {
+  border-left-color: var(--amber);
+}
+.prose blockquote.is-tip {
+  border-left-color: var(--brand);
+}
+
+/* previous / next: two equal white cards, the way forward has the green arrow */
+.pager .prev,
+.pager .next {
+  background: var(--white);
+  box-shadow: var(--hairline);
+  color: var(--ink);
+}
+.pager .next .dir {
+  color: var(--brand-ink);
+  opacity: 1;
+}
+.pager .prev:hover,
+.pager .next:hover {
+  background: var(--paper-2);
+}
+
+/* the install card's icon and the watch chip keep the night green; nothing else is near-black */
+.chip-video {
+  box-shadow: none;
 }
