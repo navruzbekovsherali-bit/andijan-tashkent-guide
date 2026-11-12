@@ -74,11 +74,15 @@ const numbered = groups.map((g) => ({ ...g, steps: g.pages.map((p) => ({ p, n: +
                   <b>{i + 1}</b>
                   <Icon name="check" size={18} />
                 </span>
-                <div class="path-head">
-                  <h3>{st.title[lang]}</h3>
-                  <span class="path-when">{st.when[lang]}</span>
-                </div>
-                <ul class="path-steps">
+                <h3 class="path-head">
+                  <button type="button" class="path-open" aria-expanded="true" aria-controls={`path-${st.id}`}>
+                    <span class="path-name">{st.title[lang]}</span>
+                    <span class="path-when">{st.when[lang]}</span>
+                    <span class="path-n" data-path-n />
+                    <Icon name="chevron" size={18} />
+                  </button>
+                </h3>
+                <ul class="path-steps" id={`path-${st.id}`}>
                   {st.steps.map((step) => (
                     <li>
                       <button type="button" class="path-tick" data-step={step.id} aria-pressed="false" aria-label={`${P.mark}: ${step.title[lang]}`}>
@@ -102,17 +106,17 @@ const numbered = groups.map((g) => ({ ...g, steps: g.pages.map((p) => ({ p, n: +
 
   <div class="wrap">
     {
-      numbered.map((g) => (
-        <section class="chapter" id={g.id}>
-          <div class="chapter-head">
+      numbered.map((g, gi) => (
+        <details class="chapter" id={g.id} open={gi === 0}>
+          <summary class="chapter-head">
             <Illus name={illusOf(g.id)} lang={lang} />
-            <h2>
-              <a href={url(lang, `/topic/${g.id}/`)}>{SECTIONS[g.id].title[lang]}</a>
-            </h2>
-          </div>
+            <h2>{SECTIONS[g.id].title[lang]}</h2>
+            <span class="chapter-n">{g.steps.length}</span>
+            <Icon name="chevron" size={20} />
+          </summary>
           <ol class="steps">
-            {g.steps.map(({ p, n }) => (
-              <li class="reveal row-in" style={`--i:${n % 6}`}>
+            {g.steps.map(({ p }) => (
+              <li>
                 <a href={url(lang, `/guide/${p.slug}/`)}>
                   <strong>{p.entry.data.title}</strong>
                   <span class="step-lead">{p.entry.data.description}</span>
@@ -121,7 +125,7 @@ const numbered = groups.map((g) => ({ ...g, steps: g.pages.map((p) => ({ p, n: +
               </li>
             ))}
           </ol>
-        </section>
+        </details>
       ))
     }
   </div>

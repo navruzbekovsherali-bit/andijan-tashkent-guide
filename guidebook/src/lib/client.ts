@@ -402,6 +402,7 @@ export function initSite() {
     textSize,
     installCard,
     todayWidgets,
+    ratesBox,
     taxCalc,
     stories,
     offline,
@@ -777,6 +778,12 @@ function todayWidgets() {
 
   row.innerHTML = cards.join('');
   rates(row, T);
+}
+
+/** Bank card page: today's Central Bank rates where currency exchange is discussed. */
+function ratesBox() {
+  const box = document.querySelector<HTMLElement>('[data-rates]');
+  if (box) rates(box, TODAY_TX[pageLang()]);
 }
 
 /** Today's official rates from the Central Bank; the card stays away if the bank's site does not answer. */
@@ -1696,6 +1703,16 @@ function expatPath() {
   const bar = box.querySelector<HTMLElement>('[data-path-bar]')!;
   const all = box.querySelector<HTMLElement>('.path-all')!;
   store.set('gb-path-n', String(ticks.length));
+  const setOpen = (st: HTMLElement, on: boolean) => {
+    st.classList.toggle('is-open', on);
+    st.querySelector('.path-open')!.setAttribute('aria-expanded', String(on));
+  };
+  stages.forEach((st) =>
+    st.querySelector('.path-open')!.addEventListener('click', () => {
+      st.dataset.touched = '1';
+      setOpen(st, !st.classList.contains('is-open'));
+    }),
+  );
   const paint = () => {
     ticks.forEach((b) => {
       const on = done.includes(b.dataset.step!);
@@ -1704,10 +1721,15 @@ function expatPath() {
     });
     let current = false;
     stages.forEach((st) => {
-      const full = Array.from(st.querySelectorAll<HTMLButtonElement>('.path-tick')).every((b) => done.includes(b.dataset.step!));
+      const own = Array.from(st.querySelectorAll<HTMLButtonElement>('.path-tick'));
+      const k = own.filter((b) => done.includes(b.dataset.step!)).length;
+      const full = k === own.length;
       st.classList.toggle('is-done', full);
-      st.classList.toggle('is-current', !full && !current);
+      const isCur = !full && !current;
+      st.classList.toggle('is-current', isCur);
       if (!full) current = true;
+      st.querySelector<HTMLElement>('[data-path-n]')!.textContent = `${k}/${own.length}`;
+      if (!st.dataset.touched) setOpen(st, isCur);
     });
     const n = ticks.filter((b) => done.includes(b.dataset.step!)).length;
     count.textContent = String(n);
@@ -1762,6 +1784,11 @@ function installCard() {
   if (!host) return;
   const nav = navigator as Navigator & { standalone?: boolean };
   if (matchMedia('(display-mode: standalone)').matches || nav.standalone === true || store.get('gb-install-hide') === '1') return;
+  // first visit: the guidebook speaks first; the offer comes from the next day on
+  const day = new Date().toISOString().slice(0, 10);
+  const seen = (store.get('gb-visits') || '').split(',').filter(Boolean);
+  if (!seen.includes(day)) store.set('gb-visits', [...seen, day].slice(-3).join(','));
+  if (!seen.some((d) => d !== day)) return;
   const T = INSTALL_TX[pageLang()];
   const ua = navigator.userAgent;
   const ios = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);

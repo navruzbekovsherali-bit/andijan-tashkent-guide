@@ -91,6 +91,7 @@ const ru: Dict = {
   onThisPage: 'На этой странице',
   todayTitle: 'Сегодня для вас',
   videoWeek: 'Видео недели',
+  allQuestions: 'Все вопросы и ответы',
   videoWeekLead: 'Иногда проще посмотреть, чем читать. Короткие ролики по главным темам — по 30 секунд.',
 };
 
@@ -170,6 +171,7 @@ const en: Dict = {
   onThisPage: 'On this page',
   todayTitle: 'Today for you',
   videoWeek: 'Videos of the week',
+  allQuestions: 'All questions and answers',
   videoWeekLead: 'Sometimes watching is easier than reading. Short films on the main topics, 30 seconds each.',
 };
 
@@ -249,6 +251,7 @@ const uz: Dict = {
   onThisPage: 'Ushbu sahifada',
   todayTitle: 'Bugun siz uchun',
   videoWeek: 'Hafta videolari',
+  allQuestions: 'Barcha savollar va javoblar',
   videoWeekLead: 'Baʼzan koʻrish oʻqishdan osonroq. Asosiy mavzular boʻyicha qisqa roliklar — 30 soniyadan.',
 };
 

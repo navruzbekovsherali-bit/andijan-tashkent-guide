@@ -5319,3 +5319,221 @@ a:hover .topic-meta .round-arrow {
 .chip-video {
   box-shadow: none;
 }
+
+
+/* ==========================================================================
+   Quiet pass 3: structure — folded stages, folded chapters, folded FAQ topics
+   ========================================================================== */
+/* route: a stage is one line until it is opened; the current one opens by itself */
+.path-head {
+  margin: 0;
+  min-height: 44px;
+}
+.path-open {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.path-name {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: var(--t-h3);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.path-n {
+  margin-left: auto;
+  font-size: var(--t-small);
+  font-weight: 600;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.path-open svg {
+  color: var(--ink-3);
+  transform: rotate(90deg);
+  transition: transform 260ms var(--ease);
+}
+.path-stage.is-open .path-open svg {
+  transform: rotate(-90deg);
+}
+.path-stage:not(.is-open) .path-steps {
+  display: none;
+}
+.path-stage {
+  padding-bottom: 18px;
+}
+.path-stage.is-open {
+  padding-bottom: 28px;
+}
+
+/* chapters on the hubs: a title row with a count; the list opens on a tap */
+details.chapter {
+  margin-top: 0;
+  border-bottom: 1px solid var(--line);
+}
+details.chapter:first-of-type {
+  margin-top: 40px;
+  border-top: 1px solid var(--line);
+}
+.chapter-head,
+.faq-group-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 72px;
+  margin: 0;
+  padding: 10px 0;
+  list-style: none;
+  cursor: pointer;
+}
+.chapter-head::-webkit-details-marker,
+.faq-group-head::-webkit-details-marker {
+  display: none;
+}
+.chapter-head .illus-frame {
+  width: 52px;
+  padding: 2px;
+}
+.chapter-head h2,
+.faq-group-head h2 {
+  flex: 1;
+  margin: 0;
+  font-size: var(--t-h3);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+.chapter-n {
+  min-width: 28px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--paper-2);
+  font-size: var(--t-small);
+  font-weight: 650;
+  color: var(--ink-2);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.chapter-head > svg,
+.faq-group-head > svg {
+  flex: none;
+  color: var(--ink-3);
+  transform: rotate(90deg);
+  transition: transform 260ms var(--ease);
+}
+details[open] > .chapter-head > svg,
+details[open] > .faq-group-head > svg {
+  transform: rotate(-90deg);
+}
+details.chapter .steps {
+  margin-bottom: 18px;
+}
+details.chapter .steps li:last-child {
+  border-bottom: 0;
+}
+
+/* FAQ: the popular questions are open, topics fold */
+details.faq-group {
+  border-bottom: 1px solid var(--line);
+}
+details.faq-group .faq-list {
+  margin-bottom: 18px;
+}
+details.faq-top {
+  border-bottom: 0;
+  margin-bottom: 18px;
+}
+.faq-group-head .section-title {
+  margin: 0;
+}
+
+/* home: one quiet link to all questions under the popular pages */
+.all-q {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 56px;
+  margin-top: 8px;
+  padding: 0 4px;
+  font-weight: 700;
+  color: var(--brand-ink);
+  text-decoration: none;
+}
+
+/* bank card page: today's rates as one white card in the text */
+.rates-box:empty {
+  display: none;
+}
+.rates-box .w-card {
+  width: 100%;
+  min-height: 0;
+}
+
+/* phones: topic tiles become a short list — small picture, name, count */
+@media (max-width: 559px) {
+  .topic-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+    border-top: 1px solid var(--line);
+  }
+  .topic-card {
+    display: grid;
+    grid-template-columns: 52px 1fr auto;
+    align-items: center;
+    gap: 2px 14px;
+    min-height: 0;
+    padding: 12px 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    border-bottom: 1px solid var(--line);
+  }
+  .topic-card .illus-frame {
+    grid-row: 1 / span 2;
+    width: 52px;
+    padding: 2px;
+  }
+  .topic-title {
+    margin: 0;
+    font-size: var(--t-item);
+  }
+  .topic-meta {
+    grid-column: 2;
+    margin: 0;
+    font-size: var(--t-small);
+  }
+  .topic-meta .round-arrow {
+    display: none;
+  }
+}
+
+.path-open .path-when {
+  flex: none;
+}
+.path-open svg {
+  flex: none;
+}
+@media (max-width: 559px) {
+  .path-open .path-when {
+    display: none;
+  }
+}
+.prose .rates-box a::after {
+  content: none;
+}
+.prose .rates-box a {
+  text-decoration: none;
+}

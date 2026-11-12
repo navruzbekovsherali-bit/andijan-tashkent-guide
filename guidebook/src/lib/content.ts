@@ -89,8 +89,8 @@ export const SECTION_ORDER = Object.keys(SECTIONS) as SectionId[];
 
 /** Hub pages go in the order things happen to you; "about the bank" waits until the urgent things are done. */
 export const HUB_ORDER: Record<Audience, SectionId[]> = {
-  expat: ['arrival', 'first-days', 'living', 'work', 'help', 'family', 'start', 'country', 'travel'],
-  local: ['first-days', 'work', 'help', 'start', 'living', 'family', 'country', 'travel', 'arrival'],
+  expat: ['start', 'arrival', 'first-days', 'living', 'work', 'help', 'family', 'country', 'travel'],
+  local: ['start', 'first-days', 'work', 'help', 'living', 'family', 'country', 'travel', 'arrival'],
 };
 
 /** Slug of an entry without the language folder. */

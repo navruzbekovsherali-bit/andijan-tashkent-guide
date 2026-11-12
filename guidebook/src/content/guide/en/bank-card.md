@@ -57,6 +57,8 @@ Available card types: Visa, Mastercard, UnionPay, HUMO and Uzcard. Ask your onbo
 
 ## Exchanging currency
 
+<div class="rates-box" data-rates></div>
+
 ### Where to exchange
 
 - **Official exchange desks** are in every branch of Hamkorbank and other banks.

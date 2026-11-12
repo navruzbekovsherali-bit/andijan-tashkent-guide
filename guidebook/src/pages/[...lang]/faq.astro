@@ -57,8 +57,12 @@ const blocks = [{ id: 'top', title: tr('topQuestions'), items: top }, ...groups.
 
     {
       blocks.map((g) => (
-        <section class:list={['faq-group', { 'faq-top': g.id === 'top' }]}>
-          <h2 class="section-title">{g.title}</h2>
+        <details class:list={['faq-group', { 'faq-top': g.id === 'top' }]} open={g.id === 'top'}>
+          <summary class="faq-group-head">
+            <h2 class="section-title">{g.title}</h2>
+            <span class="chapter-n">{g.items.length}</span>
+            <Icon name="chevron" size={20} />
+          </summary>
           <div class="faq-list">
             {g.items.map((f) => (
               <details class="faq-item" data-aud-list={f.p.entry.data.audience.join(' ')} data-q={`${f.q} ${f.a}`.toLowerCase()}>
@@ -78,7 +82,7 @@ const blocks = [{ id: 'top', title: tr('topQuestions'), items: top }, ...groups.
               </details>
             ))}
           </div>
-        </section>
+        </details>
       ))
     }
   </div>
@@ -99,8 +103,12 @@ const blocks = [{ id: 'top', title: tr('topQuestions'), items: top }, ...groups.
       if (visible) shown++;
       d.open = visible && terms.length > 0 && shown <= 3;
     });
-    document.querySelectorAll<HTMLElement>('.faq-group').forEach((g) => {
+    document.querySelectorAll<HTMLDetailsElement>('.faq-group').forEach((g) => {
       g.hidden = !g.querySelector('.faq-item:not([hidden]):not([data-miss])');
+      // while searching every topic with a match opens; cleared, only the popular block stays open
+      if (terms.length) g.open = !g.hidden;
+      else if (g.hasAttribute('data-searched')) g.open = g.classList.contains('faq-top');
+      g.toggleAttribute('data-searched', terms.length > 0);
     });
     document.getElementById('faq-empty')!.hidden = shown > 0;
   };

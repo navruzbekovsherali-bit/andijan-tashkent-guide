@@ -56,6 +56,8 @@ Mavjud karta turlari: Visa, Mastercard, UnionPay, HUMO va Uzcard. Limitlar, komi
 
 ## Valyuta ayirboshlash
 
+<div class="rates-box" data-rates></div>
+
 ### Qayerda almashtirish mumkin
 
 - **Rasmiy ayirboshlash shoxobchalari** Hamkorbank va boshqa banklarning har qanday filialida bor.
